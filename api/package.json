@@ -1,0 +1,46 @@
+{
+  "name": "peerprep_user_service_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start:dev": "nodemon",
+    "start": "npm run build && node ./build/main.js",
+    "build": "rimraf ./build && tsc",
+    "test": "jest ./tests",
+    "format": "prettier --config .prettierrc --write 'src/**/*.ts' --write 'tests/**/*.ts'",
+    "lint": "eslint . --ext .ts",
+    "fix": "npm run format && eslint . --ext .ts --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
+    "@types/bcrypt": "^5.0.0",
+    "@types/cookie-parser": "^1.4.4",
+    "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.5",
+    "@types/node": "^20.6.0",
+    "@types/pg": "^8.10.2",
+    "@types/uuid": "^9.0.3",
+    "@typescript-eslint/eslint-plugin": "^6.6.0",
+    "@typescript-eslint/parser": "^6.6.0",
+    "eslint": "^8.49.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-jsdoc": "^46.8.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3",
+    "rimraf": "^5.0.1",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "uuid": "^9.0.0"
+  }
+}
