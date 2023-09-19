@@ -127,6 +127,26 @@ export async function updateUserProfileEntry(
   return result.rowCount > 0;
 }
 
+/**
+ * Deletes the entry for the user profile which belongs to the user who owns
+ * the session token {@link token}.
+ * @param client - Client for communicating with the database.
+ * @param token - Session token belonging to the user.
+ * @returns True if the entry was deleted. False if no entry is deleted due to
+ * the session token {@link token} being an invalid token.
+ */
+export async function deleteUserProfileEntry(
+  client: pg.ClientBase,
+  token: string,
+): Promise<boolean> {
+  const result: pg.QueryResult = await client.query(
+    'DELETE FROM User_Profiles ' +
+      'WHERE user_id IN (SELECT user_id FROM User_Sessions WHERE token=$1)',
+    [token],
+  );
+
+  return result.rowCount > 0;
+}
 
 /**
  * @param err - The error to check.
