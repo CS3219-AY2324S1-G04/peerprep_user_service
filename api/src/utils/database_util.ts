@@ -30,6 +30,37 @@ export async function fetchPasswordHashFromUsername(
 }
 
 /**
+ * Fetches the user profile of the user who the session token {@link token}
+ * belongs to.
+ * @param client - Client for communicating with the database.
+ * @param token - Session token belonging to the user.
+ * @returns Profile of the user if a user who owns the session token exist.
+ * Else, returns undefined.
+ */
+export async function fetchUserProfileFromToken(
+  client: pg.ClientBase,
+  token: string,
+): Promise<UserProfile | undefined> {
+  const result: pg.QueryResult = await client.query(
+    'SELECT * FROM User_Profiles WHERE user_id IN (' +
+      '  SELECT user_id FROM User_Sessions ' +
+      '  WHERE token=$1 AND expire_time > CURRENT_TIMESTAMP)',
+    [token],
+  );
+
+  if (result.rows.length == 0) {
+    return undefined;
+  }
+
+  return new UserProfile(
+    result.rows[0]['user_id'],
+    result.rows[0]['username'],
+    result.rows[0]['email'],
+    result.rows[0]['role'],
+  );
+}
+
+/**
  * Creates an entry in the database for a user profile and another entry for a
  * user credential corresponding to the user profile.
  * @param client - Client for communicating with the database.
