@@ -104,6 +104,31 @@ export async function createUserSessionEntry(
 }
 
 /**
+ * Updates the entry for the user profile which belongs to the user who owns
+ * the session token {@link token}.
+ * @param client - Client for communicating with the database.
+ * @param userProfile - Details of the user's profile.
+ * @param token - Session token belonging to the user.
+ * @returns True if the entry was updated. False if no entry is updated due to
+ * the session token {@link token} being an invalid token.
+ */
+export async function updateUserProfileEntry(
+  client: pg.ClientBase,
+  userProfile: UserProfile,
+  token: string,
+): Promise<boolean> {
+  const result: pg.QueryResult = await client.query(
+    'UPDATE User_Profiles SET username=$1, email=$2 WHERE user_id IN (' +
+      '  SELECT user_id FROM User_Sessions ' +
+      '  WHERE token=$3 AND expire_time > CURRENT_TIMESTAMP)',
+    [userProfile.username, userProfile.email, token],
+  );
+
+  return result.rowCount > 0;
+}
+
+
+/**
  * @param err - The error to check.
  * @returns True if {@link err} is an {@link Error} caused by a duplicated user
  * profile username in the user_profiles database relation.
