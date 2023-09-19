@@ -9,4 +9,4 @@ RUN chmod 744 /docker-entrypoint-initdb.d/init_db.sh
 ENV POSTGRES_DB="user"
 ENV ADMIN_PASSWORD=""
 ENV ADMIN_EMAIL=""
-ENV HASH_SALT_ROUNDS=10
+ENV HASH_COST=10

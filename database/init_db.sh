@@ -5,8 +5,8 @@ if ! [[ $ADMIN_EMAIL =~ ^[^[:space:]]+@[a-z0-9.-]+[a-z0-9-]$ ]]; then
     exit 1
 fi
 
-if ! [[ $HASH_SALT_ROUNDS =~ ^[0-9]+$ && $HASH_SALT_ROUNDS -gt 0 ]]; then
-    echo "ERROR: HASH_SALT_ROUNDS must be a positive integer."
+if ! [[ $HASH_COST =~ ^[0-9]+$ && $HASH_COST -gt 0 ]]; then
+    echo "ERROR: HASH_COST must be a positive integer."
     exit 1
 fi
 
@@ -14,7 +14,7 @@ if [[ $ADMIN_PASSWORD = "" ]]; then
     ADMIN_PASSWORD=$POSTGRES_PASSWORD
 fi
 
-password_hash=$(htpasswd -bnBC $HASH_SALT_ROUNDS "" $ADMIN_PASSWORD | sed 's/:$2y/$2b/')
+password_hash=$(htpasswd -bnBC $HASH_COST "" $ADMIN_PASSWORD | sed 's/:$2y/$2b/')
 admin_email=$(echo $ADMIN_EMAIL | tr '[:upper:]' '[:lower:]')
 
 psql -U postgres -d user -f /init.sql -c \
