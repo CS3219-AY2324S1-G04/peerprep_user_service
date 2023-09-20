@@ -5,7 +5,7 @@ import express from 'express';
 import pg from 'pg';
 
 import HttpInfoError from '../../errors/http_info_error';
-import { deleteUserProfileEntry } from '../../utils/database_util';
+import { deleteUserProfile } from '../../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles deleting the user who sent the request. */
@@ -29,11 +29,11 @@ export default class DeleteUserHandler implements Handler {
     return token;
   }
 
-  private static async _deleteUserProfileEntry(
+  private static async _deleteUserProfile(
     client: pg.ClientBase,
     token: string,
   ) {
-    if (!(await deleteUserProfileEntry(client, token))) {
+    if (!(await deleteUserProfile(client, token))) {
       throw new HttpInfoError(401);
     }
   }
@@ -59,7 +59,7 @@ export default class DeleteUserHandler implements Handler {
   ): Promise<void> {
     try {
       const token: string = DeleteUserHandler._parseCookie(req.cookies);
-      await DeleteUserHandler._deleteUserProfileEntry(client, token);
+      await DeleteUserHandler._deleteUserProfile(client, token);
 
       res.sendStatus(200);
     } catch (e) {

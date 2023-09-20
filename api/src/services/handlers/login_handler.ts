@@ -10,7 +10,7 @@ import { v4 as uuidV4 } from 'uuid';
 import HttpInfoError from '../../errors/http_info_error';
 import { parsePassword, parseUsername } from '../../utils/data_parser';
 import {
-  createUserSessionEntry,
+  createUserSession,
   fetchPasswordHashFromUsername,
   isDuplicateUserSessionTokenError,
 } from '../../utils/database_util';
@@ -50,7 +50,7 @@ export default class LoginHandler implements Handler {
     sessionExpireMillis: number,
   ): Promise<[string, Date]> {
     await LoginHandler._verifyIdentity(client, username, password);
-    return await LoginHandler._createSession(
+    return await LoginHandler._createUserSession(
       client,
       username,
       sessionExpireMillis,
@@ -92,7 +92,7 @@ export default class LoginHandler implements Handler {
     return await bcrypt.compare(password, passwordHash);
   }
 
-  private static async _createSession(
+  private static async _createUserSession(
     client: pg.ClientBase,
     username: string,
     sessionExpireMillis: number,
@@ -107,13 +107,7 @@ export default class LoginHandler implements Handler {
       token = uuidV4();
 
       try {
-        await createUserSessionEntry(
-          client,
-          token,
-          username,
-          loginTime,
-          expireTime,
-        );
+        await createUserSession(client, token, username, loginTime, expireTime);
 
         isEntryCreated = true;
       } catch (e) {

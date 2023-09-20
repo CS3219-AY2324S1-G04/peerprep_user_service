@@ -10,7 +10,7 @@ import { parseEmail, parseUsername } from '../../utils/data_parser';
 import {
   isDuplicateUserProfileEmailError,
   isDuplicateUserProfileUsernameError,
-  updateUserProfileEntry,
+  updateUserProfile,
 } from '../../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
@@ -46,13 +46,13 @@ export default class UpdateUserProfileHandler implements Handler {
     }
   }
 
-  private static async _updateUserProfileEntry(
+  private static async _updateUserProfile(
     client: pg.ClientBase,
     userProfile: UserProfile,
     token: string,
   ): Promise<void> {
     try {
-      if (!(await updateUserProfileEntry(client, userProfile, token))) {
+      if (!(await updateUserProfile(client, userProfile, token))) {
         throw new HttpInfoError(401);
       }
     } catch (e) {
@@ -94,7 +94,7 @@ export default class UpdateUserProfileHandler implements Handler {
         req.query,
       );
 
-      await UpdateUserProfileHandler._updateUserProfileEntry(
+      await UpdateUserProfileHandler._updateUserProfile(
         client,
         userProfile,
         token,

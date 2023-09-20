@@ -93,7 +93,7 @@ export default class Config {
   public readonly port: number;
   /** Cost factor of the password hashing algorithm. */
   public readonly hashCost: number;
-  /** Number of milliseconds a login session can last for. */
+  /** Number of milliseconds a user login session can last for. */
   public readonly sessionExpireMillis: number;
 
   /**

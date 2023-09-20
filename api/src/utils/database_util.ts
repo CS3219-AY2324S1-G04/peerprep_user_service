@@ -67,7 +67,7 @@ export async function fetchUserProfileFromToken(
  * @param userProfile - Details of the user profile.
  * @param passwordHash - Hash of the user's password.
  */
-export async function createUserProfileAndCredentialEntry(
+export async function createUserProfileAndCredential(
   client: pg.ClientBase,
   userProfile: UserProfile,
   passwordHash: string,
@@ -89,7 +89,7 @@ export async function createUserProfileAndCredentialEntry(
  * @param loginTime - Time of session creation.
  * @param expireTime - Time of session expiry.
  */
-export async function createUserSessionEntry(
+export async function createUserSession(
   client: pg.ClientBase,
   token: string,
   username: string,
@@ -104,15 +104,15 @@ export async function createUserSessionEntry(
 }
 
 /**
- * Updates the entry for the user profile which belongs to the user who owns
- * the session token {@link token}.
+ * Updates the entry in the database for the user profile which belongs to the
+ * user who owns the session token {@link token}.
  * @param client - Client for communicating with the database.
  * @param userProfile - Details of the user's profile.
  * @param token - Session token belonging to the user.
- * @returns True if the entry was updated. False if no entry is updated due to
+ * @returns True if an entry was updated. False if no entry was updated due to
  * the session token {@link token} being an invalid token.
  */
-export async function updateUserProfileEntry(
+export async function updateUserProfile(
   client: pg.ClientBase,
   userProfile: UserProfile,
   token: string,
@@ -128,14 +128,14 @@ export async function updateUserProfileEntry(
 }
 
 /**
- * Deletes the entry for the user profile which belongs to the user who owns
- * the session token {@link token}.
+ * Deletes the entry in the database for the user profile which belongs to the
+ * user who owns the session token {@link token}.
  * @param client - Client for communicating with the database.
  * @param token - Session token belonging to the user.
- * @returns True if the entry was deleted. False if no entry is deleted due to
+ * @returns True if an entry was deleted. False if no entry was deleted due to
  * the session token {@link token} being an invalid token.
  */
-export async function deleteUserProfileEntry(
+export async function deleteUserProfile(
   client: pg.ClientBase,
   token: string,
 ): Promise<boolean> {
@@ -149,14 +149,14 @@ export async function deleteUserProfileEntry(
 }
 
 /**
- * Deletes the entry for the user session which has the session token
- * {@link token}.
+ * Deletes the entry in the database for the user session which has the session
+ * token {@link token}.
  * @param client - Client for communicating wih the database.
  * @param token - Session token belonging to the user.
- * @returns True if the entry was deleted. False if no entry was deleted due to
+ * @returns True if an entry was deleted. False if no entry was deleted due to
  * the session token {@link token} being an invalid token.
  */
-export async function deleteUserSessionEntry(
+export async function deleteUserSession(
   client: pg.ClientBase,
   token: string,
 ): Promise<boolean> {

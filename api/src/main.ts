@@ -23,8 +23,8 @@ const pgPool: pg.Pool = new pg.Pool({
   idleTimeoutMillis: config.pgPoolIdleTimeoutMillis,
 });
 
-// TODO: Admin account
 // TODO: Change password
+// TODO: Check if session token is valid
 const app: App = new App(config.port, pgPool, [
   new RegisterHandler(config.hashCost),
   new LoginHandler(config.sessionExpireMillis),

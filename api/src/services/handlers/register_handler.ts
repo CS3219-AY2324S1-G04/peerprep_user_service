@@ -13,7 +13,7 @@ import {
   parseUsername,
 } from '../../utils/data_parser';
 import {
-  createUserProfileAndCredentialEntry,
+  createUserProfileAndCredential,
   isDuplicateUserProfileEmailError,
   isDuplicateUserProfileUsernameError,
 } from '../../utils/database_util';
@@ -62,7 +62,7 @@ export default class RegisterHandler implements Handler {
       hashSaltRounds,
     );
 
-    await RegisterHandler._createUserProfileAndCredentialEntry(
+    await RegisterHandler._createUserProfileAndCredential(
       client,
       userProfile,
       passwordHash,
@@ -76,17 +76,13 @@ export default class RegisterHandler implements Handler {
     return await bcrypt.hash(password, await bcrypt.genSalt(hashSaltRounds));
   }
 
-  private static async _createUserProfileAndCredentialEntry(
+  private static async _createUserProfileAndCredential(
     client: pg.ClientBase,
     userProfile: UserProfile,
     passwordHash: string,
   ): Promise<void> {
     try {
-      await createUserProfileAndCredentialEntry(
-        client,
-        userProfile,
-        passwordHash,
-      );
+      await createUserProfileAndCredential(client, userProfile, passwordHash);
     } catch (e) {
       if (isDuplicateUserProfileUsernameError(e)) {
         throw new HttpInfoError(400, 'Username already in use.');

@@ -30,7 +30,7 @@ export default class GetUserProfileHandler implements Handler {
     return token;
   }
 
-  private static async _fetchUserProfileFromToken(
+  private static async _fetchUserProfile(
     client: pg.ClientBase,
     token: string,
   ): Promise<UserProfile> {
@@ -65,7 +65,7 @@ export default class GetUserProfileHandler implements Handler {
     try {
       const token: string = GetUserProfileHandler._parseCookie(req.cookies);
       const userProfile: UserProfile =
-        await GetUserProfileHandler._fetchUserProfileFromToken(client, token);
+        await GetUserProfileHandler._fetchUserProfile(client, token);
 
       res.status(200).send(JSON.stringify(userProfile));
     } catch (e) {
