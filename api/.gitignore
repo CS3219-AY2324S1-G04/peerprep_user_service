@@ -1,3 +1,4 @@
 .vscode/
 build/
+docker-build/
 node_modules/

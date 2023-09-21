@@ -1,0 +1,22 @@
+FROM node:lts-hydrogen
+
+COPY ./build /peerprep_user_service_api/
+COPY package.json /peerprep_user_service_api/
+
+WORKDIR /peerprep_user_service_api
+
+RUN npm install --omit=dev -y
+
+ENV PG_PASSWORD=""
+ENV PG_USER=""
+ENV PG_HOST=""
+ENV PG_PORT=""
+ENV PG_DATABASE=""
+ENV PG_POOL_CONNECTION_TIMEOUT_MILLIS=""
+ENV PG_POOL_IDLE_TIMEOUT_MILLIS=""
+ENV PG_POOL_MAX=""
+ENV PORT=""
+ENV HASH_COST=""
+ENV SESSION_EXPIRE_MILLIS=""
+
+CMD node main.js
