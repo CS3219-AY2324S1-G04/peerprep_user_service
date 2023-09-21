@@ -59,8 +59,8 @@ export default class App {
 
   /** Starts the app. */
   public start(): void {
-    this._app.listen(this._port, () => {
-      console.log(`App is listening on http://localhost:${this._port}`);
+    this._app.listen(this._port, '0.0.0.0', () => {
+      console.log(`App is listening on ${this._port}`);
     });
   }
 
