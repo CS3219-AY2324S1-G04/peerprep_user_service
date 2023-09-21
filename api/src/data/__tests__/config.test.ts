@@ -3,7 +3,7 @@
  */
 import { AssertionError } from 'assert';
 
-import Config from '../../src/data/config';
+import Config from '../config';
 
 describe('Config', () => {
   describe('constructor', () => {
