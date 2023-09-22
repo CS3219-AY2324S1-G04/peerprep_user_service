@@ -111,12 +111,18 @@ export default class Config {
       'Postgres database password not specified via the environment variable "PG_PASSWORD".',
     );
 
-    this.pgPassword = env[Config.pgPasswordEnvVar] as string;
-    this.pgUser = env[Config.pgUserEnvVar] ?? Config.defaultPgUser;
-    this.pgHost = env[Config.pgHostEnvVar] ?? Config.defaultPgHost;
+    this.pgPassword = Config._parseString(
+      env[Config.pgPasswordEnvVar],
+    ) as string;
+    this.pgUser =
+      Config._parseString(env[Config.pgUserEnvVar]) ?? Config.defaultPgUser;
+    this.pgHost =
+      Config._parseString(env[Config.pgHostEnvVar]) ?? Config.defaultPgHost;
     this.pgPort =
       Config._parseInt(env[Config.pgPortEnvVar]) ?? Config.defaultPgPort;
-    this.pgDatabase = env[Config.pgDatabaseEnvVar] ?? Config.defaultPgDatabase;
+    this.pgDatabase =
+      Config._parseString(env[Config.pgDatabaseEnvVar]) ??
+      Config.defaultPgDatabase;
 
     this.pgPoolConnectionTimeoutMillis =
       Config._parseInt(env[Config.pgPoolConnectionTimeoutMillisEnvVar]) ??
@@ -133,6 +139,14 @@ export default class Config {
     this.sessionExpireMillis =
       Config._parseInt(env[Config.sessionExpireMillisEnvVar]) ??
       Config.defaultSessionExpireMillis;
+  }
+
+  private static _parseString(raw: string | undefined): string | undefined {
+    if (raw === undefined || raw === '') {
+      return undefined;
+    }
+
+    return raw;
   }
 
   private static _parseInt(raw: string | undefined): number | undefined {
