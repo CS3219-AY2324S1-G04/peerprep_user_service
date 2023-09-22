@@ -1,7 +1,7 @@
 #!/bin/bash
 
 image_tag="peerprep_user_service_database"
-export_dir="./docker-build"
+export_dir="./docker_build"
 export_file="$export_dir/peerprep_user_service_database.tar"
 
 echo "Building image ..."
