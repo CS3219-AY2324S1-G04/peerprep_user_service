@@ -1,6 +1,21 @@
 # PeerPrep User Service
 
+Handles the storing and retrieving of user information.
+
+The build script `build_image.sh` produces 2 docker images.
+- `peerprep_user_service_database` - the database for storing user information.
+- `peerprep_user_service_api` - the REST API for interacting with the database.
+
+Note that when a `peerprep_user_service_database` container is created, a default admin account, with user name `admin`, is created as well.
+
+## Table of Contents
+
 - [PeerPrep User Service](#peerprep-user-service)
+  - [Quickstart Guide](#quickstart-guide)
+  - [Environment Variables](#environment-variables)
+    - [Common](#common)
+    - [Database](#database)
+    - [API](#api)
   - [REST API](#rest-api)
     - [Register a User](#register-a-user)
     - [Login to a Session](#login-to-a-session)
@@ -8,6 +23,38 @@
     - [Get the User Profile](#get-the-user-profile)
     - [Update the User Profile](#update-the-user-profile)
     - [Delete a User](#delete-a-user)
+
+## Quickstart Guide
+
+1. Clone this repository.
+2. Build the docker images by running: `./build_image.sh`
+3. Modify the `.env` file as per needed. Refer to [Environment Variables](#environment-variables) for a list of configs. It is recommended that you modify `POSTGRES_PASSWORD` and `ADMIN_EMAIL`.
+4. Create the docker containers by running: `docker compose up`
+
+## Environment Variables
+
+### Common
+
+These environment variables are used by both the API and database images.
+
+* `POSTGRES_PASSWORD` - Password of the database.
+* `POSTGRES_USER` - User on the database host.
+* `POSTGRES_DB` - Name of the database.
+* `HASH_COST` - Cost factor of the password hashing algorithm.
+
+### Database
+
+* `ADMIN_EMAIL` - Email of the default admin user.
+* `ADMIN_PASSWORD` - Password of the default admin user.
+
+### API
+
+* `PORT` - Port to listen on.
+* `POSTGRES_PORT` - Port the database is listening on. This environment variable can be ignored if using docker compose.
+* `POSTGRES_POOL_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
+* `POSTGRES_POOL_IDLE_TIMEOUT_MILLIS` - Number of milliseconds a database client can remain idle for before being disconnected.
+* `POSTGRES_POOL_MAX` - Max number of database clients.
+* `SESSION_EXPIRE_MILLIS` - The number of milliseconds a login session can last for.
 
 ## REST API
 
