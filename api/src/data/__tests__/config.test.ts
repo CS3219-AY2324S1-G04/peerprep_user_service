@@ -88,7 +88,7 @@ describe('Config', () => {
       expect(new Config(createEnv(baseConfig))).toEqual(baseConfig);
     });
 
-    test('PG_PASSWORD missing | Throws AssertionError', () => {
+    test('POSTGRES_PASSWORD missing | Throws AssertionError', () => {
       const env: NodeJS.ProcessEnv = createEnv(baseConfig);
       delete env[Config.pgPasswordEnvVar];
 

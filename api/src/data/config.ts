@@ -6,30 +6,30 @@ import assert from 'assert';
 /** Represents the app's configs. */
 export default class Config {
   /** Name of the environment variable corresponding to {@link pgPassword}. */
-  public static readonly pgPasswordEnvVar: string = 'PG_PASSWORD';
+  public static readonly pgPasswordEnvVar: string = 'POSTGRES_PASSWORD';
   /** Name of the environment variable corresponding to {@link pgUser}. */
-  public static readonly pgUserEnvVar: string = 'PG_USER';
+  public static readonly pgUserEnvVar: string = 'POSTGRES_USER';
   /** Name of the environment variable corresponding to {@link pgHost}. */
-  public static readonly pgHostEnvVar: string = 'PG_HOST';
+  public static readonly pgHostEnvVar: string = 'POSTGRES_HOST';
   /** Name of the environment variable corresponding to {@link pgPort}. */
-  public static readonly pgPortEnvVar: string = 'PG_PORT';
+  public static readonly pgPortEnvVar: string = 'POSTGRES_PORT';
   /** Name of the environment variable corresponding to {@link pgDatabase}. */
-  public static readonly pgDatabaseEnvVar: string = 'PG_DATABASE';
+  public static readonly pgDatabaseEnvVar: string = 'POSTGRES_DB';
 
   /**
    * Name of the environment variable corresponding to
    * {@link pgPoolConnectionTimeoutMillis}.
    */
   public static readonly pgPoolConnectionTimeoutMillisEnvVar: string =
-    'PG_POOL_CONNECTION_TIMEOUT_MILLIS';
+    'POSTGRES_POOL_CONNECTION_TIMEOUT_MILLIS';
   /**
    * Name of the environment variable corresponding to
    * {@link pgPoolIdleTimeoutMillis}.
    */
   public static readonly pgPoolIdleTimeoutMillisEnvVar: string =
-    'PG_POOL_IDLE_TIMEOUT_MILLIS';
+    'POSTGRES_POOL_IDLE_TIMEOUT_MILLIS';
   /** Name of the environment variable corresponding to {@link pgPoolMax}. */
-  public static readonly pgPoolMaxEnvVar: string = 'PG_POOL_MAX';
+  public static readonly pgPoolMaxEnvVar: string = 'POSTGRES_POOL_MAX';
 
   /** Name of the environment variable corresponding to {@link port}. */
   public static readonly portEnvVar: string = 'PORT';
@@ -108,7 +108,7 @@ export default class Config {
   public constructor(env: NodeJS.ProcessEnv = process.env) {
     assert(
       env[Config.pgPasswordEnvVar] !== undefined,
-      'Postgres database password not specified via the environment variable "PG_PASSWORD".',
+      'Postgres database password not specified via the environment variable "POSTGRES_PASSWORD".',
     );
 
     this.pgPassword = Config._parseString(
