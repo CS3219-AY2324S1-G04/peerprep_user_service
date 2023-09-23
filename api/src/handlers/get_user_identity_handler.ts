@@ -20,7 +20,7 @@ export default class GetUserIdentityHandler implements Handler {
   }
 
   public get path(): string {
-    return '/user_service/identity';
+    return '/user_service/user/identity';
   }
 
   private static _getSessionToken(

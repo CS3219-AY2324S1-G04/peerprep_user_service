@@ -120,7 +120,7 @@ Logout of the current session.
 
 ### Get the User Profile
 
-> [GET] `/user_service/profile`
+> [GET] `/user_service/user/profile`
 
 Gets the user's profile information.
 
@@ -145,7 +145,7 @@ Gets the user's profile information.
 
 ### Update the User Profile
 
-> [POST] `/user_service/profile`
+> [POST] `/user_service/user/profile`
 
 Updates the profile of the current user.
 
@@ -190,7 +190,7 @@ Deletes the current user.
 
 ### Get the User Identity
 
-> [GET] `/user_service/identity`
+> [GET] `/user_service/user/identity`
 
 Gets the user's ID and role.
 
