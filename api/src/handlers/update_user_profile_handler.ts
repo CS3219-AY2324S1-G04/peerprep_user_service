@@ -4,18 +4,18 @@
 import express from 'express';
 import pg from 'pg';
 
-import UserProfile from '../../data/user_profile';
-import HttpInfoError from '../../errors/http_info_error';
+import UserProfile from '../data_structs/user_profile';
+import HttpInfoError from '../errors/http_info_error';
 import {
   parseEmail,
   parseSessionToken,
   parseUsername,
-} from '../../utils/data_parser';
+} from '../utils/data_parser';
 import {
   isDuplicateUserProfileEmailError,
   isDuplicateUserProfileUsernameError,
   updateUserProfile,
-} from '../../utils/database_util';
+} from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles updating the profile of the user who sent the request. */

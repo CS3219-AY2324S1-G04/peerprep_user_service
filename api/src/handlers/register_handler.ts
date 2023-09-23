@@ -5,18 +5,14 @@ import bcrypt from 'bcrypt';
 import express from 'express';
 import pg from 'pg';
 
-import UserProfile from '../../data/user_profile';
-import HttpInfoError from '../../errors/http_info_error';
-import {
-  parseEmail,
-  parsePassword,
-  parseUsername,
-} from '../../utils/data_parser';
+import UserProfile from '../data_structs/user_profile';
+import HttpInfoError from '../errors/http_info_error';
+import { parseEmail, parsePassword, parseUsername } from '../utils/data_parser';
 import {
   createUserProfileAndCredential,
   isDuplicateUserProfileEmailError,
   isDuplicateUserProfileUsernameError,
-} from '../../utils/database_util';
+} from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user registration. */

@@ -3,8 +3,8 @@
  */
 import pg from 'pg';
 
-import UserIdentity from '../data/user_identity';
-import UserProfile from '../data/user_profile';
+import UserIdentity from '../data_structs/user_identity';
+import UserProfile from '../data_structs/user_profile';
 
 /**
  * Fetches the password hash of the user whose username is {@link username}.

@@ -3,15 +3,15 @@
  */
 import pg from 'pg';
 
-import Config from './data/config';
-import App from './services/app';
-import DeleteUserHandler from './services/handlers/delete_user_handler';
-import GetUserIdentityHandler from './services/handlers/get_user_identity_handler';
-import GetUserProfileHandler from './services/handlers/get_user_profile_handler';
-import LoginHandler from './services/handlers/login_handler';
-import LogoutHandler from './services/handlers/logout_handler';
-import RegisterHandler from './services/handlers/register_handler';
-import UpdateUserProfileHandler from './services/handlers/update_user_profile_handler';
+import App from './app';
+import Config from './data_structs/config';
+import DeleteUserHandler from './handlers/delete_user_handler';
+import GetUserIdentityHandler from './handlers/get_user_identity_handler';
+import GetUserProfileHandler from './handlers/get_user_profile_handler';
+import LoginHandler from './handlers/login_handler';
+import LogoutHandler from './handlers/logout_handler';
+import RegisterHandler from './handlers/register_handler';
+import UpdateUserProfileHandler from './handlers/update_user_profile_handler';
 
 const config: Config = new Config();
 const pgPool: pg.Pool = new pg.Pool({

@@ -5,10 +5,10 @@ import express from 'express';
 import pg from 'pg';
 import qs from 'qs';
 
-import UserIdentity from '../../data/user_identity';
-import HttpInfoError from '../../errors/http_info_error';
-import { parseSessionToken } from '../../utils/data_parser';
-import { fetchUserIdentityFromToken } from '../../utils/database_util';
+import UserIdentity from '../data_structs/user_identity';
+import HttpInfoError from '../errors/http_info_error';
+import { parseSessionToken } from '../utils/data_parser';
+import { fetchUserIdentityFromToken } from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /**

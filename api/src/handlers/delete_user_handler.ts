@@ -4,9 +4,9 @@
 import express from 'express';
 import pg from 'pg';
 
-import HttpInfoError from '../../errors/http_info_error';
-import { parseSessionToken } from '../../utils/data_parser';
-import { deleteUserProfile } from '../../utils/database_util';
+import HttpInfoError from '../errors/http_info_error';
+import { parseSessionToken } from '../utils/data_parser';
+import { deleteUserProfile } from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles deleting the user who sent the request. */

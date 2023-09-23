@@ -7,13 +7,13 @@ import pg from 'pg';
 import qs from 'qs';
 import { v4 as uuidV4 } from 'uuid';
 
-import HttpInfoError from '../../errors/http_info_error';
-import { parsePassword, parseUsername } from '../../utils/data_parser';
+import HttpInfoError from '../errors/http_info_error';
+import { parsePassword, parseUsername } from '../utils/data_parser';
 import {
   createUserSession,
   fetchPasswordHashFromUsername,
   isDuplicateUserSessionTokenError,
-} from '../../utils/database_util';
+} from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user login. */

@@ -4,10 +4,10 @@
 import express from 'express';
 import pg from 'pg';
 
-import UserProfile from '../../data/user_profile';
-import HttpInfoError from '../../errors/http_info_error';
-import { parseSessionToken } from '../../utils/data_parser';
-import { fetchUserProfileFromToken } from '../../utils/database_util';
+import UserProfile from '../data_structs/user_profile';
+import HttpInfoError from '../errors/http_info_error';
+import { parseSessionToken } from '../utils/data_parser';
+import { fetchUserProfileFromToken } from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles getting the profile of the user who sent the request. */
