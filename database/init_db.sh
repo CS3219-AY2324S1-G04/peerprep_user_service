@@ -17,7 +17,7 @@ fi
 password_hash=$(htpasswd -bnBC $HASH_COST "" $ADMIN_PASSWORD | sed 's/:$2y/$2b/')
 admin_email=$(echo $ADMIN_EMAIL | tr '[:upper:]' '[:lower:]')
 
-psql -U postgres -d user -f /init.sql -c \
+psql -U $POSTGRES_USER -d $POSTGRES_DB -f /init.sql -c \
 "INSERT INTO User_Profiles (username, email, role) VALUES ('admin', '$admin_email', 'admin');
 INSERT INTO User_Credentials VALUES (1, '$password_hash');"
 
