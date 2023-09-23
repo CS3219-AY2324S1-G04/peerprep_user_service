@@ -5,6 +5,7 @@ import express from 'express';
 import pg from 'pg';
 
 import HttpInfoError from '../../errors/http_info_error';
+import { parseSessionToken } from '../../utils/data_parser';
 import { deleteUserSession } from '../../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
@@ -21,12 +22,11 @@ export default class LogoutHandler implements Handler {
   private static _parseCookie(cookies: {
     [x: string]: string | undefined;
   }): string {
-    const token: string | undefined = cookies['session_token'];
-    if (token === undefined) {
+    try {
+      return parseSessionToken(cookies['session_token']);
+    } catch (e) {
       throw new HttpInfoError(401);
     }
-
-    return token;
   }
 
   private static async _deleteUserSession(

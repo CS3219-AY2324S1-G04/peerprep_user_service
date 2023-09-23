@@ -6,6 +6,7 @@ import pg from 'pg';
 
 import UserProfile from '../../data/user_profile';
 import HttpInfoError from '../../errors/http_info_error';
+import { parseSessionToken } from '../../utils/data_parser';
 import { fetchUserProfileFromToken } from '../../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
@@ -22,12 +23,11 @@ export default class GetUserProfileHandler implements Handler {
   private static _parseCookie(cookies: {
     [x: string]: string | undefined;
   }): string {
-    const token: string | undefined = cookies['session_token'];
-    if (token === undefined) {
+    try {
+      return parseSessionToken(cookies['session_token']);
+    } catch (e) {
       throw new HttpInfoError(401);
     }
-
-    return token;
   }
 
   private static async _fetchUserProfile(

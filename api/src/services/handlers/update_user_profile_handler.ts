@@ -6,7 +6,11 @@ import pg from 'pg';
 
 import UserProfile from '../../data/user_profile';
 import HttpInfoError from '../../errors/http_info_error';
-import { parseEmail, parseUsername } from '../../utils/data_parser';
+import {
+  parseEmail,
+  parseSessionToken,
+  parseUsername,
+} from '../../utils/data_parser';
 import {
   isDuplicateUserProfileEmailError,
   isDuplicateUserProfileUsernameError,
@@ -27,12 +31,11 @@ export default class UpdateUserProfileHandler implements Handler {
   private static _parseCookie(cookies: {
     [x: string]: string | undefined;
   }): string {
-    const token: string | undefined = cookies['session_token'];
-    if (token === undefined) {
+    try {
+      return parseSessionToken(cookies['session_token']);
+    } catch (e) {
       throw new HttpInfoError(401);
     }
-
-    return token;
   }
 
   private static _parseQuery(query: qs.ParsedQs): UserProfile {
