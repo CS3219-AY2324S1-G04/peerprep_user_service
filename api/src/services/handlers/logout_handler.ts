@@ -15,7 +15,7 @@ export default class LogoutHandler implements Handler {
   }
 
   public get path(): string {
-    return '/logout';
+    return '/user_service/logout';
   }
 
   private static _parseCookie(cookies: {

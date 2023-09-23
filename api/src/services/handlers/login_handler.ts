@@ -29,7 +29,7 @@ export default class LoginHandler implements Handler {
   }
 
   public get path(): string {
-    return '/login';
+    return '/user_service/login';
   }
 
   private static _parseQuery(query: qs.ParsedQs): [string, string] {

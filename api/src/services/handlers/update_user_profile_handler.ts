@@ -21,7 +21,7 @@ export default class UpdateUserProfileHandler implements Handler {
   }
 
   public get path(): string {
-    return '/user';
+    return '/user_service/profile';
   }
 
   private static _parseCookie(cookies: {

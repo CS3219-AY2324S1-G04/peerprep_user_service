@@ -16,7 +16,7 @@ export default class GetUserProfileHandler implements Handler {
   }
 
   public get path(): string {
-    return '/user';
+    return '/user_service/profile';
   }
 
   private static _parseCookie(cookies: {

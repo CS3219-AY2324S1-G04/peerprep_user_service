@@ -15,7 +15,7 @@ export default class DeleteUserHandler implements Handler {
   }
 
   public get path(): string {
-    return '/user';
+    return '/user_service/user';
   }
 
   private static _parseCookie(cookies: {
