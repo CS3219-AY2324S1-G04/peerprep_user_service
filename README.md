@@ -131,6 +131,15 @@ Gets the user's profile information.
 **Response**
 
 - `200` - Success. User's profile information is stored as a JSON string in the response body.
+  - Example response body:
+    ```json
+    {
+      "userId": 2,
+      "role": "user",
+      "username": "foo",
+      "email": "foo@example.com"
+    }
+    ```
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
 
@@ -198,5 +207,13 @@ This is similar to [Get the User Profile](#get-the-user-profile) but sends less 
 **Response**
 
 - `200` - Success. User's ID and role is stored as a JSON string in the response body.
+  - `userId` can have the value `admin`, `maintainer`, or `user`
+  - Example response body:
+    ```json
+    {
+      "userId": 2,
+      "role": "user"
+    }
+    ```
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
