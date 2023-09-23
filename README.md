@@ -3,10 +3,10 @@
 Handles the storing and retrieving of user information.
 
 The build script `build_image.sh` produces 2 docker images.
-- `peerprep_user_service_database` - the database for storing user information.
-- `peerprep_user_service_api` - the REST API for interacting with the database.
+- `peerprep_user_service_database` - Database for storing user information.
+- `peerprep_user_service_api` - REST API for interacting with the database.
 
-Note that when a `peerprep_user_service_database` container is created, a default admin account, with user name `admin`, is created as well.
+Note that when a `peerprep_user_service_database` container is created, a default PeerPrep admin user account, with user name `admin`, is created as well.
 
 ## Table of Contents
 
@@ -45,8 +45,8 @@ These environment variables are used by both the API and database images.
 
 ### Database
 
-* `ADMIN_EMAIL` - Email of the default admin user.
-* `ADMIN_PASSWORD` - Password of the default admin user.
+* `ADMIN_EMAIL` - Email of the default PeerPrep admin user.
+* `ADMIN_PASSWORD` - Password of the default PeerPrep admin user.
 
 ### API
 
