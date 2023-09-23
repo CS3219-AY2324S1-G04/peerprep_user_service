@@ -1,20 +1,15 @@
 /**
  * @file Defines {@link UserProfile}.
  */
+import UserIdentity from './user_identity';
 
 /** Represents a user's profile. */
-export default class UserProfile {
-  /** Unique ID. */
-  public readonly userId?: number;
-
+export default class UserProfile extends UserIdentity {
   /** Username. */
   public readonly username?: string;
 
   /** Email. */
   public readonly email?: string;
-
-  /** Role. */
-  public readonly role?: string;
 
   /**
    * @param userId - Unique ID.
@@ -28,9 +23,8 @@ export default class UserProfile {
     email: string | undefined,
     role: string | undefined,
   ) {
-    this.userId = userId;
+    super(userId, role);
     this.username = username;
     this.email = email;
-    this.role = role;
   }
 }

@@ -3,6 +3,7 @@
  */
 import pg from 'pg';
 
+import UserIdentity from '../data/user_identity';
 import UserProfile from '../data/user_profile';
 
 /**
@@ -58,6 +59,32 @@ export async function fetchUserProfileFromToken(
     result.rows[0]['email'],
     result.rows[0]['role'],
   );
+}
+
+/**
+ * Fetches the ID and role of the user who the session token {@link token}
+ * belongs to.
+ * @param client - Client for communicating with the database.
+ * @param token - Session token belonging to the user.
+ * @returns Identity of the user if a user who owns the session token exist.
+ * Else, returns undefined.
+ */
+export async function fetchUserIdentityFromToken(
+  client: pg.ClientBase,
+  token: string,
+): Promise<UserIdentity | undefined> {
+  const result: pg.QueryResult = await client.query(
+    'SELECT user_id, role FROM User_Profiles WHERE user_id IN (' +
+      '  SELECT user_id FROM User_Sessions ' +
+      '  WHERE token=$1 AND expire_time > CURRENT_TIMESTAMP)',
+    [token],
+  );
+
+  if (result.rows.length == 0) {
+    return undefined;
+  }
+
+  return new UserIdentity(result.rows[0]['user_id'], result.rows[0]['role']);
 }
 
 /**

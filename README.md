@@ -23,6 +23,7 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
     - [Get the User Profile](#get-the-user-profile)
     - [Update the User Profile](#update-the-user-profile)
     - [Delete a User](#delete-a-user)
+    - [Get the User Identity](#get-the-user-identity)
 
 ## Quickstart Guide
 
@@ -175,5 +176,27 @@ Deletes the current user.
 **Response**
 
 - `200` - Success.
+- `401` - Session token was not provided or does not match any existing tokens.
+- `500` - Unexpected error occurred on the server.
+
+### Get the User Identity
+
+> [GET] `/user_service/identity`
+
+Gets the user's ID and role.
+
+This is similar to [Get the User Profile](#get-the-user-profile) but sends less information and allows the session token to be specified via a query parameter. It is mainly to be use by other services to determine the existence and role of a user. It can also be use by the frontend to determine the role of a user when other user profile information is unnecessary.
+
+**Parameters**
+
+- `session_token` - Session token. This is preferred if the HTTP request is made from another service. If specified, there is no need to specify it again in the request cookie.
+
+**Cookies**
+
+- `session_token` - Session token. This is only to be use if the HTTP request is made from a browser. If specified, there is no need to specify it again in the request query parameter.
+
+**Response**
+
+- `200` - Success. User's ID and role is stored as a JSON string in the response body.
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.

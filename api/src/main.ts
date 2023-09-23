@@ -6,6 +6,7 @@ import pg from 'pg';
 import Config from './data/config';
 import App from './services/app';
 import DeleteUserHandler from './services/handlers/delete_user_handler';
+import GetUserIdentityHandler from './services/handlers/get_user_identity_handler';
 import GetUserProfileHandler from './services/handlers/get_user_profile_handler';
 import LoginHandler from './services/handlers/login_handler';
 import LogoutHandler from './services/handlers/logout_handler';
@@ -24,7 +25,7 @@ const pgPool: pg.Pool = new pg.Pool({
 });
 
 // TODO: Change password
-// TODO: Check if session token is valid
+// TODO: Change user role
 const app: App = new App(config.port, pgPool, [
   new RegisterHandler(config.hashCost),
   new LoginHandler(config.sessionExpireMillis),
@@ -32,6 +33,7 @@ const app: App = new App(config.port, pgPool, [
   new GetUserProfileHandler(),
   new UpdateUserProfileHandler(),
   new DeleteUserHandler(),
+  new GetUserIdentityHandler(),
 ]);
 
 app.start();

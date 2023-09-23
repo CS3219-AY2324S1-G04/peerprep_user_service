@@ -73,3 +73,23 @@ export function parsePassword(
 
   return password;
 }
+
+/**
+ * Parses {@link token} as a session token and check it's validity.
+ * @param token - The session token to check.
+ * @returns The parsed session token.
+ * @throws Error when session token is empty or not a string.
+ */
+export function parseSessionToken(
+  token: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
+): string {
+  if (token === undefined || (typeof token === 'string' && token.length == 0)) {
+    throw new Error('Session token was not specified.');
+  }
+
+  if (typeof token !== 'string') {
+    throw new Error('Session token is of the wrong type.');
+  }
+
+  return token;
+}
