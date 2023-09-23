@@ -21,7 +21,7 @@ services:
       network1:
         ipv4_address: 172.100.0.3
     ports:
-      - "3000:3000"
+      - "{PORT}:{PORT}"
     environment:
       PG_HOST: "172.100.0.2"
       PG_PASSWORD: ${PG_PASSWORD}
