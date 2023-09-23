@@ -4,7 +4,7 @@
 import express from 'express';
 import pg from 'pg';
 
-/** Interface for all handlers. */
+/** Handler of a HTTP route. */
 export default interface Handler {
   /** Gets the HTTP request method to handle. */
   get method(): HttpMethod;
