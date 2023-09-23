@@ -1,8 +1,19 @@
 # PeerPrep User Service
 
+- [PeerPrep User Service](#peerprep-user-service)
+  - [REST API](#rest-api)
+    - [Register a User](#register-a-user)
+    - [Login to a Session](#login-to-a-session)
+    - [Logout of a Session](#logout-of-a-session)
+    - [Get the User Profile](#get-the-user-profile)
+    - [Update the User Profile](#update-the-user-profile)
+    - [Delete a User](#delete-a-user)
+
 ## REST API
 
-### [POST] `/user_service/register`
+### Register a User
+
+> [POST] `/user_service/register`
 
 Registers a new user.
 
@@ -22,7 +33,9 @@ Registers a new user.
     - Username/Email is already in use.
 - `500` - Unexpected error occurred on the server.
 
-### [POST] `/user_service/login`
+### Login to a Session
+
+> [POST] `/user_service/login`
 
 Login to a new session.
 
@@ -41,7 +54,9 @@ Login to a new session.
 - `401` - Username is not in use or the username and password do not match.
 - `500` - Unexpected error occurred on the server.
 
-### [POST] `/user_service/logout`
+### Logout of a Session
+
+> [POST] `/user_service/logout`
 
 Logout of the current session.
 
@@ -55,7 +70,9 @@ Logout of the current session.
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
 
-### [GET] `/user_service/profile`
+### Get the User Profile
+
+> [GET] `/user_service/profile`
 
 Gets the user's profile information.
 
@@ -69,7 +86,9 @@ Gets the user's profile information.
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
 
-### [POST] `/user_service/profile`
+### Update the User Profile
+
+> [POST] `/user_service/profile`
 
 Updates the profile of the current user.
 
@@ -96,7 +115,9 @@ Note that all fields of the user profile must be provided including fields that 
 - `500` - Unexpected error occurred on the server.
 
 
-### [DELETE] `/user_service/user`
+### Delete a User
+
+> [DELETE] `/user_service/user`
 
 Deletes the current user.
 
