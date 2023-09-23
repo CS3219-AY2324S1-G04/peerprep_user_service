@@ -4,7 +4,7 @@ cd api
 echo "Building API ..."
 echo
 
-./build_image.sh
+bash ./build_image.sh
 
 if [[ $? -ne 0 ]]; then
     exit 1
@@ -15,7 +15,7 @@ echo
 echo "Building Database ..."
 echo
 
-./build_image.sh
+bash ./build_image.sh
 
 if [[ $? -ne 0 ]]; then
     exit 1
