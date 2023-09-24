@@ -1,6 +1,7 @@
 /**
  * @file Defines {@link UserProfile}.
  */
+import UserRole from '../enums/user_role';
 import UserIdentity from './user_identity';
 
 /** Represents a user's profile. */
@@ -21,7 +22,7 @@ export default class UserProfile extends UserIdentity {
     userId: number | undefined,
     username: string | undefined,
     email: string | undefined,
-    role: string | undefined,
+    role: UserRole | undefined,
   ) {
     super(userId, role);
     this.username = username;

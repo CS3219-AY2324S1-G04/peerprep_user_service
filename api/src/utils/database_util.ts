@@ -5,6 +5,8 @@ import pg from 'pg';
 
 import UserIdentity from '../data_structs/user_identity';
 import UserProfile from '../data_structs/user_profile';
+import UserRole from '../enums/user_role';
+import { parseUserRole } from './data_parser';
 
 /**
  * Fetches the password hash of the user whose username is {@link username}.
@@ -57,7 +59,7 @@ export async function fetchUserProfileFromToken(
     result.rows[0]['user_id'],
     result.rows[0]['username'],
     result.rows[0]['email'],
-    result.rows[0]['role'],
+    parseUserRole(result.rows[0]['role']),
   );
 }
 
@@ -84,7 +86,10 @@ export async function fetchUserIdentityFromToken(
     return undefined;
   }
 
-  return new UserIdentity(result.rows[0]['user_id'], result.rows[0]['role']);
+  return new UserIdentity(
+    result.rows[0]['user_id'],
+    parseUserRole(result.rows[0]['role']),
+  );
 }
 
 /**
@@ -149,6 +154,28 @@ export async function updateUserProfile(
       '  SELECT user_id FROM User_Sessions ' +
       '  WHERE token=$3 AND expire_time > CURRENT_TIMESTAMP)',
     [userProfile.username, userProfile.email, token],
+  );
+
+  return result.rowCount > 0;
+}
+
+/**
+ * Updates the entry in the database for the user role which belongs to the
+ * user whose username is {@link username}.
+ * @param client - Client for communicating with the database.
+ * @param username - Username of the user.
+ * @param userRole - User role to assign.
+ * @returns True if an entry was updated. False if no entry was updated due to
+ * no user existing with the username {@link username}.
+ */
+export async function updateUserRole(
+  client: pg.ClientBase,
+  username: string,
+  userRole: UserRole,
+): Promise<boolean> {
+  const result: pg.QueryResult = await client.query(
+    'UPDATE User_Profiles SET role=$1 WHERE username=$2',
+    [userRole, username],
   );
 
   return result.rowCount > 0;

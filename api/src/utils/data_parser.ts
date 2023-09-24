@@ -3,6 +3,8 @@
  */
 import qs from 'qs';
 
+import UserRole from '../enums/user_role';
+
 /**
  * Parses {@link username} as a username and check it's validity.
  * @param username - The username to check.
@@ -92,4 +94,33 @@ export function parseSessionToken(
   }
 
   return token;
+}
+
+/**
+ * Parses {@link role} as a user role and check it's validity.
+ * @param role - The user role to check.
+ * @returns The parsed {@link UserRole}.
+ * @throws Error when {@link role} is empty or not a string.
+ */
+export function parseUserRole(
+  role: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
+): UserRole {
+  if (role === undefined || (typeof role === 'string' && role.length == 0)) {
+    throw new Error('Role was not specified.');
+  }
+
+  if (typeof role !== 'string') {
+    throw new Error('Role is of the wrong type.');
+  }
+
+  switch (role) {
+    case 'user':
+      return UserRole.user;
+    case 'maintainer':
+      return UserRole.maintainer;
+    case 'admin':
+      return UserRole.admin;
+  }
+
+  throw new Error('Role is invalid.');
 }

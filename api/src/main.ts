@@ -12,6 +12,7 @@ import LoginHandler from './handlers/login_handler';
 import LogoutHandler from './handlers/logout_handler';
 import RegisterHandler from './handlers/register_handler';
 import UpdateUserProfileHandler from './handlers/update_user_profile_handler';
+import UpdateUserRoleHandler from './handlers/update_user_role_handler';
 
 const config: Config = new Config();
 const pgPool: pg.Pool = new pg.Pool({
@@ -25,13 +26,14 @@ const pgPool: pg.Pool = new pg.Pool({
 });
 
 // TODO: Change password
-// TODO: Change user role
+// TODO: List users if admin (requires pagination)
 const app: App = new App(config.port, pgPool, [
   new RegisterHandler(config.hashCost),
   new LoginHandler(config.sessionExpireMillis),
   new LogoutHandler(),
   new GetUserProfileHandler(),
   new UpdateUserProfileHandler(),
+  new UpdateUserRoleHandler(),
   new DeleteUserHandler(),
   new GetUserIdentityHandler(),
 ]);
