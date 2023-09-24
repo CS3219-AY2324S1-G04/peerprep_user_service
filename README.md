@@ -22,6 +22,7 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
     - [Logout of a Session](#logout-of-a-session)
     - [Get the User Profile](#get-the-user-profile)
     - [Update the User Profile](#update-the-user-profile)
+    - [Update the User Role](#update-the-user-role)
     - [Delete a User](#delete-a-user)
     - [Get the User Identity](#get-the-user-identity)
 
@@ -171,6 +172,34 @@ Note that all fields of the user profile must be provided including fields that 
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
 
+### Update the User Role
+
+> [POST] `/user_service/user/role`
+
+Updates the role of a user.
+
+The user making the request must have the "admin" role.
+
+**Parameters**
+
+- `username` - Username of the user whose role is to be updated.
+- `role` - Updated role.
+
+**Cookies**
+
+- `session_token` - Session token of the user making the request.
+
+**Response**
+
+- `200` - Success.
+- `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
+  - Possible causes:
+    - Username/Role was not specified.
+    - Username/Role is of the wrong type.
+    - Role does not match any of the possible user roles.
+- `401` - Session token was not provided, or does not match any existing tokens, or does not belong to a user with the "admin" role.
+- `404` - Username does not belong to any existing user.
+- `500` - Unexpected error occurred on the server.
 
 ### Delete a User
 
