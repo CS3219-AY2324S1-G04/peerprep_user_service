@@ -9,14 +9,14 @@ export default class UserIdentity {
   public readonly userId?: number;
 
   /** Role. */
-  public readonly role?: UserRole;
+  public readonly userRole?: UserRole;
 
   /**
    * @param userId - Unique ID.
-   * @param role - Role.
+   * @param role - User role.
    */
   public constructor(userId: number | undefined, role: UserRole | undefined) {
     this.userId = userId;
-    this.role = role;
+    this.userRole = role;
   }
 }

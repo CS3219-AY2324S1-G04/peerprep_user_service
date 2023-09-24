@@ -97,7 +97,6 @@ export default class LoginHandler implements Handler {
     username: string,
     sessionExpireMillis: number,
   ): Promise<[string, Date]> {
-    const loginTime: Date = new Date(Date.now());
     const expireTime: Date = new Date(Date.now() + sessionExpireMillis);
 
     let token: string = '';
@@ -107,7 +106,7 @@ export default class LoginHandler implements Handler {
       token = uuidV4();
 
       try {
-        await createUserSession(client, token, username, loginTime, expireTime);
+        await createUserSession(client, token, username, expireTime);
 
         isEntryCreated = true;
       } catch (e) {
@@ -121,8 +120,8 @@ export default class LoginHandler implements Handler {
   }
 
   /**
-   * Creates a new user session in the database if the username and password
-   * provided in the request are a match. Sends a HTTP 200 response.
+   * Creates a new user session if the username and password provided in the
+   * request are a match. Sends a HTTP 200 response.
    *
    * If the username and/or password are invalid (missing, empty etc.), sends
    * a HTTP 400 response containing the reason for the error in the response

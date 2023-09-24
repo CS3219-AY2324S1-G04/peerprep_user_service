@@ -60,7 +60,7 @@ export default class UpdateUserRoleHandler implements Handler {
     const userIdentity: UserIdentity | undefined =
       await fetchUserIdentityFromToken(client, token);
 
-    if (userIdentity?.role !== UserRole.admin) {
+    if (userIdentity?.userRole !== UserRole.admin) {
       throw new HttpInfoError(401);
     }
   }
@@ -76,20 +76,21 @@ export default class UpdateUserRoleHandler implements Handler {
   }
 
   /**
-   * Updates the role of the user on the database whose username is specified in
-   * the request. The token stored in the request cookie must belong to a user
-   * who has the user role {@link UserRole.admin}. Sends a HTTP 200 response.
+   * Updates the role of the user whose username is specified in the request.
+   * The session token stored in the request cookie must belong to a user who
+   * has the user role {@link UserRole.admin}. Sends a HTTP 200 response.
    *
-   * If no token is found, the token is invalid, or the user who owns the token
-   * does not have the user role {@link UserRole.admin}, sends a HTTP 401
-   * response. A token can be invalid if it is expired or is not owned by any
-   * user.
+   * If the username or user role specified in the request is invalid, sends a
+   * HTTP 400 response containing the reason for the error in the response
+   * message.
+   *
+   * If no session token is found, or the session token is invalid, or the user
+   * who owns the session token does not have the user role
+   * {@link UserRole.admin}, sends a HTTP 401 response. A session token can be
+   * invalid if it is expired or is not owned by any user.
    *
    * If the username specified in the request does not belong to any user, sends
    * a HTTP 404 response.
-   *
-   * If the username or role specified in the request is invalid, sends a HTTP
-   * 400 response containing the reason for the error in the response message.
    *
    * If an internal server error occurs, sends a HTTP 500 response.
    * @param req - Information about the request.

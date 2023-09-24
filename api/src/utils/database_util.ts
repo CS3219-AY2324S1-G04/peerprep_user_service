@@ -11,9 +11,9 @@ import { parseUserRole } from './data_parser';
 /**
  * Fetches the password hash of the user whose username is {@link username}.
  * @param client - Client for communicating with the database.
- * @param username - Username of the user.
- * @returns Password hash of the user if a user with the username exist. Else,
- * returns undefined.
+ * @param username - Username of the user whose password hash is to be fetched.
+ * @returns Password hash of the user if a user with the username
+ * {@link username} exist. Else, returns undefined.
  */
 export async function fetchPasswordHashFromUsername(
   client: pg.ClientBase,
@@ -37,8 +37,8 @@ export async function fetchPasswordHashFromUsername(
  * belongs to.
  * @param client - Client for communicating with the database.
  * @param token - Session token belonging to the user.
- * @returns Profile of the user if a user who owns the session token exist.
- * Else, returns undefined.
+ * @returns Profile of the user if a user who owns the session token
+ * {@link token} exist. Else, returns undefined.
  */
 export async function fetchUserProfileFromToken(
   client: pg.ClientBase,
@@ -68,8 +68,8 @@ export async function fetchUserProfileFromToken(
  * belongs to.
  * @param client - Client for communicating with the database.
  * @param token - Session token belonging to the user.
- * @returns Identity of the user if a user who owns the session token exist.
- * Else, returns undefined.
+ * @returns ID and role of the user if a user who owns the session token
+ * {@link token} exist. Else, returns undefined.
  */
 export async function fetchUserIdentityFromToken(
   client: pg.ClientBase,
@@ -93,10 +93,10 @@ export async function fetchUserIdentityFromToken(
 }
 
 /**
- * Creates an entry in the database for a user profile and another entry for a
- * user credential corresponding to the user profile.
+ * Creates a user profile using information in {@link userProfile} and a user
+ * credential using {@link passwordHash}.
  * @param client - Client for communicating with the database.
- * @param userProfile - Details of the user profile.
+ * @param userProfile - Information on the user profile.
  * @param passwordHash - Hash of the user's password.
  */
 export async function createUserProfileAndCredential(
@@ -114,18 +114,18 @@ export async function createUserProfileAndCredential(
 }
 
 /**
- * Creates an entry in the database for a user session.
+ * Creates a user session for the user with username {@link username}. The
+ * session will have a session token {@link token} and will expire at
+ * {@link expireTime}.
  * @param client - Client for communicating with the database.
  * @param token - Session token.
  * @param username - Username of the user.
- * @param loginTime - Time of session creation.
  * @param expireTime - Time of session expiry.
  */
 export async function createUserSession(
   client: pg.ClientBase,
   token: string,
   username: string,
-  loginTime: Date,
   expireTime: Date,
 ): Promise<void> {
   await client.query(
@@ -136,13 +136,14 @@ export async function createUserSession(
 }
 
 /**
- * Updates the entry in the database for the user profile which belongs to the
- * user who owns the session token {@link token}.
+ * Updates the user profile which belongs to the user who owns the session
+ * token {@link token}. The user profile is updated with values in
+ * {@link userProfile}.
  * @param client - Client for communicating with the database.
  * @param userProfile - Details of the user's profile.
  * @param token - Session token belonging to the user.
- * @returns True if an entry was updated. False if no entry was updated due to
- * the session token {@link token} being an invalid token.
+ * @returns True if a user profile was updated. False if no user profile was
+ * updated due to the session token {@link token} being an invalid token.
  */
 export async function updateUserProfile(
   client: pg.ClientBase,
@@ -160,13 +161,13 @@ export async function updateUserProfile(
 }
 
 /**
- * Updates the entry in the database for the user role which belongs to the
- * user whose username is {@link username}.
+ * Updates the user role of the user with username {@link username}. The user
+ * role will be updated to {@link userRole}.
  * @param client - Client for communicating with the database.
- * @param username - Username of the user.
+ * @param username - Username of the user whose role is to be updated.
  * @param userRole - User role to assign.
- * @returns True if an entry was updated. False if no entry was updated due to
- * no user existing with the username {@link username}.
+ * @returns True if a user role was updated. False if no user role was updated
+ * due to no user existing with the username {@link username}.
  */
 export async function updateUserRole(
   client: pg.ClientBase,
@@ -182,11 +183,10 @@ export async function updateUserRole(
 }
 
 /**
- * Deletes the entry in the database for the user profile which belongs to the
- * user who owns the session token {@link token}.
+ * Deletes the user who owns the session token {@link token}.
  * @param client - Client for communicating with the database.
- * @param token - Session token belonging to the user.
- * @returns True if an entry was deleted. False if no entry was deleted due to
+ * @param token - Session token belonging to the user to be deleted.
+ * @returns True if a user was deleted. False if no user was deleted due to
  * the session token {@link token} being an invalid token.
  */
 export async function deleteUserProfile(
@@ -203,12 +203,11 @@ export async function deleteUserProfile(
 }
 
 /**
- * Deletes the entry in the database for the user session which has the session
- * token {@link token}.
- * @param client - Client for communicating wih the database.
- * @param token - Session token belonging to the user.
- * @returns True if an entry was deleted. False if no entry was deleted due to
- * the session token {@link token} being an invalid token.
+ * Deletes the user session which has the session token {@link token}.
+ * @param client - Client for communicating with the database.
+ * @param token - Session token of the user session to be deleted.
+ * @returns True if a user session was deleted. False if no user session was
+ * deleted due to the session token {@link token} being an invalid token.
  */
 export async function deleteUserSession(
   client: pg.ClientBase,

@@ -70,11 +70,12 @@ export default class UpdateUserProfileHandler implements Handler {
   }
 
   /**
-   * Updates the user profile on the database belonging to the user who owns the
-   * token stored in the request cookie. Sends a HTTP 200 response.
+   * Updates the user profile belonging to the user who owns the session token
+   * stored in the request cookie. Sends a HTTP 200 response.
    *
-   * If no token is found or the token is invalid, sends a HTTP 401 response. A
-   * token can be invalid if it is expired or is not owned by any user.
+   * If no session token is found or the session token is invalid, sends a HTTP
+   * 401 response. A session token can be invalid if it is expired or is not
+   * owned by any user.
    *
    * If the updated user profile values are invalid, sends a HTTP 400 response
    * containing the reason for the error in the response message.

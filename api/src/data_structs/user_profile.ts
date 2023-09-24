@@ -16,7 +16,7 @@ export default class UserProfile extends UserIdentity {
    * @param userId - Unique ID.
    * @param username - Username.
    * @param email - Email.
-   * @param role - Role.
+   * @param role - User role.
    */
   public constructor(
     userId: number | undefined,

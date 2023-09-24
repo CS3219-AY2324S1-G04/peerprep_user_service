@@ -91,8 +91,8 @@ export default class RegisterHandler implements Handler {
   }
 
   /**
-   * Creates a new user in the database using the details specified in the
-   * request. Sends a HTTP 200 response.
+   * Creates a new user using the details specified in the request. Sends a HTTP
+   * 200 response.
    *
    * If the username, email, or password are invalid, sends a HTTP 400 response
    * containing the reason for the error in the response message.

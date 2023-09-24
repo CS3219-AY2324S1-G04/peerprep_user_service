@@ -56,12 +56,12 @@ export default class GetUserIdentityHandler implements Handler {
   }
 
   /**
-   * Gets from the database, the ID and role of the user who owns the token
-   * specified in the request query or in the request cookie. Sends a HTTP 200
-   * response.
+   * Gets the ID and role of the user who owns the session token specified in
+   * the request query or in the request cookie. Sends a HTTP 200 response.
    *
-   * If no token is found or the token is invalid, sends a HTTP 401 response. A
-   * token can be invalid if it is expired or is not owned by any user.
+   * If no session token is found or the session token is invalid, sends a HTTP
+   * 401 response. A session token can be invalid if it is expired or is not
+   * owned by any user.
    *
    * If an internal server error occurs, sends a HTTP 500 response.
    * @param req - Information about the request.

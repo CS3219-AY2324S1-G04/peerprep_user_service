@@ -16,7 +16,7 @@ export default class App {
   /**
    * Setup the app.
    * @param port - Port to listen on.
-   * @param pgPool - Pool of postgres clients to be used by a handler when
+   * @param pgPool - Pool of postgres clients to be used by a handlers when
    * handling an API request.
    * @param handlers - Handlers for handling API requests.
    */

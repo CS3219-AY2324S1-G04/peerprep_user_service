@@ -39,11 +39,12 @@ export default class LogoutHandler implements Handler {
   }
 
   /**
-   * Deletes from the database, the session which has the token stored in the
-   * request cookie. Sends a HTTP 200 response.
+   * Deletes the user session which has the session token stored in the request
+   * cookie. Sends a HTTP 200 response.
    *
-   * If no token is found or the token is invalid, sends a HTTP 401 response. A
-   * token can be invalid if it is expired or is not owned by any user.
+   * If no session token is found or the session token is invalid, sends a HTTP
+   * 401 response. A session token can be invalid if it is expired or is not
+   * owned by any user.
    *
    * If an internal server error occurs, sends a HTTP 500 response.
    * @param req - Information about the request.
