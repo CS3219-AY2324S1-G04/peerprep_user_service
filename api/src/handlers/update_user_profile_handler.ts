@@ -2,20 +2,15 @@
  * @file Defines {@link UpdateUserProfileHandler}.
  */
 import express from 'express';
-import pg from 'pg';
 
 import UserProfile from '../data_structs/user_profile';
 import HttpInfoError from '../errors/http_info_error';
+import DatabaseClient from '../service/database_client';
 import {
   parseEmail,
   parseSessionToken,
   parseUsername,
 } from '../utils/data_parser';
-import {
-  isDuplicateUserProfileEmailError,
-  isDuplicateUserProfileUsernameError,
-  updateUserProfile,
-} from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles updating the profile of the user who sent the request. */
@@ -50,18 +45,18 @@ export default class UpdateUserProfileHandler implements Handler {
   }
 
   private static async _updateUserProfile(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     userProfile: UserProfile,
     token: string,
   ): Promise<void> {
     try {
-      if (!(await updateUserProfile(client, userProfile, token))) {
+      if (!(await client.updateUserProfile(userProfile, token))) {
         throw new HttpInfoError(401);
       }
     } catch (e) {
-      if (isDuplicateUserProfileUsernameError(e)) {
+      if (client.isDuplicateUserProfileUsernameError(e)) {
         throw new HttpInfoError(400, 'Username already in use.');
-      } else if (isDuplicateUserProfileEmailError(e)) {
+      } else if (client.isDuplicateUserProfileEmailError(e)) {
         throw new HttpInfoError(400, 'Email already in use.');
       }
 
@@ -90,7 +85,7 @@ export default class UpdateUserProfileHandler implements Handler {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    client: pg.ClientBase,
+    client: DatabaseClient,
   ): Promise<void> {
     try {
       const token: string = UpdateUserProfileHandler._parseCookie(req.cookies);

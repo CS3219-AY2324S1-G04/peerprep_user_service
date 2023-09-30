@@ -3,16 +3,11 @@
  */
 import bcrypt from 'bcrypt';
 import express from 'express';
-import pg from 'pg';
 
 import UserProfile from '../data_structs/user_profile';
 import HttpInfoError from '../errors/http_info_error';
+import DatabaseClient from '../service/database_client';
 import { parseEmail, parsePassword, parseUsername } from '../utils/data_parser';
-import {
-  createUserProfileAndCredential,
-  isDuplicateUserProfileEmailError,
-  isDuplicateUserProfileUsernameError,
-} from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user registration. */
@@ -48,7 +43,7 @@ export default class RegisterHandler implements Handler {
   }
 
   private static async _createUser(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     userProfile: UserProfile,
     password: string,
     hashSaltRounds: number,
@@ -73,16 +68,16 @@ export default class RegisterHandler implements Handler {
   }
 
   private static async _createUserProfileAndCredential(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     userProfile: UserProfile,
     passwordHash: string,
   ): Promise<void> {
     try {
-      await createUserProfileAndCredential(client, userProfile, passwordHash);
+      await client.createUserProfileAndCredential(userProfile, passwordHash);
     } catch (e) {
-      if (isDuplicateUserProfileUsernameError(e)) {
+      if (client.isDuplicateUserProfileUsernameError(e)) {
         throw new HttpInfoError(400, 'Username already in use.');
-      } else if (isDuplicateUserProfileEmailError(e)) {
+      } else if (client.isDuplicateUserProfileEmailError(e)) {
         throw new HttpInfoError(400, 'Email already in use.');
       }
 
@@ -107,7 +102,7 @@ export default class RegisterHandler implements Handler {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    client: pg.ClientBase,
+    client: DatabaseClient,
   ): Promise<void> {
     try {
       const [userProfile, password]: [UserProfile, string] =

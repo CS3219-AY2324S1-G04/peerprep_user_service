@@ -2,12 +2,11 @@
  * @file Defines {@link GetUserProfileHandler}.
  */
 import express from 'express';
-import pg from 'pg';
 
 import UserProfile from '../data_structs/user_profile';
 import HttpInfoError from '../errors/http_info_error';
+import DatabaseClient from '../service/database_client';
 import { parseSessionToken } from '../utils/data_parser';
-import { fetchUserProfileFromToken } from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles getting the profile of the user who sent the request. */
@@ -31,11 +30,11 @@ export default class GetUserProfileHandler implements Handler {
   }
 
   private static async _fetchUserProfile(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     token: string,
   ): Promise<UserProfile> {
     const userProfile: UserProfile | undefined =
-      await fetchUserProfileFromToken(client, token);
+      await client.fetchUserProfileFromToken(token);
     if (userProfile === undefined) {
       throw new HttpInfoError(401);
     }
@@ -61,7 +60,7 @@ export default class GetUserProfileHandler implements Handler {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    client: pg.ClientBase,
+    client: DatabaseClient,
   ): Promise<void> {
     try {
       const token: string = GetUserProfileHandler._parseCookie(req.cookies);
