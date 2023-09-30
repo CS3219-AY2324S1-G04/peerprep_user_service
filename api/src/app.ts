@@ -3,29 +3,32 @@
  */
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import pg from 'pg';
 
 import Handler, { HttpMethod } from './handlers/handler';
+import DatabaseClient from './service/database_client';
 
 /** Represents the app. */
 export default class App {
   private readonly _app: express.Application;
   private readonly _port: number;
-  private readonly _pgPool: pg.Pool;
+  private readonly _database: DatabaseClient;
 
   /**
    * Setup the app.
    * @param port - Port to listen on.
-   * @param pgPool - Pool of postgres clients to be used by a handlers when
-   * handling an API request.
+   * @param client - Client for communicating with the database.
    * @param handlers - Handlers for handling API requests.
    */
-  public constructor(port: number, pgPool: pg.Pool, handlers: Handler[]) {
+  public constructor(
+    port: number,
+    client: DatabaseClient,
+    handlers: Handler[],
+  ) {
     this._app = express();
     this._app.use(cookieParser());
 
     this._port = port;
-    this._pgPool = pgPool;
+    this._database = client;
 
     for (const handler of handlers) {
       switch (handler.method) {
@@ -69,7 +72,7 @@ export default class App {
       req: express.Request,
       res: express.Response,
       next: express.NextFunction,
-      client: pg.ClientBase,
+      client: DatabaseClient,
     ) => Promise<void>,
   ): (
     req: express.Request,
@@ -81,9 +84,7 @@ export default class App {
       res: express.Response,
       next: express.NextFunction,
     ) => {
-      const client: pg.PoolClient = await this._pgPool.connect();
-      await handle(req, res, next, client);
-      client.release();
+      await handle(req, res, next, this._database);
     };
   }
 }

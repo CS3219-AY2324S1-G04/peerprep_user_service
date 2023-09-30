@@ -2,11 +2,10 @@
  * @file Defines {@link DeleteUserHandler}.
  */
 import express from 'express';
-import pg from 'pg';
 
 import HttpInfoError from '../errors/http_info_error';
+import DatabaseClient from '../service/database_client';
 import { parseSessionToken } from '../utils/data_parser';
-import { deleteUserProfile } from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles deleting the user who sent the request. */
@@ -30,10 +29,10 @@ export default class DeleteUserHandler implements Handler {
   }
 
   private static async _deleteUserProfile(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     token: string,
   ) {
-    if (!(await deleteUserProfile(client, token))) {
+    if (!(await client.deleteUserProfile(token))) {
       throw new HttpInfoError(401);
     }
   }
@@ -56,7 +55,7 @@ export default class DeleteUserHandler implements Handler {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    client: pg.ClientBase,
+    client: DatabaseClient,
   ): Promise<void> {
     try {
       const token: string = DeleteUserHandler._parseCookie(req.cookies);

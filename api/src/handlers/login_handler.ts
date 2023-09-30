@@ -3,17 +3,12 @@
  */
 import bcrypt from 'bcrypt';
 import express from 'express';
-import pg from 'pg';
 import qs from 'qs';
 import { v4 as uuidV4 } from 'uuid';
 
 import HttpInfoError from '../errors/http_info_error';
+import DatabaseClient from '../service/database_client';
 import { parsePassword, parseUsername } from '../utils/data_parser';
-import {
-  createUserSession,
-  fetchPasswordHashFromUsername,
-  isDuplicateUserSessionTokenError,
-} from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user login. */
@@ -44,7 +39,7 @@ export default class LoginHandler implements Handler {
   }
 
   private static async _authenticate(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     username: string,
     password: string,
     sessionExpireMillis: number,
@@ -58,7 +53,7 @@ export default class LoginHandler implements Handler {
   }
 
   private static async _verifyIdentity(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     username: string,
     password: string,
   ): Promise<void> {
@@ -73,11 +68,11 @@ export default class LoginHandler implements Handler {
   }
 
   private static async _fetchPasswordHash(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     username: string,
   ): Promise<string> {
     const passwordHash: string | undefined =
-      await fetchPasswordHashFromUsername(client, username);
+      await client.fetchPasswordHashFromUsername(username);
     if (passwordHash === undefined) {
       throw new HttpInfoError(401);
     }
@@ -93,7 +88,7 @@ export default class LoginHandler implements Handler {
   }
 
   private static async _createUserSession(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     username: string,
     sessionExpireMillis: number,
   ): Promise<[string, Date]> {
@@ -106,11 +101,11 @@ export default class LoginHandler implements Handler {
       token = uuidV4();
 
       try {
-        await createUserSession(client, token, username, expireTime);
+        await client.createUserSession(token, username, expireTime);
 
         isEntryCreated = true;
       } catch (e) {
-        if (!isDuplicateUserSessionTokenError(e)) {
+        if (!client.isDuplicateUserSessionTokenError(e)) {
           throw e;
         }
       }
@@ -140,7 +135,7 @@ export default class LoginHandler implements Handler {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    client: pg.ClientBase,
+    client: DatabaseClient,
   ): Promise<void> {
     try {
       const [username, password]: [string, string] = LoginHandler._parseQuery(

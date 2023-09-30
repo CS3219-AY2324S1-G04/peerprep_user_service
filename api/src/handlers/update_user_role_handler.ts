@@ -2,20 +2,16 @@
  * @file Defines {@link UpdateUserRoleHandler}.
  */
 import express from 'express';
-import pg from 'pg';
 
 import UserIdentity from '../data_structs/user_identity';
 import UserRole from '../enums/user_role';
 import HttpInfoError from '../errors/http_info_error';
+import DatabaseClient from '../service/database_client';
 import {
   parseSessionToken,
   parseUserRole,
   parseUsername,
 } from '../utils/data_parser';
-import {
-  fetchUserIdentityFromToken,
-  updateUserRole,
-} from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /**
@@ -54,11 +50,11 @@ export default class UpdateUserRoleHandler implements Handler {
   }
 
   private static async _validatePermission(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     token: string,
   ): Promise<void> {
     const userIdentity: UserIdentity | undefined =
-      await fetchUserIdentityFromToken(client, token);
+      await client.fetchUserIdentityFromToken(token);
 
     if (userIdentity?.userRole !== UserRole.admin) {
       throw new HttpInfoError(401);
@@ -66,11 +62,11 @@ export default class UpdateUserRoleHandler implements Handler {
   }
 
   private static async _updateUserRole(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     username: string,
     userRole: UserRole,
   ): Promise<void> {
-    if (!(await updateUserRole(client, username, userRole))) {
+    if (!(await client.updateUserRole(username, userRole))) {
       throw new HttpInfoError(404, 'Username is not in use.');
     }
   }
@@ -102,7 +98,7 @@ export default class UpdateUserRoleHandler implements Handler {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    client: pg.ClientBase,
+    client: DatabaseClient,
   ): Promise<void> {
     try {
       const token: string = UpdateUserRoleHandler._parseCookie(req.cookies);

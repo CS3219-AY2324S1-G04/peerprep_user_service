@@ -2,13 +2,12 @@
  * @file Defines {@link ValidateUserHandler}.
  */
 import express from 'express';
-import pg from 'pg';
 import qs from 'qs';
 
 import UserIdentity from '../data_structs/user_identity';
 import HttpInfoError from '../errors/http_info_error';
+import DatabaseClient from '../service/database_client';
 import { parseSessionToken } from '../utils/data_parser';
-import { fetchUserIdentityFromToken } from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /**
@@ -43,11 +42,11 @@ export default class GetUserIdentityHandler implements Handler {
   }
 
   private static async _fetchUserIdentity(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     token: string,
   ): Promise<UserIdentity> {
     const userIdentity: UserIdentity | undefined =
-      await fetchUserIdentityFromToken(client, token);
+      await client.fetchUserIdentityFromToken(token);
     if (userIdentity === undefined) {
       throw new HttpInfoError(401);
     }
@@ -73,7 +72,7 @@ export default class GetUserIdentityHandler implements Handler {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    client: pg.ClientBase,
+    client: DatabaseClient,
   ): Promise<void> {
     try {
       const token: string = GetUserIdentityHandler._getSessionToken(

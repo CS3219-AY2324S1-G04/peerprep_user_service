@@ -2,7 +2,8 @@
  * @file Defines {@link Handler}.
  */
 import express from 'express';
-import pg from 'pg';
+
+import DatabaseClient from '../service/database_client';
 
 /** Handler of a HTTP route. */
 export default interface Handler {
@@ -23,7 +24,7 @@ export default interface Handler {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    client: pg.ClientBase,
+    client: DatabaseClient,
   ): Promise<void>;
 }
 

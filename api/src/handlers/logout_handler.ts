@@ -2,11 +2,10 @@
  * @file Defines {@link LogoutHandler}.
  */
 import express from 'express';
-import pg from 'pg';
 
 import HttpInfoError from '../errors/http_info_error';
+import DatabaseClient from '../service/database_client';
 import { parseSessionToken } from '../utils/data_parser';
-import { deleteUserSession } from '../utils/database_util';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user logout. */
@@ -30,10 +29,10 @@ export default class LogoutHandler implements Handler {
   }
 
   private static async _deleteUserSession(
-    client: pg.ClientBase,
+    client: DatabaseClient,
     token: string,
   ): Promise<void> {
-    if (!(await deleteUserSession(client, token))) {
+    if (!(await client.deleteUserSession(token))) {
       throw new HttpInfoError(401);
     }
   }
@@ -56,7 +55,7 @@ export default class LogoutHandler implements Handler {
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
-    client: pg.ClientBase,
+    client: DatabaseClient,
   ): Promise<void> {
     try {
       const token: string = LogoutHandler._parseCookie(req.cookies);
