@@ -1,6 +1,7 @@
 /**
  * @file Defines {@link DatabaseClient}.
  */
+import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import UserIdentity from '../data_structs/user_identity';
 import UserProfile from '../data_structs/user_profile';
 import UserRole from '../enums/user_role';
@@ -41,7 +42,7 @@ export default interface DatabaseClient {
    * @param passwordHash - Hash of the user's password.
    */
   createUserProfileAndCredential(
-    userProfile: UserProfile,
+    userProfile: ClientModifiableUserProfile,
     passwordHash: string,
   ): Promise<void>;
 
@@ -63,12 +64,15 @@ export default interface DatabaseClient {
    * Updates the user profile which belongs to the user who owns the session
    * token {@link token}. The user profile is updated with values in
    * {@link userProfile}.
-   * @param userProfile - Details of the user's profile.
+   * @param userProfile - Updated information on the user's profile.
    * @param token - Session token belonging to the user.
    * @returns True if a user profile was updated. False if no user profile was
    * updated due to the session token {@link token} being an invalid token.
    */
-  updateUserProfile(userProfile: UserProfile, token: string): Promise<boolean>;
+  updateUserProfile(
+    userProfile: ClientModifiableUserProfile,
+    token: string,
+  ): Promise<boolean>;
 
   /**
    * Updates the user role of the user with username {@link userId}. The user

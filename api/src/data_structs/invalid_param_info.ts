@@ -4,6 +4,9 @@
 
 /** Information on an invalid query or path parameter. */
 export default interface InvalidParamInfo {
-  readonly field: string;
+  /** Name of the parameter. */
+  readonly param: string;
+
+  /** Message containing the reason for the parameter being invalid. */
   readonly message: string;
 }

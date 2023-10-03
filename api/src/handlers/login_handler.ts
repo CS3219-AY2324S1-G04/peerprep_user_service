@@ -6,25 +6,26 @@ import express from 'express';
 import qs from 'qs';
 import { v4 as uuidV4 } from 'uuid';
 
+import HttpErrorInfo from '../data_structs/http_error_info';
 import InvalidParamInfo from '../data_structs/invalid_param_info';
-import HttpInfoError from '../errors/http_info_error';
 import DatabaseClient from '../service/database_client';
 import { parsePassword, parseUsername } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user login. */
-export default class LoginHandler implements Handler {
+export default class LoginHandler extends Handler {
   private readonly _sessionExpireMillis: number;
 
   public constructor(sessionExpireMillis: number) {
+    super();
     this._sessionExpireMillis = sessionExpireMillis;
   }
 
-  public get method(): HttpMethod {
+  public override get method(): HttpMethod {
     return HttpMethod.post;
   }
 
-  public get path(): string {
+  public override get path(): string {
     return '/user-service/sessions';
   }
 
@@ -37,17 +38,17 @@ export default class LoginHandler implements Handler {
     try {
       username = parseUsername(query['username']);
     } catch (e) {
-      invalidInfo.push({ field: 'username', message: (e as Error).message });
+      invalidInfo.push({ param: 'username', message: (e as Error).message });
     }
 
     try {
       password = parsePassword(query['password']);
     } catch (e) {
-      invalidInfo.push({ field: 'password', message: (e as Error).message });
+      invalidInfo.push({ param: 'password', message: (e as Error).message });
     }
 
     if (invalidInfo.length > 0) {
-      throw new HttpInfoError(400, JSON.stringify(invalidInfo));
+      throw new HttpErrorInfo(400, JSON.stringify(invalidInfo));
     }
 
     return [username!, password!];
@@ -78,7 +79,7 @@ export default class LoginHandler implements Handler {
     );
 
     if (!(await LoginHandler._doesPasswordMatch(password, passwordHash))) {
-      throw new HttpInfoError(401);
+      throw new HttpErrorInfo(401);
     }
   }
 
@@ -89,7 +90,7 @@ export default class LoginHandler implements Handler {
     const passwordHash: string | undefined =
       await client.fetchPasswordHashFromUsername(username);
     if (passwordHash === undefined) {
-      throw new HttpInfoError(401);
+      throw new HttpErrorInfo(401);
     }
 
     return passwordHash;
@@ -132,48 +133,37 @@ export default class LoginHandler implements Handler {
   /**
    * Creates a new user session if the username and password provided in the
    * request are a match. Sends a HTTP 200 response.
-   *
-   * If the username and/or password are invalid (missing, empty etc.), sends
-   * a HTTP 400 response containing the reason for the error in the response
-   * message.
-   *
-   * If no user with the username exist, or the username and password do not
-   * match, sends a HTTP 401 response.
-   *
-   * If an internal server error occurs, sends a HTTP 500 response.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
+   * @throws {HttpErrorInfo} Error 400 if the username and/or password are
+   * invalid (missing, empty etc.). Message contains a JSON string of the
+   * reasons for the error.
+   * @throws {HttpErrorInfo} Error 401 if no user with the username exist, or
+   * the username and password do not match.
+   * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
-  public async handle(
+  public override async handleLogic(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    try {
-      const [username, password]: [string, string] = LoginHandler._parseQuery(
-        req.query,
-      );
+    const [username, password]: [string, string] = LoginHandler._parseQuery(
+      req.query,
+    );
 
-      const sessionToken: [string, Date] = await LoginHandler._authenticate(
-        client,
-        username,
-        password,
-        this._sessionExpireMillis,
-      );
+    const sessionToken: [string, Date] = await LoginHandler._authenticate(
+      client,
+      username,
+      password,
+      this._sessionExpireMillis,
+    );
 
-      res
-        .status(200)
-        .cookie('session_token', sessionToken[0], { expires: sessionToken[1] })
-        .send();
-    } catch (e) {
-      if (e instanceof HttpInfoError) {
-        res.status(e.statusCode).send(e.message);
-      } else {
-        res.sendStatus(500);
-      }
-    }
+    res
+      .status(200)
+      .cookie('session-token', sessionToken[0], { expires: sessionToken[1] })
+      .send();
   }
 }

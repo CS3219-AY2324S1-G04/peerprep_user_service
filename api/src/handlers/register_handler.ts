@@ -4,30 +4,33 @@
 import bcrypt from 'bcrypt';
 import express from 'express';
 
+import HttpErrorInfo from '../data_structs/http_error_info';
 import InvalidParamInfo from '../data_structs/invalid_param_info';
-import UserProfile from '../data_structs/user_profile';
-import HttpInfoError from '../errors/http_info_error';
+import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import DatabaseClient from '../service/database_client';
 import { parseEmail, parsePassword, parseUsername } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user registration. */
-export default class RegisterHandler implements Handler {
+export default class RegisterHandler extends Handler {
   private readonly _hashSaltRounds: number;
 
   public constructor(hashSaltRounds: number) {
+    super();
     this._hashSaltRounds = hashSaltRounds;
   }
 
-  public get method(): HttpMethod {
+  public override get method(): HttpMethod {
     return HttpMethod.post;
   }
 
-  public get path(): string {
+  public override get path(): string {
     return '/user-service/users';
   }
 
-  private static _parseQuery(query: qs.ParsedQs): [UserProfile, string] {
+  private static _parseQuery(
+    query: qs.ParsedQs,
+  ): [ClientModifiableUserProfile, string] {
     let username: string;
     let email: string;
     let password: string;
@@ -37,23 +40,23 @@ export default class RegisterHandler implements Handler {
     try {
       username = parseUsername(query['username']);
     } catch (e) {
-      invalidInfo.push({ field: 'username', message: (e as Error).message });
+      invalidInfo.push({ param: 'username', message: (e as Error).message });
     }
 
     try {
       email = parseEmail(query['email']);
     } catch (e) {
-      invalidInfo.push({ field: 'email', message: (e as Error).message });
+      invalidInfo.push({ param: 'email', message: (e as Error).message });
     }
 
     try {
       password = parsePassword(query['password']);
     } catch (e) {
-      invalidInfo.push({ field: 'password', message: (e as Error).message });
+      invalidInfo.push({ param: 'password', message: (e as Error).message });
     }
 
     if (invalidInfo.length > 0) {
-      throw new HttpInfoError(400, JSON.stringify(invalidInfo));
+      throw new HttpErrorInfo(400, JSON.stringify(invalidInfo));
     }
 
     return [{ username: username!, email: email! }, password!];
@@ -61,7 +64,7 @@ export default class RegisterHandler implements Handler {
 
   private static async _createUser(
     client: DatabaseClient,
-    userProfile: UserProfile,
+    userProfile: ClientModifiableUserProfile,
     password: string,
     hashSaltRounds: number,
   ): Promise<void> {
@@ -86,16 +89,32 @@ export default class RegisterHandler implements Handler {
 
   private static async _createUserProfileAndCredential(
     client: DatabaseClient,
-    userProfile: UserProfile,
+    userProfile: ClientModifiableUserProfile,
     passwordHash: string,
   ): Promise<void> {
     try {
       await client.createUserProfileAndCredential(userProfile, passwordHash);
     } catch (e) {
       if (client.isDuplicateUserProfileUsernameError(e)) {
-        throw new HttpInfoError(400, 'Username already in use.');
+        throw new HttpErrorInfo(
+          400,
+          JSON.stringify([
+            {
+              param: 'username',
+              message: 'Username already in use.',
+            },
+          ]),
+        );
       } else if (client.isDuplicateUserProfileEmailError(e)) {
-        throw new HttpInfoError(400, 'Email already in use.');
+        throw new HttpErrorInfo(
+          400,
+          JSON.stringify([
+            {
+              param: 'email',
+              message: 'Email already in use.',
+            },
+          ]),
+        );
       }
 
       throw e;
@@ -105,40 +124,30 @@ export default class RegisterHandler implements Handler {
   /**
    * Creates a new user using the details specified in the request. Sends a HTTP
    * 200 response.
-   *
-   * If the username, email, or password are invalid, sends a HTTP 400 response
-   * containing the reason for the error in the response message.
-   *
-   * If an internal server error occurs, sends a HTTP 500 response.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
+   * @throws {HttpErrorInfo} Error 400 if the username, email, or password are
+   * invalid. Message contains a JSON string of the reasons for the error.
+   * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
-  public async handle(
+  public override async handleLogic(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    try {
-      const [userProfile, password]: [UserProfile, string] =
-        RegisterHandler._parseQuery(req.query);
+    const [userProfile, password]: [ClientModifiableUserProfile, string] =
+      RegisterHandler._parseQuery(req.query);
 
-      await RegisterHandler._createUser(
-        client,
-        userProfile,
-        password,
-        this._hashSaltRounds,
-      );
+    await RegisterHandler._createUser(
+      client,
+      userProfile,
+      password,
+      this._hashSaltRounds,
+    );
 
-      res.sendStatus(200);
-    } catch (e) {
-      if (e instanceof HttpInfoError) {
-        res.status(e.statusCode).send(e.message);
-      } else {
-        res.sendStatus(500);
-      }
-    }
+    res.sendStatus(200);
   }
 }
