@@ -114,12 +114,12 @@ export class PostgresDatabaseClient implements DatabaseClient {
   }
 
   public async updateUserRole(
-    username: string,
+    userId: number,
     userRole: UserRole,
   ): Promise<boolean> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'UPDATE User_Profiles SET role=$1 WHERE username=$2',
-      [userRole, username],
+      'UPDATE User_Profiles SET role=$1 WHERE user_id=$2',
+      [userRole, userId],
     );
 
     return result.rowCount > 0;

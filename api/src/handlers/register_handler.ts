@@ -23,7 +23,7 @@ export default class RegisterHandler implements Handler {
   }
 
   public get path(): string {
-    return '/user_service/register';
+    return '/user-service/users';
   }
 
   private static _parseQuery(query: qs.ParsedQs): [UserProfile, string] {

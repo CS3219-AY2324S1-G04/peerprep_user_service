@@ -16,11 +16,11 @@ import Handler, { HttpMethod } from './handler';
 /** Handles updating the profile of the user who sent the request. */
 export default class UpdateUserProfileHandler implements Handler {
   public get method(): HttpMethod {
-    return HttpMethod.post;
+    return HttpMethod.put;
   }
 
   public get path(): string {
-    return '/user_service/user/profile';
+    return '/user-service/user/profile';
   }
 
   private static _parseCookie(cookies: {

@@ -24,7 +24,7 @@ export default class LoginHandler implements Handler {
   }
 
   public get path(): string {
-    return '/user_service/login';
+    return '/user-service/sessions';
   }
 
   private static _parseQuery(query: qs.ParsedQs): [string, string] {

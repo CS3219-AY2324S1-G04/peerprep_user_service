@@ -2,6 +2,7 @@
  * @file Defines {@link UpdateUserRoleHandler}.
  */
 import express from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
 
 import UserIdentity from '../data_structs/user_identity';
 import UserRole from '../enums/user_role';
@@ -9,8 +10,8 @@ import HttpInfoError from '../errors/http_info_error';
 import DatabaseClient from '../service/database_client';
 import {
   parseSessionToken,
+  parseUserId,
   parseUserRole,
-  parseUsername,
 } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
@@ -21,11 +22,11 @@ import Handler, { HttpMethod } from './handler';
  */
 export default class UpdateUserRoleHandler implements Handler {
   public get method(): HttpMethod {
-    return HttpMethod.post;
+    return HttpMethod.put;
   }
 
   public get path(): string {
-    return '/user_service/user/role';
+    return '/user-service/users/:userId/role';
   }
 
   private static _parseCookie(cookies: {
@@ -38,12 +39,19 @@ export default class UpdateUserRoleHandler implements Handler {
     }
   }
 
-  private static _parseQuery(query: qs.ParsedQs): [string, UserRole] {
+  private static _parseParams(params: ParamsDictionary): number {
     try {
-      const username: string = parseUsername(query['username']);
+      return parseUserId(params['userId']);
+    } catch (e) {
+      throw new HttpInfoError(400, (e as Error).message);
+    }
+  }
+
+  private static _parseQuery(query: qs.ParsedQs): UserRole {
+    try {
       const userRole: UserRole = parseUserRole(query['role']);
 
-      return [username, userRole];
+      return userRole;
     } catch (e) {
       throw new HttpInfoError(400, (e as Error).message);
     }
@@ -63,11 +71,11 @@ export default class UpdateUserRoleHandler implements Handler {
 
   private static async _updateUserRole(
     client: DatabaseClient,
-    username: string,
+    userId: number,
     userRole: UserRole,
   ): Promise<void> {
-    if (!(await client.updateUserRole(username, userRole))) {
-      throw new HttpInfoError(404, 'Username is not in use.');
+    if (!(await client.updateUserRole(userId, userRole))) {
+      throw new HttpInfoError(404, 'User does not exist.');
     }
   }
 
@@ -102,12 +110,12 @@ export default class UpdateUserRoleHandler implements Handler {
   ): Promise<void> {
     try {
       const token: string = UpdateUserRoleHandler._parseCookie(req.cookies);
-      const [username, userRole]: [string, UserRole] =
-        UpdateUserRoleHandler._parseQuery(req.query);
+      const userId: number = UpdateUserRoleHandler._parseParams(req.params);
+      const userRole: UserRole = UpdateUserRoleHandler._parseQuery(req.query);
 
       await UpdateUserRoleHandler._validatePermission(client, token);
 
-      await UpdateUserRoleHandler._updateUserRole(client, username, userRole);
+      await UpdateUserRoleHandler._updateUserRole(client, userId, userRole);
 
       res.sendStatus(200);
     } catch (e) {

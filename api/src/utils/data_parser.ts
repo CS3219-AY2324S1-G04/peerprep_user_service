@@ -6,6 +6,25 @@ import qs from 'qs';
 import UserRole from '../enums/user_role';
 
 /**
+ * Parses {@link userId} as a user ID.
+ * @param userId - Raw user ID to parse.
+ * @returns The parsed user ID.
+ * @throws Error when user ID is empty or is not a positive integer in string
+ * form.
+ */
+export function parseUserId(userId: string): number {
+  if (userId.length === 0) {
+    throw new Error('User ID was not specified.');
+  }
+
+  if (!userId.match('^[1-9][0-9]*$')) {
+    throw new Error('User ID must be a positive integer.');
+  }
+
+  return parseInt(userId, 10);
+}
+
+/**
  * Parses {@link username} as a username and check it's validity.
  * @param username - The username to check.
  * @returns The parsed username.

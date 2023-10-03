@@ -11,11 +11,11 @@ import Handler, { HttpMethod } from './handler';
 /** Handles user logout. */
 export default class LogoutHandler implements Handler {
   public get method(): HttpMethod {
-    return HttpMethod.post;
+    return HttpMethod.delete;
   }
 
   public get path(): string {
-    return '/user_service/logout';
+    return '/user-service/session';
   }
 
   private static _parseCookie(cookies: {

@@ -71,14 +71,14 @@ export default interface DatabaseClient {
   updateUserProfile(userProfile: UserProfile, token: string): Promise<boolean>;
 
   /**
-   * Updates the user role of the user with username {@link username}. The user
+   * Updates the user role of the user with username {@link userId}. The user
    * role will be updated to {@link userRole}.
-   * @param username - Username of the user whose role is to be updated.
+   * @param userId - ID of the user whose role is to be updated.
    * @param userRole - User role to assign.
    * @returns True if a user role was updated. False if no user role was updated
-   * due to no user existing with the username {@link username}.
+   * due to no user existing with the username {@link userId}.
    */
-  updateUserRole(username: string, userRole: UserRole): Promise<boolean>;
+  updateUserRole(userId: number, userRole: UserRole): Promise<boolean>;
 
   /**
    * Deletes the user who owns the session token {@link token}.
