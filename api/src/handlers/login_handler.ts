@@ -6,6 +6,7 @@ import express from 'express';
 import qs from 'qs';
 import { v4 as uuidV4 } from 'uuid';
 
+import InvalidParamInfo from '../data_structs/invalid_param_info';
 import HttpInfoError from '../errors/http_info_error';
 import DatabaseClient from '../service/database_client';
 import { parsePassword, parseUsername } from '../utils/data_parser';
@@ -28,14 +29,28 @@ export default class LoginHandler implements Handler {
   }
 
   private static _parseQuery(query: qs.ParsedQs): [string, string] {
-    try {
-      const username = parseUsername(query['username']);
-      const password = parsePassword(query['password']);
+    let username: string;
+    let password: string;
 
-      return [username, password];
+    const invalidInfo: Array<InvalidParamInfo> = [];
+
+    try {
+      username = parseUsername(query['username']);
     } catch (e) {
-      throw new HttpInfoError(400, (e as Error).message);
+      invalidInfo.push({ field: 'username', message: (e as Error).message });
     }
+
+    try {
+      password = parsePassword(query['password']);
+    } catch (e) {
+      invalidInfo.push({ field: 'password', message: (e as Error).message });
+    }
+
+    if (invalidInfo.length > 0) {
+      throw new HttpInfoError(400, JSON.stringify(invalidInfo));
+    }
+
+    return [username!, password!];
   }
 
   private static async _authenticate(

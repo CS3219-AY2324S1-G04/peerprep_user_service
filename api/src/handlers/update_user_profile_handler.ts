@@ -3,6 +3,7 @@
  */
 import express from 'express';
 
+import InvalidParamInfo from '../data_structs/invalid_param_info';
 import UserProfile from '../data_structs/user_profile';
 import HttpInfoError from '../errors/http_info_error';
 import DatabaseClient from '../service/database_client';
@@ -34,14 +35,28 @@ export default class UpdateUserProfileHandler implements Handler {
   }
 
   private static _parseQuery(query: qs.ParsedQs): UserProfile {
-    try {
-      const username = parseUsername(query['username']);
-      const email = parseEmail(query['email']);
+    let username: string;
+    let email: string;
 
-      return new UserProfile(undefined, username, email, undefined);
+    const invalidInfo: Array<InvalidParamInfo> = [];
+
+    try {
+      username = parseUsername(query['username']);
     } catch (e) {
-      throw new HttpInfoError(400, (e as Error).message);
+      invalidInfo.push({ field: 'username', message: (e as Error).message });
     }
+
+    try {
+      email = parseEmail(query['email']);
+    } catch (e) {
+      invalidInfo.push({ field: 'email', message: (e as Error).message });
+    }
+
+    if (invalidInfo.length > 0) {
+      throw new HttpInfoError(400, JSON.stringify(invalidInfo));
+    }
+
+    return { username: username!, email: email! };
   }
 
   private static async _updateUserProfile(

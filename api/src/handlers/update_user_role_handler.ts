@@ -4,6 +4,7 @@
 import express from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
+import InvalidParamInfo from '../data_structs/invalid_param_info';
 import UserIdentity from '../data_structs/user_identity';
 import UserRole from '../enums/user_role';
 import HttpInfoError from '../errors/http_info_error';
@@ -39,22 +40,32 @@ export default class UpdateUserRoleHandler implements Handler {
     }
   }
 
-  private static _parseParams(params: ParamsDictionary): number {
-    try {
-      return parseUserId(params['userId']);
-    } catch (e) {
-      throw new HttpInfoError(400, (e as Error).message);
-    }
-  }
+  private static _parseParams(
+    pathParams: ParamsDictionary,
+    queryParams: qs.ParsedQs,
+  ): [number, UserRole] {
+    let userId: number;
+    let userRole: UserRole;
 
-  private static _parseQuery(query: qs.ParsedQs): UserRole {
-    try {
-      const userRole: UserRole = parseUserRole(query['role']);
+    const invalidInfo: Array<InvalidParamInfo> = [];
 
-      return userRole;
+    try {
+      userId = parseUserId(pathParams['userId']);
     } catch (e) {
-      throw new HttpInfoError(400, (e as Error).message);
+      invalidInfo.push({ field: 'userId', message: (e as Error).message });
     }
+
+    try {
+      userRole = parseUserRole(queryParams['role']);
+    } catch (e) {
+      invalidInfo.push({ field: 'role', message: (e as Error).message });
+    }
+
+    if (invalidInfo.length > 0) {
+      throw new HttpInfoError(400, JSON.stringify(invalidInfo));
+    }
+
+    return [userId!, userRole!];
   }
 
   private static async _validatePermission(
@@ -110,8 +121,8 @@ export default class UpdateUserRoleHandler implements Handler {
   ): Promise<void> {
     try {
       const token: string = UpdateUserRoleHandler._parseCookie(req.cookies);
-      const userId: number = UpdateUserRoleHandler._parseParams(req.params);
-      const userRole: UserRole = UpdateUserRoleHandler._parseQuery(req.query);
+      const [userId, userRole]: [number, UserRole] =
+        UpdateUserRoleHandler._parseParams(req.params, req.query);
 
       await UpdateUserRoleHandler._validatePermission(client, token);
 

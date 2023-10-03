@@ -4,6 +4,7 @@
 import bcrypt from 'bcrypt';
 import express from 'express';
 
+import InvalidParamInfo from '../data_structs/invalid_param_info';
 import UserProfile from '../data_structs/user_profile';
 import HttpInfoError from '../errors/http_info_error';
 import DatabaseClient from '../service/database_client';
@@ -27,19 +28,35 @@ export default class RegisterHandler implements Handler {
   }
 
   private static _parseQuery(query: qs.ParsedQs): [UserProfile, string] {
-    try {
-      const userProfile: UserProfile = new UserProfile(
-        undefined,
-        parseUsername(query['username']),
-        parseEmail(query['email']),
-        undefined,
-      );
-      const password: string = parsePassword(query['password']);
+    let username: string;
+    let email: string;
+    let password: string;
 
-      return [userProfile, password];
+    const invalidInfo: Array<InvalidParamInfo> = [];
+
+    try {
+      username = parseUsername(query['username']);
     } catch (e) {
-      throw new HttpInfoError(400, (e as Error).message);
+      invalidInfo.push({ field: 'username', message: (e as Error).message });
     }
+
+    try {
+      email = parseEmail(query['email']);
+    } catch (e) {
+      invalidInfo.push({ field: 'email', message: (e as Error).message });
+    }
+
+    try {
+      password = parsePassword(query['password']);
+    } catch (e) {
+      invalidInfo.push({ field: 'password', message: (e as Error).message });
+    }
+
+    if (invalidInfo.length > 0) {
+      throw new HttpInfoError(400, JSON.stringify(invalidInfo));
+    }
+
+    return [{ username: username!, email: email! }, password!];
   }
 
   private static async _createUser(
