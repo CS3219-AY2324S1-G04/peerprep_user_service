@@ -9,6 +9,20 @@ import UserRole from '../enums/user_role';
 /** Represents the database storing the user information. */
 export default interface DatabaseClient {
   /**
+   * Checks if username {@link username} is already in use.
+   * @param username - Username to check.
+   * @returns True if the username is in use. Else, returns false.
+   */
+  isUsernameInUse(username: string): Promise<boolean>;
+
+  /**
+   * Checks if email {@link email} is already in use.
+   * @param email - Email to check.
+   * @returns True if the email is in use. Else, returns false.
+   */
+  isEmailInUse(email: string): Promise<boolean>;
+
+  /**
    * Fetches the password hash of the user whose username is {@link username}.
    * @param username - Username of the user whose password hash is to be
    * fetched.

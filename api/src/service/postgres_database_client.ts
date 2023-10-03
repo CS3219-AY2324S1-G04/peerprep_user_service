@@ -17,6 +17,24 @@ export class PostgresDatabaseClient implements DatabaseClient {
     this._pgPool = new pg.Pool(config);
   }
 
+  public async isUsernameInUse(username: string): Promise<boolean> {
+    const result: pg.QueryResult = await this._pgPool.query(
+      'SELECT 1 FROM User_Profiles WHERE username=$1',
+      [username],
+    );
+
+    return result.rows.length > 0;
+  }
+
+  public async isEmailInUse(email: string): Promise<boolean> {
+    const result: pg.QueryResult = await this._pgPool.query(
+      'SELECT 1 FROM User_Profiles WHERE email=$1',
+      [email],
+    );
+
+    return result.rows.length > 0;
+  }
+
   public async fetchPasswordHashFromUsername(
     username: string,
   ): Promise<string | undefined> {

@@ -3,6 +3,7 @@
  */
 import bcrypt from 'bcrypt';
 import express from 'express';
+import { ParsedQs } from 'qs';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
 import InvalidParamInfo from '../data_structs/invalid_param_info';
@@ -28,31 +29,32 @@ export default class RegisterHandler extends Handler {
     return '/user-service/users';
   }
 
-  private static _parseQuery(
+  private static async _parseAndValidateParams(
+    client: DatabaseClient,
     query: qs.ParsedQs,
-  ): [ClientModifiableUserProfile, string] {
-    let username: string;
-    let email: string;
-    let password: string;
+  ): Promise<[ClientModifiableUserProfile, string]> {
+    const [username, invalidUsernameInfo]: [string?, InvalidParamInfo?] =
+      await RegisterHandler._parseAndValidateUsername(
+        client,
+        query['username'],
+      );
+    const [email, invalidEmailInfo]: [string?, InvalidParamInfo?] =
+      await RegisterHandler._parseAndValidateEmail(client, query['email']);
+    const [password, isInvalidPasswordInfo]: [string?, InvalidParamInfo?] =
+      RegisterHandler._parseAndValidatePassword(query['password']);
 
     const invalidInfo: Array<InvalidParamInfo> = [];
 
-    try {
-      username = parseUsername(query['username']);
-    } catch (e) {
-      invalidInfo.push({ param: 'username', message: (e as Error).message });
+    if (invalidUsernameInfo !== undefined) {
+      invalidInfo.push(invalidUsernameInfo);
     }
 
-    try {
-      email = parseEmail(query['email']);
-    } catch (e) {
-      invalidInfo.push({ param: 'email', message: (e as Error).message });
+    if (invalidEmailInfo !== undefined) {
+      invalidInfo.push(invalidEmailInfo);
     }
 
-    try {
-      password = parsePassword(query['password']);
-    } catch (e) {
-      invalidInfo.push({ param: 'password', message: (e as Error).message });
+    if (isInvalidPasswordInfo !== undefined) {
+      invalidInfo.push(isInvalidPasswordInfo);
     }
 
     if (invalidInfo.length > 0) {
@@ -60,6 +62,59 @@ export default class RegisterHandler extends Handler {
     }
 
     return [{ username: username!, email: email! }, password!];
+  }
+
+  private static async _parseAndValidateUsername(
+    client: DatabaseClient,
+    usernameRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
+  ): Promise<[string?, InvalidParamInfo?]> {
+    let username: string | undefined;
+    let invalidParamInfo: InvalidParamInfo | undefined;
+
+    try {
+      username = parseUsername(usernameRaw);
+    } catch (e) {
+      invalidParamInfo = { param: 'username', message: (e as Error).message };
+    }
+
+    if (username !== undefined && (await client.isUsernameInUse(username))) {
+      invalidParamInfo = {
+        param: 'username',
+        message: 'Username already in use.',
+      };
+    }
+
+    return [username, invalidParamInfo];
+  }
+
+  private static async _parseAndValidateEmail(
+    client: DatabaseClient,
+    emailRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
+  ): Promise<[string?, InvalidParamInfo?]> {
+    let email: string | undefined;
+    let invalidParamInfo: InvalidParamInfo | undefined;
+
+    try {
+      email = parseEmail(emailRaw);
+    } catch (e) {
+      invalidParamInfo = { param: 'email', message: (e as Error).message };
+    }
+
+    if (email !== undefined && (await client.isEmailInUse(email))) {
+      invalidParamInfo = { param: 'email', message: 'Email already in use.' };
+    }
+
+    return [email, invalidParamInfo];
+  }
+
+  private static _parseAndValidatePassword(
+    passwordRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
+  ): [string?, InvalidParamInfo?] {
+    try {
+      return [parsePassword(passwordRaw), undefined];
+    } catch (e) {
+      return [undefined, { param: 'password', message: (e as Error).message }];
+    }
   }
 
   private static async _createUser(
@@ -139,7 +194,7 @@ export default class RegisterHandler extends Handler {
     client: DatabaseClient,
   ): Promise<void> {
     const [userProfile, password]: [ClientModifiableUserProfile, string] =
-      RegisterHandler._parseQuery(req.query);
+      await RegisterHandler._parseAndValidateParams(client, req.query);
 
     await RegisterHandler._createUser(
       client,

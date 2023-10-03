@@ -2,6 +2,7 @@
  * @file Defines {@link UpdateUserProfileHandler}.
  */
 import express from 'express';
+import { ParsedQs } from 'qs';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
 import InvalidParamInfo from '../data_structs/invalid_param_info';
@@ -34,22 +35,29 @@ export default class UpdateUserProfileHandler extends Handler {
     }
   }
 
-  private static _parseQuery(query: qs.ParsedQs): ClientModifiableUserProfile {
-    let username: string;
-    let email: string;
+  private static async _parseAndValidateParams(
+    client: DatabaseClient,
+    query: qs.ParsedQs,
+  ): Promise<ClientModifiableUserProfile> {
+    const [username, invalidUsernameInfo]: [string?, InvalidParamInfo?] =
+      await UpdateUserProfileHandler._parseAndValidateUsername(
+        client,
+        query['username'],
+      );
+    const [email, invalidEmailInfo]: [string?, InvalidParamInfo?] =
+      await UpdateUserProfileHandler._parseAndValidateEmail(
+        client,
+        query['email'],
+      );
 
     const invalidInfo: Array<InvalidParamInfo> = [];
 
-    try {
-      username = parseUsername(query['username']);
-    } catch (e) {
-      invalidInfo.push({ param: 'username', message: (e as Error).message });
+    if (invalidUsernameInfo !== undefined) {
+      invalidInfo.push(invalidUsernameInfo);
     }
 
-    try {
-      email = parseEmail(query['email']);
-    } catch (e) {
-      invalidInfo.push({ param: 'email', message: (e as Error).message });
+    if (invalidEmailInfo !== undefined) {
+      invalidInfo.push(invalidEmailInfo);
     }
 
     if (invalidInfo.length > 0) {
@@ -57,6 +65,49 @@ export default class UpdateUserProfileHandler extends Handler {
     }
 
     return { username: username!, email: email! };
+  }
+
+  private static async _parseAndValidateUsername(
+    client: DatabaseClient,
+    usernameRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
+  ): Promise<[string?, InvalidParamInfo?]> {
+    let username: string | undefined;
+    let invalidParamInfo: InvalidParamInfo | undefined;
+
+    try {
+      username = parseUsername(usernameRaw);
+    } catch (e) {
+      invalidParamInfo = { param: 'username', message: (e as Error).message };
+    }
+
+    if (username !== undefined && (await client.isUsernameInUse(username))) {
+      invalidParamInfo = {
+        param: 'username',
+        message: 'Username already in use.',
+      };
+    }
+
+    return [username, invalidParamInfo];
+  }
+
+  private static async _parseAndValidateEmail(
+    client: DatabaseClient,
+    emailRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
+  ): Promise<[string?, InvalidParamInfo?]> {
+    let email: string | undefined;
+    let invalidParamInfo: InvalidParamInfo | undefined;
+
+    try {
+      email = parseEmail(emailRaw);
+    } catch (e) {
+      invalidParamInfo = { param: 'email', message: (e as Error).message };
+    }
+
+    if (email !== undefined && (await client.isEmailInUse(email))) {
+      invalidParamInfo = { param: 'email', message: 'Email already in use.' };
+    }
+
+    return [email, invalidParamInfo];
   }
 
   private static async _updateUserProfile(
@@ -117,7 +168,7 @@ export default class UpdateUserProfileHandler extends Handler {
   ): Promise<void> {
     const token: string = UpdateUserProfileHandler._parseCookie(req.cookies);
     const userProfile: ClientModifiableUserProfile =
-      UpdateUserProfileHandler._parseQuery(req.query);
+      await UpdateUserProfileHandler._parseAndValidateParams(client, req.query);
 
     await UpdateUserProfileHandler._updateUserProfile(
       client,
