@@ -5,7 +5,6 @@ import express from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
-import InvalidParamInfo from '../data_structs/invalid_param_info';
 import UserIdentity from '../data_structs/user_identity';
 import UserRole from '../enums/user_role';
 import DatabaseClient from '../service/database_client';
@@ -47,21 +46,21 @@ export default class UpdateUserRoleHandler extends Handler {
     let userId: number;
     let userRole: UserRole;
 
-    const invalidInfo: Array<InvalidParamInfo> = [];
+    const invalidInfo: { [key: string]: string } = {};
 
     try {
       userId = parseUserId(pathParams['userId']);
     } catch (e) {
-      invalidInfo.push({ param: 'userId', message: (e as Error).message });
+      invalidInfo['userId'] = (e as Error).message;
     }
 
     try {
       userRole = parseUserRole(queryParams['role']);
     } catch (e) {
-      invalidInfo.push({ param: 'role', message: (e as Error).message });
+      invalidInfo['role'] = (e as Error).message;
     }
 
-    if (invalidInfo.length > 0) {
+    if (Object.keys(invalidInfo).length > 0) {
       throw new HttpErrorInfo(400, JSON.stringify(invalidInfo));
     }
 

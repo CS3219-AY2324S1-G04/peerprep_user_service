@@ -7,7 +7,6 @@ import qs from 'qs';
 import { v4 as uuidV4 } from 'uuid';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
-import InvalidParamInfo from '../data_structs/invalid_param_info';
 import DatabaseClient from '../service/database_client';
 import { parsePassword, parseUsername } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
@@ -33,21 +32,21 @@ export default class LoginHandler extends Handler {
     let username: string;
     let password: string;
 
-    const invalidInfo: Array<InvalidParamInfo> = [];
+    const invalidInfo: { [key: string]: string } = {};
 
     try {
       username = parseUsername(query['username']);
     } catch (e) {
-      invalidInfo.push({ param: 'username', message: (e as Error).message });
+      invalidInfo['username'] = (e as Error).message;
     }
 
     try {
       password = parsePassword(query['password']);
     } catch (e) {
-      invalidInfo.push({ param: 'password', message: (e as Error).message });
+      invalidInfo['password'] = (e as Error).message;
     }
 
-    if (invalidInfo.length > 0) {
+    if (Object.keys(invalidInfo).length > 0) {
       throw new HttpErrorInfo(400, JSON.stringify(invalidInfo));
     }
 

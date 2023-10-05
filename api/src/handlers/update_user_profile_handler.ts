@@ -5,7 +5,6 @@ import express from 'express';
 import { ParsedQs } from 'qs';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
-import InvalidParamInfo from '../data_structs/invalid_param_info';
 import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import DatabaseClient from '../service/database_client';
 import {
@@ -39,28 +38,30 @@ export default class UpdateUserProfileHandler extends Handler {
     client: DatabaseClient,
     query: qs.ParsedQs,
   ): Promise<ClientModifiableUserProfile> {
-    const [username, invalidUsernameInfo]: [string?, InvalidParamInfo?] =
-      await UpdateUserProfileHandler._parseAndValidateUsername(
+    let username: string;
+    let email: string;
+
+    const invalidInfo: { [key: string]: string } = {};
+
+    try {
+      username = await UpdateUserProfileHandler._parseAndValidateUsername(
         client,
         query['username'],
       );
-    const [email, invalidEmailInfo]: [string?, InvalidParamInfo?] =
-      await UpdateUserProfileHandler._parseAndValidateEmail(
+    } catch (e) {
+      invalidInfo['username'] = (e as Error).message;
+    }
+
+    try {
+      email = await UpdateUserProfileHandler._parseAndValidateEmail(
         client,
         query['email'],
       );
-
-    const invalidInfo: Array<InvalidParamInfo> = [];
-
-    if (invalidUsernameInfo !== undefined) {
-      invalidInfo.push(invalidUsernameInfo);
+    } catch (e) {
+      invalidInfo['email'] = (e as Error).message;
     }
 
-    if (invalidEmailInfo !== undefined) {
-      invalidInfo.push(invalidEmailInfo);
-    }
-
-    if (invalidInfo.length > 0) {
+    if (Object.keys(invalidInfo).length > 0) {
       throw new HttpErrorInfo(400, JSON.stringify(invalidInfo));
     }
 
@@ -70,44 +71,27 @@ export default class UpdateUserProfileHandler extends Handler {
   private static async _parseAndValidateUsername(
     client: DatabaseClient,
     usernameRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
-  ): Promise<[string?, InvalidParamInfo?]> {
-    let username: string | undefined;
-    let invalidParamInfo: InvalidParamInfo | undefined;
+  ): Promise<string> {
+    const username: string = parseUsername(usernameRaw);
 
-    try {
-      username = parseUsername(usernameRaw);
-    } catch (e) {
-      invalidParamInfo = { param: 'username', message: (e as Error).message };
+    if (await client.isUsernameInUse(username)) {
+      throw Error('Username already in use.');
     }
 
-    if (username !== undefined && (await client.isUsernameInUse(username))) {
-      invalidParamInfo = {
-        param: 'username',
-        message: 'Username already in use.',
-      };
-    }
-
-    return [username, invalidParamInfo];
+    return username;
   }
 
   private static async _parseAndValidateEmail(
     client: DatabaseClient,
     emailRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
-  ): Promise<[string?, InvalidParamInfo?]> {
-    let email: string | undefined;
-    let invalidParamInfo: InvalidParamInfo | undefined;
+  ): Promise<string> {
+    const email: string = parseEmail(emailRaw);
 
-    try {
-      email = parseEmail(emailRaw);
-    } catch (e) {
-      invalidParamInfo = { param: 'email', message: (e as Error).message };
+    if (await client.isEmailInUse(email)) {
+      throw Error('Email already in use.');
     }
 
-    if (email !== undefined && (await client.isEmailInUse(email))) {
-      invalidParamInfo = { param: 'email', message: 'Email already in use.' };
-    }
-
-    return [email, invalidParamInfo];
+    return email;
   }
 
   private static async _updateUserProfile(
@@ -123,22 +107,16 @@ export default class UpdateUserProfileHandler extends Handler {
       if (client.isDuplicateUserProfileUsernameError(e)) {
         throw new HttpErrorInfo(
           400,
-          JSON.stringify([
-            {
-              param: 'username',
-              message: 'Username already in use.',
-            },
-          ]),
+          JSON.stringify({
+            username: 'Username already in use.',
+          }),
         );
       } else if (client.isDuplicateUserProfileEmailError(e)) {
         throw new HttpErrorInfo(
           400,
-          JSON.stringify([
-            {
-              param: 'email',
-              message: 'Email already in use.',
-            },
-          ]),
+          JSON.stringify({
+            email: 'Email already in use.',
+          }),
         );
       }
 
