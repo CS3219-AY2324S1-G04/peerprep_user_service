@@ -17,14 +17,14 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
     - [Database](#database)
     - [API](#api)
   - [REST API](#rest-api)
-    - [Register a User](#register-a-user)
-    - [Login to a Session](#login-to-a-session)
-    - [Logout of a Session](#logout-of-a-session)
-    - [Get the User Profile](#get-the-user-profile)
-    - [Update the User Profile](#update-the-user-profile)
-    - [Update the User Role](#update-the-user-role)
-    - [Delete a User](#delete-a-user)
-    - [Get the User Identity](#get-the-user-identity)
+    - [Create a User](#create-a-user)
+    - [Create a Session](#create-a-session)
+    - [Delete a Session \[via Session Token\]](#delete-a-session-via-session-token)
+    - [Get a User Profile \[via Session Token\]](#get-a-user-profile-via-session-token)
+    - [Update a User Profile \[via Session Token\]](#update-a-user-profile-via-session-token)
+    - [Update a User's Role](#update-a-users-role)
+    - [Delete a User \[via Session Token\]](#delete-a-user-via-session-token)
+    - [Get a User Identity \[via Session Token\]](#get-a-user-identity-via-session-token)
 
 ## Quickstart Guide
 
@@ -60,11 +60,11 @@ These environment variables are used by both the API and database images.
 
 ## REST API
 
-### Register a User
+### Create a User
 
-> [POST] `/user_service/register`
+> [POST] `/user-service/users`
 
-Registers a new user.
+Creates a new user.
 
 **Parameters**
 
@@ -82,11 +82,11 @@ Registers a new user.
     - Username/Email is already in use.
 - `500` - Unexpected error occurred on the server.
 
-### Login to a Session
+### Create a Session
 
-> [POST] `/user_service/login`
+> [POST] `/user-service/sessions`
 
-Login to a new session.
+Creates a new user session.
 
 **Parameters**
 
@@ -103,11 +103,11 @@ Login to a new session.
 - `401` - Username is not in use or the username and password do not match.
 - `500` - Unexpected error occurred on the server.
 
-### Logout of a Session
+### Delete a Session [via Session Token]
 
-> [POST] `/user_service/logout`
+> [DELETE] `/user-service/session`
 
-Logout of the current session.
+Deletes the session whose token is the specified.
 
 **Cookies**
 
@@ -119,11 +119,11 @@ Logout of the current session.
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
 
-### Get the User Profile
+### Get a User Profile [via Session Token]
 
-> [GET] `/user_service/user/profile`
+> [GET] `/user-service/user/profile`
 
-Gets the user's profile information.
+Gets the profile of the user who owns the specified session token.
 
 **Cookies**
 
@@ -144,11 +144,11 @@ Gets the user's profile information.
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
 
-### Update the User Profile
+### Update a User Profile [via Session Token]
 
-> [POST] `/user_service/user/profile`
+> [PUT] `/user-service/user/profile`
 
-Updates the profile of the current user.
+Updates the profile of the user who owns the specified session token.
 
 Note that all fields of the user profile must be provided including fields that have not been updated.
 
@@ -172,17 +172,20 @@ Note that all fields of the user profile must be provided including fields that 
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
 
-### Update the User Role
+### Update a User's Role
 
-> [POST] `/user_service/user/role`
+> [PUT] `/user-service/users/:userId/role`
 
 Updates the role of a user.
 
 The user making the request must have the "admin" role.
 
-**Parameters**
+**Path Parameters**
 
-- `username` - Username of the user whose role is to be updated.
+- `userId` - ID of the user whose role is to be updated.
+
+**Query Parameters**
+
 - `role` - Updated role.
 
 **Cookies**
@@ -194,18 +197,18 @@ The user making the request must have the "admin" role.
 - `200` - Success.
 - `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
   - Possible causes:
-    - Username/Role was not specified.
-    - Username/Role is of the wrong type.
+    - ID/Role was not specified.
+    - ID/Role is of the wrong type.
     - Role does not match any of the possible user roles.
 - `401` - Session token was not provided, or does not match any existing tokens, or does not belong to a user with the "admin" role.
-- `404` - Username does not belong to any existing user.
+- `404` - ID does not belong to any existing user.
 - `500` - Unexpected error occurred on the server.
 
-### Delete a User
+### Delete a User [via Session Token]
 
-> [DELETE] `/user_service/user`
+> [DELETE] `/user-service/user`
 
-Deletes the current user.
+Deletes the user who owns the specified session token.
 
 **Cookies**
 
@@ -217,13 +220,13 @@ Deletes the current user.
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
 
-### Get the User Identity
+### Get a User Identity [via Session Token]
 
-> [GET] `/user_service/user/identity`
+> [GET] `/user-service/user/identity`
 
-Gets the user's ID and role.
+Gets the ID and role of the user who owns the specified session token.
 
-This is similar to [Get the User Profile](#get-the-user-profile) but sends less information and allows the session token to be specified via a query parameter. It is mainly to be use by other services to determine the existence and role of a user. It can also be use by the frontend to determine the role of a user when other user profile information is unnecessary.
+This is similar to [Get a User Profile \[via Session Token\]](#get-a-user-profile-via-session-token) but sends less information and allows the session token to be specified via a query parameter. It is mainly to be use by other services to determine the existence and role of a user. It can also be use by the frontend to determine the role of a user when other user profile information is unnecessary.
 
 **Parameters**
 

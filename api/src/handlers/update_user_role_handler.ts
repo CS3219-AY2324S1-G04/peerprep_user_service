@@ -2,15 +2,16 @@
  * @file Defines {@link UpdateUserRoleHandler}.
  */
 import express from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
 
+import HttpErrorInfo from '../data_structs/http_error_info';
 import UserIdentity from '../data_structs/user_identity';
 import UserRole from '../enums/user_role';
-import HttpInfoError from '../errors/http_info_error';
 import DatabaseClient from '../service/database_client';
 import {
   parseSessionToken,
+  parseUserId,
   parseUserRole,
-  parseUsername,
 } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
@@ -19,34 +20,51 @@ import Handler, { HttpMethod } from './handler';
  * request. The user who sent the request must have the {@link UserRole.admin}
  * role.
  */
-export default class UpdateUserRoleHandler implements Handler {
+export default class UpdateUserRoleHandler extends Handler {
   public get method(): HttpMethod {
-    return HttpMethod.post;
+    return HttpMethod.put;
   }
 
   public get path(): string {
-    return '/user_service/user/role';
+    return '/user-service/users/:userId/role';
   }
 
   private static _parseCookie(cookies: {
     [x: string]: string | undefined;
   }): string {
     try {
-      return parseSessionToken(cookies['session_token']);
+      return parseSessionToken(cookies['session-token']);
     } catch (e) {
-      throw new HttpInfoError(401);
+      throw new HttpErrorInfo(401);
     }
   }
 
-  private static _parseQuery(query: qs.ParsedQs): [string, UserRole] {
-    try {
-      const username: string = parseUsername(query['username']);
-      const userRole: UserRole = parseUserRole(query['role']);
+  private static _parseParams(
+    pathParams: ParamsDictionary,
+    queryParams: qs.ParsedQs,
+  ): [number, UserRole] {
+    let userId: number;
+    let userRole: UserRole;
 
-      return [username, userRole];
+    const invalidInfo: { [key: string]: string } = {};
+
+    try {
+      userId = parseUserId(pathParams['userId']);
     } catch (e) {
-      throw new HttpInfoError(400, (e as Error).message);
+      invalidInfo['userId'] = (e as Error).message;
     }
+
+    try {
+      userRole = parseUserRole(queryParams['role']);
+    } catch (e) {
+      invalidInfo['role'] = (e as Error).message;
+    }
+
+    if (Object.keys(invalidInfo).length > 0) {
+      throw new HttpErrorInfo(400, JSON.stringify(invalidInfo));
+    }
+
+    return [userId!, userRole!];
   }
 
   private static async _validatePermission(
@@ -57,65 +75,53 @@ export default class UpdateUserRoleHandler implements Handler {
       await client.fetchUserIdentityFromToken(token);
 
     if (userIdentity?.userRole !== UserRole.admin) {
-      throw new HttpInfoError(401);
+      throw new HttpErrorInfo(401);
     }
   }
 
   private static async _updateUserRole(
     client: DatabaseClient,
-    username: string,
+    userId: number,
     userRole: UserRole,
   ): Promise<void> {
-    if (!(await client.updateUserRole(username, userRole))) {
-      throw new HttpInfoError(404, 'Username is not in use.');
+    if (!(await client.updateUserRole(userId, userRole))) {
+      throw new HttpErrorInfo(404, 'User does not exist.');
     }
   }
 
   /**
-   * Updates the role of the user whose username is specified in the request.
+   * Updates the role of the user whose user ID is specified in the request.
    * The session token stored in the request cookie must belong to a user who
    * has the user role {@link UserRole.admin}. Sends a HTTP 200 response.
-   *
-   * If the username or user role specified in the request is invalid, sends a
-   * HTTP 400 response containing the reason for the error in the response
-   * message.
-   *
-   * If no session token is found, or the session token is invalid, or the user
-   * who owns the session token does not have the user role
-   * {@link UserRole.admin}, sends a HTTP 401 response. A session token can be
-   * invalid if it is expired or is not owned by any user.
-   *
-   * If the username specified in the request does not belong to any user, sends
-   * a HTTP 404 response.
-   *
-   * If an internal server error occurs, sends a HTTP 500 response.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
+   * @throws {HttpErrorInfo} Error 400 if the username and/or user role
+   * specified in the request is invalid. Message contains a JSON string of the
+   * reasons for the error.
+   * @throws {HttpErrorInfo} Error 401 if no session token is found, or the
+   * session token is invalid, or the user who owns the session token does not
+   * have the user role {@link UserRole.admin}. A session token can be
+   * invalid if it is expired or is not owned by any user.
+   * @throws {HttpErrorInfo} Error 404 if the user ID in the request does not
+   * belong to any user.
+   * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
-  public async handle(
+  public override async handleLogic(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    try {
-      const token: string = UpdateUserRoleHandler._parseCookie(req.cookies);
-      const [username, userRole]: [string, UserRole] =
-        UpdateUserRoleHandler._parseQuery(req.query);
+    const token: string = UpdateUserRoleHandler._parseCookie(req.cookies);
+    const [userId, userRole]: [number, UserRole] =
+      UpdateUserRoleHandler._parseParams(req.params, req.query);
 
-      await UpdateUserRoleHandler._validatePermission(client, token);
+    await UpdateUserRoleHandler._validatePermission(client, token);
 
-      await UpdateUserRoleHandler._updateUserRole(client, username, userRole);
+    await UpdateUserRoleHandler._updateUserRole(client, userId, userRole);
 
-      res.sendStatus(200);
-    } catch (e) {
-      if (e instanceof HttpInfoError) {
-        res.status(e.statusCode).send(e.message);
-      } else {
-        res.sendStatus(500);
-      }
-    }
+    res.sendStatus(200);
   }
 }

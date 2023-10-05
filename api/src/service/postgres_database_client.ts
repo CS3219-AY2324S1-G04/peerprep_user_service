@@ -3,6 +3,7 @@
  */
 import pg from 'pg';
 
+import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import UserIdentity from '../data_structs/user_identity';
 import UserProfile from '../data_structs/user_profile';
 import UserRole from '../enums/user_role';
@@ -14,6 +15,24 @@ export class PostgresDatabaseClient implements DatabaseClient {
 
   public constructor(config: pg.PoolConfig) {
     this._pgPool = new pg.Pool(config);
+  }
+
+  public async isUsernameInUse(username: string): Promise<boolean> {
+    const result: pg.QueryResult = await this._pgPool.query(
+      'SELECT 1 FROM User_Profiles WHERE username=$1',
+      [username],
+    );
+
+    return result.rows.length > 0;
+  }
+
+  public async isEmailInUse(email: string): Promise<boolean> {
+    const result: pg.QueryResult = await this._pgPool.query(
+      'SELECT 1 FROM User_Profiles WHERE email=$1',
+      [email],
+    );
+
+    return result.rows.length > 0;
   }
 
   public async fetchPasswordHashFromUsername(
@@ -46,12 +65,12 @@ export class PostgresDatabaseClient implements DatabaseClient {
       return undefined;
     }
 
-    return new UserProfile(
-      result.rows[0]['user_id'],
-      result.rows[0]['username'],
-      result.rows[0]['email'],
-      parseUserRole(result.rows[0]['role']),
-    );
+    return {
+      userId: result.rows[0]['user_id'],
+      username: result.rows[0]['username'],
+      email: result.rows[0]['email'],
+      userRole: parseUserRole(result.rows[0]['role']),
+    };
   }
 
   public async fetchUserIdentityFromToken(
@@ -68,14 +87,14 @@ export class PostgresDatabaseClient implements DatabaseClient {
       return undefined;
     }
 
-    return new UserIdentity(
-      result.rows[0]['user_id'],
-      parseUserRole(result.rows[0]['role']),
-    );
+    return {
+      userId: result.rows[0]['user_id'],
+      userRole: parseUserRole(result.rows[0]['role']),
+    };
   }
 
   public async createUserProfileAndCredential(
-    userProfile: UserProfile,
+    userProfile: ClientModifiableUserProfile,
     passwordHash: string,
   ): Promise<void> {
     await this._pgPool.query(
@@ -100,7 +119,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
   }
 
   public async updateUserProfile(
-    userProfile: UserProfile,
+    userProfile: ClientModifiableUserProfile,
     token: string,
   ): Promise<boolean> {
     const result: pg.QueryResult = await this._pgPool.query(
@@ -114,12 +133,12 @@ export class PostgresDatabaseClient implements DatabaseClient {
   }
 
   public async updateUserRole(
-    username: string,
+    userId: number,
     userRole: UserRole,
   ): Promise<boolean> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'UPDATE User_Profiles SET role=$1 WHERE username=$2',
-      [userRole, username],
+      'UPDATE User_Profiles SET role=$1 WHERE user_id=$2',
+      [userRole, userId],
     );
 
     return result.rowCount > 0;

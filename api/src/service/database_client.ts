@@ -1,12 +1,27 @@
 /**
  * @file Defines {@link DatabaseClient}.
  */
+import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import UserIdentity from '../data_structs/user_identity';
 import UserProfile from '../data_structs/user_profile';
 import UserRole from '../enums/user_role';
 
 /** Represents the database storing the user information. */
 export default interface DatabaseClient {
+  /**
+   * Checks if username {@link username} is already in use.
+   * @param username - Username to check.
+   * @returns True if the username is in use. Else, returns false.
+   */
+  isUsernameInUse(username: string): Promise<boolean>;
+
+  /**
+   * Checks if email {@link email} is already in use.
+   * @param email - Email to check.
+   * @returns True if the email is in use. Else, returns false.
+   */
+  isEmailInUse(email: string): Promise<boolean>;
+
   /**
    * Fetches the password hash of the user whose username is {@link username}.
    * @param username - Username of the user whose password hash is to be
@@ -41,7 +56,7 @@ export default interface DatabaseClient {
    * @param passwordHash - Hash of the user's password.
    */
   createUserProfileAndCredential(
-    userProfile: UserProfile,
+    userProfile: ClientModifiableUserProfile,
     passwordHash: string,
   ): Promise<void>;
 
@@ -63,22 +78,25 @@ export default interface DatabaseClient {
    * Updates the user profile which belongs to the user who owns the session
    * token {@link token}. The user profile is updated with values in
    * {@link userProfile}.
-   * @param userProfile - Details of the user's profile.
+   * @param userProfile - Updated information on the user's profile.
    * @param token - Session token belonging to the user.
    * @returns True if a user profile was updated. False if no user profile was
    * updated due to the session token {@link token} being an invalid token.
    */
-  updateUserProfile(userProfile: UserProfile, token: string): Promise<boolean>;
+  updateUserProfile(
+    userProfile: ClientModifiableUserProfile,
+    token: string,
+  ): Promise<boolean>;
 
   /**
-   * Updates the user role of the user with username {@link username}. The user
+   * Updates the user role of the user with username {@link userId}. The user
    * role will be updated to {@link userRole}.
-   * @param username - Username of the user whose role is to be updated.
+   * @param userId - ID of the user whose role is to be updated.
    * @param userRole - User role to assign.
    * @returns True if a user role was updated. False if no user role was updated
-   * due to no user existing with the username {@link username}.
+   * due to no user existing with the username {@link userId}.
    */
-  updateUserRole(username: string, userRole: UserRole): Promise<boolean>;
+  updateUserRole(userId: number, userRole: UserRole): Promise<boolean>;
 
   /**
    * Deletes the user who owns the session token {@link token}.

@@ -3,14 +3,15 @@
  */
 import express from 'express';
 
+import HttpErrorInfo from '../data_structs/http_error_info';
 import DatabaseClient from '../service/database_client';
 
 /** Handler of a HTTP route. */
-export default interface Handler {
+export default abstract class Handler {
   /** Gets the HTTP request method to handle. */
-  get method(): HttpMethod;
+  public abstract get method(): HttpMethod;
   /** Gets the request path to handle. */
-  get path(): string;
+  public abstract get path(): string;
 
   /**
    * Handles a request that was sent to path {@link path()} with method
@@ -20,7 +21,37 @@ export default interface Handler {
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
    */
-  handle(
+  public async handle(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+    client: DatabaseClient,
+  ): Promise<void> {
+    try {
+      await this.handleLogic(req, res, next, client);
+    } catch (e) {
+      if (e instanceof HttpErrorInfo) {
+        res.status(e.statusCode).send(e.message);
+      } else {
+        res.sendStatus(500);
+      }
+    }
+  }
+
+  /**
+   * Handles a request that was sent to path {@link path()} with method
+   * {@link method()}.
+   *
+   * Child classes should override this method to define the handler's logic.
+   * @param req - Information about the request.
+   * @param res - For creating and sending the response.
+   * @param next - Called to let the next handler (if any) handle the request.
+   * @param client - Client for communicating with the database.
+   * @returns Content to be use as the HTTP response body.
+   * @throws {HttpErrorInfo} Error encountered that requires a HTTP error
+   * response to be sent.
+   */
+  protected abstract handleLogic(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
