@@ -16,14 +16,14 @@ import { PostgresDatabaseClient } from './service/postgres_database_client';
 
 const config: Config = new Config();
 const client: DatabaseClient = new PostgresDatabaseClient({
-  password: config.pgPassword,
-  user: config.pgUser,
-  host: config.pgHost,
-  port: config.pgPort,
-  databaseName: config.pgDatabase,
-  connectionTimeoutMillis: config.pgPoolConnectionTimeoutMillis,
-  idleTimeoutMillis: config.pgPoolIdleTimeoutMillis,
-  maxClientCount: config.pgPoolMax,
+  password: config.databasePassword,
+  user: config.databaseUser,
+  host: config.databaseHost,
+  port: config.databasePort,
+  databaseName: config.databaseName,
+  connectionTimeoutMillis: config.databaseConnectionTimeoutMillis,
+  idleTimeoutMillis: config.databaseIdleTimeoutMillis,
+  maxClientCount: config.databaseMaxClientCount,
 });
 
 // TODO: Change password

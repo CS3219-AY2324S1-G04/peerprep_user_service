@@ -8,14 +8,14 @@ import Config from '../config';
 describe('Config', () => {
   describe('constructor', () => {
     const baseConfig: Config = {
-      pgPassword: 'password123',
-      pgUser: 'postgres_user',
-      pgHost: 'postgres_host',
-      pgPort: 100,
-      pgDatabase: 'postgres_database',
-      pgPoolConnectionTimeoutMillis: 101,
-      pgPoolIdleTimeoutMillis: 102,
-      pgPoolMax: 103,
+      databasePassword: 'password123',
+      databaseUser: 'postgres_user',
+      databaseHost: 'postgres_host',
+      databasePort: 100,
+      databaseName: 'postgres_database',
+      databaseConnectionTimeoutMillis: 101,
+      databaseIdleTimeoutMillis: 102,
+      databaseMaxClientCount: 103,
       port: 104,
       hashCost: 105,
       sessionExpireMillis: 106,
@@ -23,45 +23,51 @@ describe('Config', () => {
 
     const defaultPgUserConfig: Config = new Config(
       createEnv(baseConfig, [
-        { name: Config.pgUserEnvVar, val: Config.defaultPgUser },
+        { name: Config.databaseUserEnvVar, val: Config.defaultDatabaseUser },
       ]),
     );
     const defaultPgHostConfig: Config = new Config(
       createEnv(baseConfig, [
-        { name: Config.pgHostEnvVar, val: Config.defaultPgHost },
+        { name: Config.databaseHostEnvVar, val: Config.defaultDatabaseHost },
       ]),
     );
     const defaultPgPortConfig: Config = new Config(
       createEnv(baseConfig, [
-        { name: Config.pgPortEnvVar, val: Config.defaultPgPort.toString() },
+        {
+          name: Config.databasePortEnvVar,
+          val: Config.defaultDatabasePort.toString(),
+        },
       ]),
     );
     const defaultPgDatabaseConfig: Config = new Config(
       createEnv(baseConfig, [
-        { name: Config.pgDatabaseEnvVar, val: Config.defaultPgDatabase },
+        {
+          name: Config.databaseNameEnvVar,
+          val: Config.defaultDatabaseName,
+        },
       ]),
     );
     const defaultPgPoolConnectionTimeoutMillisConfig: Config = new Config(
       createEnv(baseConfig, [
         {
-          name: Config.pgPoolConnectionTimeoutMillisEnvVar,
-          val: Config.defaultPgPoolConnectionTimeoutMillis.toString(),
+          name: Config.databaseConnectionTimeoutMillisEnvVar,
+          val: Config.defaultDatabaseConnectionTimeoutMillis.toString(),
         },
       ]),
     );
     const defaultPgPoolIdleTimeoutMillisConfig: Config = new Config(
       createEnv(baseConfig, [
         {
-          name: Config.pgPoolIdleTimeoutMillisEnvVar,
-          val: Config.defaultPgPoolIdleTimeoutMillis.toString(),
+          name: Config.databaseIdleTimeoutMillisEnvVar,
+          val: Config.defaultDatabaseIdleTimeoutMillis.toString(),
         },
       ]),
     );
     const defaultPgPoolMaxConfig: Config = new Config(
       createEnv(baseConfig, [
         {
-          name: Config.pgPoolMaxEnvVar,
-          val: Config.defaultPgPoolMax.toString(),
+          name: Config.databaseMaxClientCountEnvVar,
+          val: Config.defaultDatabaseMaxClientCount.toString(),
         },
       ]),
     );
@@ -90,38 +96,38 @@ describe('Config', () => {
 
     test('POSTGRES_PASSWORD missing | Throws AssertionError', () => {
       const env: NodeJS.ProcessEnv = createEnv(baseConfig);
-      delete env[Config.pgPasswordEnvVar];
+      delete env[Config.databasePasswordEnvVar];
 
       expect(() => new Config(env)).toThrow(AssertionError);
     });
 
     test.each([
       {
-        envVar: Config.pgUserEnvVar,
+        envVar: Config.databaseUserEnvVar,
         expected: defaultPgUserConfig,
       },
       {
-        envVar: Config.pgHostEnvVar,
+        envVar: Config.databaseHostEnvVar,
         expected: defaultPgHostConfig,
       },
       {
-        envVar: Config.pgPortEnvVar,
+        envVar: Config.databasePortEnvVar,
         expected: defaultPgPortConfig,
       },
       {
-        envVar: Config.pgDatabaseEnvVar,
+        envVar: Config.databaseNameEnvVar,
         expected: defaultPgDatabaseConfig,
       },
       {
-        envVar: Config.pgPoolConnectionTimeoutMillisEnvVar,
+        envVar: Config.databaseConnectionTimeoutMillisEnvVar,
         expected: defaultPgPoolConnectionTimeoutMillisConfig,
       },
       {
-        envVar: Config.pgPoolIdleTimeoutMillisEnvVar,
+        envVar: Config.databaseIdleTimeoutMillisEnvVar,
         expected: defaultPgPoolIdleTimeoutMillisConfig,
       },
       {
-        envVar: Config.pgPoolMaxEnvVar,
+        envVar: Config.databaseMaxClientCountEnvVar,
         expected: defaultPgPoolMaxConfig,
       },
       {
@@ -148,19 +154,19 @@ describe('Config', () => {
 
     test.each([
       {
-        envVar: Config.pgPortEnvVar,
+        envVar: Config.databasePortEnvVar,
         expected: defaultPgPortConfig,
       },
       {
-        envVar: Config.pgPoolConnectionTimeoutMillisEnvVar,
+        envVar: Config.databaseConnectionTimeoutMillisEnvVar,
         expected: defaultPgPoolConnectionTimeoutMillisConfig,
       },
       {
-        envVar: Config.pgPoolIdleTimeoutMillisEnvVar,
+        envVar: Config.databaseIdleTimeoutMillisEnvVar,
         expected: defaultPgPoolIdleTimeoutMillisConfig,
       },
       {
-        envVar: Config.pgPoolMaxEnvVar,
+        envVar: Config.databaseMaxClientCountEnvVar,
         expected: defaultPgPoolMaxConfig,
       },
       {
@@ -204,16 +210,17 @@ function createEnv(
   extras: { name: string; val: string }[] = [],
 ): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = {};
-  env[Config.pgPasswordEnvVar] = config.pgPassword;
-  env[Config.pgUserEnvVar] = config.pgUser;
-  env[Config.pgHostEnvVar] = config.pgHost;
-  env[Config.pgPortEnvVar] = config.pgPort.toString();
-  env[Config.pgDatabaseEnvVar] = config.pgDatabase;
-  env[Config.pgPoolConnectionTimeoutMillisEnvVar] =
-    config.pgPoolConnectionTimeoutMillis.toString();
-  env[Config.pgPoolIdleTimeoutMillisEnvVar] =
-    config.pgPoolIdleTimeoutMillis.toString();
-  env[Config.pgPoolMaxEnvVar] = config.pgPoolMax.toString();
+  env[Config.databasePasswordEnvVar] = config.databasePassword;
+  env[Config.databaseUserEnvVar] = config.databaseUser;
+  env[Config.databaseHostEnvVar] = config.databaseHost;
+  env[Config.databasePortEnvVar] = config.databasePort.toString();
+  env[Config.databaseNameEnvVar] = config.databaseName;
+  env[Config.databaseConnectionTimeoutMillisEnvVar] =
+    config.databaseConnectionTimeoutMillis.toString();
+  env[Config.databaseIdleTimeoutMillisEnvVar] =
+    config.databaseIdleTimeoutMillis.toString();
+  env[Config.databaseMaxClientCountEnvVar] =
+    config.databaseMaxClientCount.toString();
   env[Config.portEnvVar] = config.port.toString();
   env[Config.hashCostEnvVar] = config.hashCost.toString();
   env[Config.sessionExpireMillisEnvVar] = config.sessionExpireMillis.toString();

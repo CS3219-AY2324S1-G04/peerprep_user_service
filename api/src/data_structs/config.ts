@@ -6,31 +6,39 @@ import assert from 'assert';
 // TODO: Make names unspecific to Postgres
 /** Represents the app's configs. */
 export default class Config {
-  /** Name of the environment variable corresponding to {@link pgPassword}. */
-  public static readonly pgPasswordEnvVar: string = 'POSTGRES_PASSWORD';
-  /** Name of the environment variable corresponding to {@link pgUser}. */
-  public static readonly pgUserEnvVar: string = 'POSTGRES_USER';
-  /** Name of the environment variable corresponding to {@link pgHost}. */
-  public static readonly pgHostEnvVar: string = 'POSTGRES_HOST';
-  /** Name of the environment variable corresponding to {@link pgPort}. */
-  public static readonly pgPortEnvVar: string = 'POSTGRES_PORT';
-  /** Name of the environment variable corresponding to {@link pgDatabase}. */
-  public static readonly pgDatabaseEnvVar: string = 'POSTGRES_DB';
+  /**
+   * Name of the environment variable corresponding to {@link databasePassword}.
+   */
+  public static readonly databasePasswordEnvVar: string = 'DATABASE_PASSWORD';
+  /** Name of the environment variable corresponding to {@link databaseUser}. */
+  public static readonly databaseUserEnvVar: string = 'DATABASE_USER';
+  /** Name of the environment variable corresponding to {@link databaseHost}. */
+  public static readonly databaseHostEnvVar: string = 'DATABASE_HOST';
+  /** Name of the environment variable corresponding to {@link databasePort}. */
+  public static readonly databasePortEnvVar: string = 'DATABASE_PORT';
+  /**
+   * Name of the environment variable corresponding to {@link databaseName}.
+   */
+  public static readonly databaseNameEnvVar: string = 'DATABASE_NAME';
 
   /**
    * Name of the environment variable corresponding to
-   * {@link pgPoolConnectionTimeoutMillis}.
+   * {@link databaseConnectionTimeoutMillis}.
    */
-  public static readonly pgPoolConnectionTimeoutMillisEnvVar: string =
-    'POSTGRES_POOL_CONNECTION_TIMEOUT_MILLIS';
+  public static readonly databaseConnectionTimeoutMillisEnvVar: string =
+    'DATABASE_CONNECTION_TIMEOUT_MILLIS';
   /**
    * Name of the environment variable corresponding to
-   * {@link pgPoolIdleTimeoutMillis}.
+   * {@link databaseIdleTimeoutMillis}.
    */
-  public static readonly pgPoolIdleTimeoutMillisEnvVar: string =
-    'POSTGRES_POOL_IDLE_TIMEOUT_MILLIS';
-  /** Name of the environment variable corresponding to {@link pgPoolMax}. */
-  public static readonly pgPoolMaxEnvVar: string = 'POSTGRES_POOL_MAX';
+  public static readonly databaseIdleTimeoutMillisEnvVar: string =
+    'DATABASE_IDLE_TIMEOUT_MILLIS';
+  /**
+   * Name of the environment variable corresponding to
+   * {@link databaseMaxClientCount}.
+   */
+  public static readonly databaseMaxClientCountEnvVar: string =
+    'DATABASE_MAX_CLIENT_COUNT';
 
   /** Name of the environment variable corresponding to {@link port}. */
   public static readonly portEnvVar: string = 'PORT';
@@ -43,21 +51,21 @@ export default class Config {
   public static readonly sessionExpireMillisEnvVar: string =
     'SESSION_EXPIRE_MILLIS';
 
-  /** Default value for {@link pgUser}. */
-  public static readonly defaultPgUser: string = 'postgres';
-  /** Default value for {@link pgHost}. */
-  public static readonly defaultPgHost: string = 'localhost';
-  /** Default value for {@link pgPort}. */
-  public static readonly defaultPgPort: number = 5432;
-  /** Default value for {@link pgDatabase}. */
-  public static readonly defaultPgDatabase: string = 'user';
+  /** Default value for {@link databaseUser}. */
+  public static readonly defaultDatabaseUser: string = 'postgres';
+  /** Default value for {@link databaseHost}. */
+  public static readonly defaultDatabaseHost: string = 'localhost';
+  /** Default value for {@link databasePort}. */
+  public static readonly defaultDatabasePort: number = 5432;
+  /** Default value for {@link databaseName}. */
+  public static readonly defaultDatabaseName: string = 'user';
 
-  /** Default value for {@link pgPoolConnectionTimeoutMillis}. */
-  public static readonly defaultPgPoolConnectionTimeoutMillis: number = 0;
-  /** Default value for {@link pgPoolIdleTimeoutMillis}. */
-  public static readonly defaultPgPoolIdleTimeoutMillis: number = 10000;
-  /** Default value for {@link pgPoolMax}. */
-  public static readonly defaultPgPoolMax: number = 20;
+  /** Default value for {@link databaseConnectionTimeoutMillis}. */
+  public static readonly defaultDatabaseConnectionTimeoutMillis: number = 0;
+  /** Default value for {@link databaseIdleTimeoutMillis}. */
+  public static readonly defaultDatabaseIdleTimeoutMillis: number = 10000;
+  /** Default value for {@link databaseMaxClientCount}. */
+  public static readonly defaultDatabaseMaxClientCount: number = 20;
 
   /** Default value for {@link port}. */
   public static readonly defaultPort: number = 3000;
@@ -67,28 +75,28 @@ export default class Config {
   public static readonly defaultSessionExpireMillis: number = 604800000;
 
   /** Password of the database.*/
-  public readonly pgPassword: string;
+  public readonly databasePassword: string;
   /** User on the database host. */
-  public readonly pgUser: string;
+  public readonly databaseUser: string;
   /** Address of the database host. */
-  public readonly pgHost: string;
+  public readonly databaseHost: string;
   /** Port of the database host that the database is listening on. */
-  public readonly pgPort: number;
+  public readonly databasePort: number;
   /** Name of the database. */
-  public readonly pgDatabase: string;
+  public readonly databaseName: string;
 
   /**
    * Number of milliseconds for a client to connect to the database before
    * timing out.
    */
-  public readonly pgPoolConnectionTimeoutMillis: number;
+  public readonly databaseConnectionTimeoutMillis: number;
   /**
    * Number of milliseconds a client can remain idle for before being
    * disconnected.
    */
-  public readonly pgPoolIdleTimeoutMillis: number;
+  public readonly databaseIdleTimeoutMillis: number;
   /** Max number of clients. */
-  public readonly pgPoolMax: number;
+  public readonly databaseMaxClientCount: number;
 
   /** Port that the app will listen on. */
   public readonly port: number;
@@ -102,37 +110,41 @@ export default class Config {
    * corresponding environment variable. If an environment variable does not
    * have a valid value, assigns a default value instead.
    *
-   * {@link pgPassword} has no default value and must be specified in the
-   * {@link pgPasswordEnvVar} environment variable.
+   * {@link databasePassword} has no default value and must be specified in the
+   * {@link databasePasswordEnvVar} environment variable.
    * @param env - Environment variables.
    */
   public constructor(env: NodeJS.ProcessEnv = process.env) {
     assert(
-      env[Config.pgPasswordEnvVar] !== undefined,
-      'Postgres database password not specified via the environment variable "POSTGRES_PASSWORD".',
+      env[Config.databasePasswordEnvVar] !== undefined,
+      `Postgres database password not specified via the environment variable "${Config.databasePasswordEnvVar}".`,
     );
 
-    this.pgPassword = Config._parseString(
-      env[Config.pgPasswordEnvVar],
+    this.databasePassword = Config._parseString(
+      env[Config.databasePasswordEnvVar],
     ) as string;
-    this.pgUser =
-      Config._parseString(env[Config.pgUserEnvVar]) ?? Config.defaultPgUser;
-    this.pgHost =
-      Config._parseString(env[Config.pgHostEnvVar]) ?? Config.defaultPgHost;
-    this.pgPort =
-      Config._parseInt(env[Config.pgPortEnvVar]) ?? Config.defaultPgPort;
-    this.pgDatabase =
-      Config._parseString(env[Config.pgDatabaseEnvVar]) ??
-      Config.defaultPgDatabase;
+    this.databaseUser =
+      Config._parseString(env[Config.databaseUserEnvVar]) ??
+      Config.defaultDatabaseUser;
+    this.databaseHost =
+      Config._parseString(env[Config.databaseHostEnvVar]) ??
+      Config.defaultDatabaseHost;
+    this.databasePort =
+      Config._parseInt(env[Config.databasePortEnvVar]) ??
+      Config.defaultDatabasePort;
+    this.databaseName =
+      Config._parseString(env[Config.databaseNameEnvVar]) ??
+      Config.defaultDatabaseName;
 
-    this.pgPoolConnectionTimeoutMillis =
-      Config._parseInt(env[Config.pgPoolConnectionTimeoutMillisEnvVar]) ??
-      Config.defaultPgPoolConnectionTimeoutMillis;
-    this.pgPoolIdleTimeoutMillis =
-      Config._parseInt(env[Config.pgPoolIdleTimeoutMillisEnvVar]) ??
-      Config.defaultPgPoolIdleTimeoutMillis;
-    this.pgPoolMax =
-      Config._parseInt(env[Config.pgPoolMaxEnvVar]) ?? Config.defaultPgPoolMax;
+    this.databaseConnectionTimeoutMillis =
+      Config._parseInt(env[Config.databaseConnectionTimeoutMillisEnvVar]) ??
+      Config.defaultDatabaseConnectionTimeoutMillis;
+    this.databaseIdleTimeoutMillis =
+      Config._parseInt(env[Config.databaseIdleTimeoutMillisEnvVar]) ??
+      Config.defaultDatabaseIdleTimeoutMillis;
+    this.databaseMaxClientCount =
+      Config._parseInt(env[Config.databaseMaxClientCountEnvVar]) ??
+      Config.defaultDatabaseMaxClientCount;
 
     this.port = Config._parseInt(env[Config.portEnvVar]) ?? Config.defaultPort;
     this.hashCost =
