@@ -3,6 +3,7 @@
  */
 import assert from 'assert';
 
+// TODO: Make names unspecific to Postgres
 /** Represents the app's configs. */
 export default class Config {
   /** Name of the environment variable corresponding to {@link pgPassword}. */

@@ -4,11 +4,12 @@
 import bcrypt from 'bcrypt';
 import express from 'express';
 import qs from 'qs';
-import { v4 as uuidV4 } from 'uuid';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
+import Password from '../data_structs/password';
+import SessionToken from '../data_structs/session_token';
+import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
-import { parsePassword, parseUsername } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user login. */
@@ -28,20 +29,20 @@ export default class LoginHandler extends Handler {
     return '/user-service/sessions';
   }
 
-  private static _parseQuery(query: qs.ParsedQs): [string, string] {
-    let username: string;
-    let password: string;
+  private static _parseQuery(query: qs.ParsedQs): [Username, Password] {
+    let username: Username;
+    let password: Password;
 
     const invalidInfo: { [key: string]: string } = {};
 
     try {
-      username = parseUsername(query['username']);
+      username = Username.parse(query['username']);
     } catch (e) {
       invalidInfo['username'] = (e as Error).message;
     }
 
     try {
-      password = parsePassword(query['password']);
+      password = Password.parse(query['password']);
     } catch (e) {
       invalidInfo['password'] = (e as Error).message;
     }
@@ -55,10 +56,10 @@ export default class LoginHandler extends Handler {
 
   private static async _authenticate(
     client: DatabaseClient,
-    username: string,
-    password: string,
+    username: Username,
+    password: Password,
     sessionExpireMillis: number,
-  ): Promise<[string, Date]> {
+  ): Promise<[SessionToken, Date]> {
     await LoginHandler._verifyIdentity(client, username, password);
     return await LoginHandler._createUserSession(
       client,
@@ -69,8 +70,8 @@ export default class LoginHandler extends Handler {
 
   private static async _verifyIdentity(
     client: DatabaseClient,
-    username: string,
-    password: string,
+    username: Username,
+    password: Password,
   ): Promise<void> {
     const passwordHash: string = await LoginHandler._fetchPasswordHash(
       client,
@@ -84,7 +85,7 @@ export default class LoginHandler extends Handler {
 
   private static async _fetchPasswordHash(
     client: DatabaseClient,
-    username: string,
+    username: Username,
   ): Promise<string> {
     const passwordHash: string | undefined =
       await client.fetchPasswordHashFromUsername(username);
@@ -96,24 +97,24 @@ export default class LoginHandler extends Handler {
   }
 
   private static async _doesPasswordMatch(
-    password: string,
+    password: Password,
     passwordHash: string,
   ): Promise<boolean> {
-    return await bcrypt.compare(password, passwordHash);
+    return await bcrypt.compare(password.toString(), passwordHash);
   }
 
   private static async _createUserSession(
     client: DatabaseClient,
-    username: string,
+    username: Username,
     sessionExpireMillis: number,
-  ): Promise<[string, Date]> {
+  ): Promise<[SessionToken, Date]> {
     const expireTime: Date = new Date(Date.now() + sessionExpireMillis);
 
-    let token: string = '';
+    let token: SessionToken;
 
     let isEntryCreated: boolean = false;
     while (!isEntryCreated) {
-      token = uuidV4();
+      token = SessionToken.createNew();
 
       try {
         await client.createUserSession(token, username, expireTime);
@@ -126,7 +127,7 @@ export default class LoginHandler extends Handler {
       }
     }
 
-    return [token, expireTime];
+    return [token!, expireTime];
   }
 
   /**
@@ -149,11 +150,11 @@ export default class LoginHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const [username, password]: [string, string] = LoginHandler._parseQuery(
+    const [username, password]: [Username, Password] = LoginHandler._parseQuery(
       req.query,
     );
 
-    const sessionToken: [string, Date] = await LoginHandler._authenticate(
+    const session: [SessionToken, Date] = await LoginHandler._authenticate(
       client,
       username,
       password,
@@ -162,7 +163,7 @@ export default class LoginHandler extends Handler {
 
     res
       .status(200)
-      .cookie('session-token', sessionToken[0], { expires: sessionToken[1] })
+      .cookie('session-token', session[0].toString(), { expires: session[1] })
       .send();
   }
 }

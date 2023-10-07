@@ -20,9 +20,10 @@ const client: DatabaseClient = new PostgresDatabaseClient({
   user: config.pgUser,
   host: config.pgHost,
   port: config.pgPort,
-  database: config.pgDatabase,
+  databaseName: config.pgDatabase,
   connectionTimeoutMillis: config.pgPoolConnectionTimeoutMillis,
   idleTimeoutMillis: config.pgPoolIdleTimeoutMillis,
+  maxClientCount: config.pgPoolMax,
 });
 
 // TODO: Change password

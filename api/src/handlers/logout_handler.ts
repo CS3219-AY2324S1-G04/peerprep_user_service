@@ -4,8 +4,8 @@
 import express from 'express';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
+import SessionToken from '../data_structs/session_token';
 import DatabaseClient from '../service/database_client';
-import { parseSessionToken } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user logout. */
@@ -20,9 +20,9 @@ export default class LogoutHandler extends Handler {
 
   private static _parseCookie(cookies: {
     [x: string]: string | undefined;
-  }): string {
+  }): SessionToken {
     try {
-      return parseSessionToken(cookies['session-token']);
+      return SessionToken.parse(cookies['session-token']);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }
@@ -30,7 +30,7 @@ export default class LogoutHandler extends Handler {
 
   private static async _deleteUserSession(
     client: DatabaseClient,
-    token: string,
+    token: SessionToken,
   ): Promise<void> {
     if (!(await client.deleteUserSession(token))) {
       throw new HttpErrorInfo(401);
@@ -54,7 +54,7 @@ export default class LogoutHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: string = LogoutHandler._parseCookie(req.cookies);
+    const token: SessionToken = LogoutHandler._parseCookie(req.cookies);
     await LogoutHandler._deleteUserSession(client, token);
 
     res.sendStatus(200);

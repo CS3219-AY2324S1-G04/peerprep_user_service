@@ -5,14 +5,11 @@ import express from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
+import SessionToken from '../data_structs/session_token';
+import UserId from '../data_structs/user_id';
 import UserIdentity from '../data_structs/user_identity';
-import UserRole from '../enums/user_role';
+import UserRole, { parseUserRole } from '../enums/user_role';
 import DatabaseClient from '../service/database_client';
-import {
-  parseSessionToken,
-  parseUserId,
-  parseUserRole,
-} from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
 /**
@@ -31,9 +28,9 @@ export default class UpdateUserRoleHandler extends Handler {
 
   private static _parseCookie(cookies: {
     [x: string]: string | undefined;
-  }): string {
+  }): SessionToken {
     try {
-      return parseSessionToken(cookies['session-token']);
+      return SessionToken.parse(cookies['session-token']);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }
@@ -42,14 +39,14 @@ export default class UpdateUserRoleHandler extends Handler {
   private static _parseParams(
     pathParams: ParamsDictionary,
     queryParams: qs.ParsedQs,
-  ): [number, UserRole] {
-    let userId: number;
+  ): [UserId, UserRole] {
+    let userId: UserId;
     let userRole: UserRole;
 
     const invalidInfo: { [key: string]: string } = {};
 
     try {
-      userId = parseUserId(pathParams['userId']);
+      userId = UserId.parseString(pathParams['userId']);
     } catch (e) {
       invalidInfo['userId'] = (e as Error).message;
     }
@@ -69,7 +66,7 @@ export default class UpdateUserRoleHandler extends Handler {
 
   private static async _validatePermission(
     client: DatabaseClient,
-    token: string,
+    token: SessionToken,
   ): Promise<void> {
     const userIdentity: UserIdentity | undefined =
       await client.fetchUserIdentityFromToken(token);
@@ -81,7 +78,7 @@ export default class UpdateUserRoleHandler extends Handler {
 
   private static async _updateUserRole(
     client: DatabaseClient,
-    userId: number,
+    userId: UserId,
     userRole: UserRole,
   ): Promise<void> {
     if (!(await client.updateUserRole(userId, userRole))) {
@@ -114,8 +111,8 @@ export default class UpdateUserRoleHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: string = UpdateUserRoleHandler._parseCookie(req.cookies);
-    const [userId, userRole]: [number, UserRole] =
+    const token: SessionToken = UpdateUserRoleHandler._parseCookie(req.cookies);
+    const [userId, userRole]: [UserId, UserRole] =
       UpdateUserRoleHandler._parseParams(req.params, req.query);
 
     await UpdateUserRoleHandler._validatePermission(client, token);

@@ -5,9 +5,9 @@ import express from 'express';
 import qs from 'qs';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
-import UserIdentity from '../data_structs/user_identity';
+import SessionToken from '../data_structs/session_token';
+import UserIdentity, { JsonUserIdentity } from '../data_structs/user_identity';
 import DatabaseClient from '../service/database_client';
-import { parseSessionToken } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
 /**
@@ -29,13 +29,13 @@ export default class GetUserIdentityHandler extends Handler {
     },
   ) {
     try {
-      return parseSessionToken(query['session-token']);
+      return SessionToken.parse(query['session-token']);
     } catch (e) {
       // Look for session token in cookies instead
     }
 
     try {
-      return parseSessionToken(cookies['session-token']);
+      return SessionToken.parse(cookies['session-token']);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }
@@ -43,7 +43,7 @@ export default class GetUserIdentityHandler extends Handler {
 
   private static async _fetchUserIdentity(
     client: DatabaseClient,
-    token: string,
+    token: SessionToken,
   ): Promise<UserIdentity> {
     const userIdentity: UserIdentity | undefined =
       await client.fetchUserIdentityFromToken(token);
@@ -72,7 +72,7 @@ export default class GetUserIdentityHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: string = GetUserIdentityHandler._getSessionToken(
+    const token: SessionToken = GetUserIdentityHandler._getSessionToken(
       req.query,
       req.cookies,
     );
@@ -80,6 +80,6 @@ export default class GetUserIdentityHandler extends Handler {
     const userIdentity: UserIdentity =
       await GetUserIdentityHandler._fetchUserIdentity(client, token);
 
-    res.status(200).send(JSON.stringify(userIdentity));
+    res.status(200).send(JSON.stringify(new JsonUserIdentity(userIdentity)));
   }
 }
