@@ -30,7 +30,7 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
 
 1. Clone this repository.
 2. Build the docker images by running: `./build_image.sh`
-3. Modify the `.env` file as per needed. Refer to [Environment Variables](#environment-variables) for a list of configs. It is recommended that you modify `POSTGRES_PASSWORD` and `ADMIN_EMAIL`.
+3. Modify the `.env` file as per needed. Refer to [Environment Variables](#environment-variables) for a list of configs. It is recommended that you modify `DATABASE_PASSWORD` and `ADMIN_EMAIL`.
 4. Create the docker containers by running: `docker compose up`
 
 ## Environment Variables
@@ -39,9 +39,9 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
 
 These environment variables are used by both the API and database images.
 
-* `POSTGRES_PASSWORD` - Password of the database.
-* `POSTGRES_USER` - User on the database host.
-* `POSTGRES_DB` - Name of the database.
+* `DATABASE_PASSWORD` - Password of the database.
+* `DATABASE_USER` - User on the database host.
+* `DATABASE_NAME` - Name of the database.
 * `HASH_COST` - Cost factor of the password hashing algorithm.
 
 ### Database
@@ -52,10 +52,10 @@ These environment variables are used by both the API and database images.
 ### API
 
 * `PORT` - Port to listen on.
-* `POSTGRES_PORT` - Port the database is listening on. This environment variable can be ignored if using docker compose.
-* `POSTGRES_POOL_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
-* `POSTGRES_POOL_IDLE_TIMEOUT_MILLIS` - Number of milliseconds a database client can remain idle for before being disconnected.
-* `POSTGRES_POOL_MAX` - Max number of database clients.
+* `DATABASE_PORT` - Port the database is listening on. This environment variable can be ignored if using docker compose.
+* `DATABASE_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
+* `DATABASE_IDLE_TIMEOUT_MILLIS` - Number of milliseconds a database client can remain idle for before being disconnected.
+* `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
 * `SESSION_EXPIRE_MILLIS` - The number of milliseconds a login session can last for.
 
 ## REST API

@@ -4,9 +4,9 @@
 import express from 'express';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
-import UserProfile from '../data_structs/user_profile';
+import SessionToken from '../data_structs/session_token';
+import UserProfile, { JsonUserProfile } from '../data_structs/user_profile';
 import DatabaseClient from '../service/database_client';
-import { parseSessionToken } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles getting the profile of the user who sent the request. */
@@ -21,9 +21,9 @@ export default class GetUserProfileHandler extends Handler {
 
   private static _parseCookie(cookies: {
     [x: string]: string | undefined;
-  }): string {
+  }): SessionToken {
     try {
-      return parseSessionToken(cookies['session-token']);
+      return SessionToken.parse(cookies['session-token']);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }
@@ -31,7 +31,7 @@ export default class GetUserProfileHandler extends Handler {
 
   private static async _fetchUserProfile(
     client: DatabaseClient,
-    token: string,
+    token: SessionToken,
   ): Promise<UserProfile> {
     const userProfile: UserProfile | undefined =
       await client.fetchUserProfileFromToken(token);
@@ -60,10 +60,10 @@ export default class GetUserProfileHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: string = GetUserProfileHandler._parseCookie(req.cookies);
+    const token: SessionToken = GetUserProfileHandler._parseCookie(req.cookies);
     const userProfile: UserProfile =
       await GetUserProfileHandler._fetchUserProfile(client, token);
 
-    res.status(200).send(JSON.stringify(userProfile));
+    res.status(200).send(JSON.stringify(new JsonUserProfile(userProfile)));
   }
 }

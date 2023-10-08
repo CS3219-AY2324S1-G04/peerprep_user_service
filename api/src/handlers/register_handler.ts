@@ -3,12 +3,13 @@
  */
 import bcrypt from 'bcrypt';
 import express from 'express';
-import { ParsedQs } from 'qs';
 
+import EmailAddress from '../data_structs/email_address';
 import HttpErrorInfo from '../data_structs/http_error_info';
+import Password from '../data_structs/password';
 import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
+import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
-import { parseEmail, parsePassword, parseUsername } from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles user registration. */
@@ -28,38 +29,40 @@ export default class RegisterHandler extends Handler {
     return '/user-service/users';
   }
 
-  private static async _parseAndValidateParams(
+  private static async _parseParams(
     client: DatabaseClient,
     query: qs.ParsedQs,
-  ): Promise<[ClientModifiableUserProfile, string]> {
-    let username: string;
-    let email: string;
-    let password: string;
+  ): Promise<[ClientModifiableUserProfile, Password]> {
+    let username: Username | undefined = undefined;
+    let email: EmailAddress | undefined = undefined;
+    let password: Password | undefined = undefined;
 
     const invalidInfo: { [key: string]: string } = {};
 
     try {
-      username = await RegisterHandler._parseAndValidateUsername(
-        client,
-        query['username'],
-      );
+      username = Username.parseAndValidate(query['username']);
     } catch (e) {
       invalidInfo['username'] = (e as Error).message;
     }
 
     try {
-      email = await RegisterHandler._parseAndValidateEmail(
-        client,
-        query['email'],
-      );
+      email = EmailAddress.parseAndValidate(query['email']);
     } catch (e) {
       invalidInfo['email'] = (e as Error).message;
     }
 
     try {
-      password = parsePassword(query['password']);
+      password = Password.parseAndValidate(query['password']);
     } catch (e) {
       invalidInfo['password'] = (e as Error).message;
+    }
+
+    if (username !== undefined && (await client.isUsernameInUse(username))) {
+      invalidInfo['username'] = 'Username already in use.';
+    }
+
+    if (email !== undefined && (await client.isEmailInUse(email))) {
+      invalidInfo['email'] = 'Email already in use.';
     }
 
     if (Object.keys(invalidInfo).length > 0) {
@@ -69,36 +72,10 @@ export default class RegisterHandler extends Handler {
     return [{ username: username!, email: email! }, password!];
   }
 
-  private static async _parseAndValidateUsername(
-    client: DatabaseClient,
-    usernameRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
-  ): Promise<string> {
-    const username: string = parseUsername(usernameRaw);
-
-    if (await client.isUsernameInUse(username)) {
-      throw Error('Username already in use.');
-    }
-
-    return username;
-  }
-
-  private static async _parseAndValidateEmail(
-    client: DatabaseClient,
-    emailRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
-  ): Promise<string> {
-    const email: string = parseEmail(emailRaw);
-
-    if (await client.isEmailInUse(email)) {
-      throw Error('Email already in use.');
-    }
-
-    return email;
-  }
-
   private static async _createUser(
     client: DatabaseClient,
     userProfile: ClientModifiableUserProfile,
-    password: string,
+    password: Password,
     hashSaltRounds: number,
   ): Promise<void> {
     const passwordHash: string = await RegisterHandler._hashPassword(
@@ -114,10 +91,13 @@ export default class RegisterHandler extends Handler {
   }
 
   private static async _hashPassword(
-    password: string,
+    password: Password,
     hashSaltRounds: number,
   ): Promise<string> {
-    return await bcrypt.hash(password, await bcrypt.genSalt(hashSaltRounds));
+    return await bcrypt.hash(
+      password.toString(),
+      await bcrypt.genSalt(hashSaltRounds),
+    );
   }
 
   private static async _createUserProfileAndCredential(
@@ -125,27 +105,7 @@ export default class RegisterHandler extends Handler {
     userProfile: ClientModifiableUserProfile,
     passwordHash: string,
   ): Promise<void> {
-    try {
-      await client.createUserProfileAndCredential(userProfile, passwordHash);
-    } catch (e) {
-      if (client.isDuplicateUserProfileUsernameError(e)) {
-        throw new HttpErrorInfo(
-          400,
-          JSON.stringify({
-            username: 'Username already in use.',
-          }),
-        );
-      } else if (client.isDuplicateUserProfileEmailError(e)) {
-        throw new HttpErrorInfo(
-          400,
-          JSON.stringify({
-            email: 'Email already in use.',
-          }),
-        );
-      }
-
-      throw e;
-    }
+    await client.createUserProfileAndCredential(userProfile, passwordHash);
   }
 
   /**
@@ -165,8 +125,8 @@ export default class RegisterHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const [userProfile, password]: [ClientModifiableUserProfile, string] =
-      await RegisterHandler._parseAndValidateParams(client, req.query);
+    const [userProfile, password]: [ClientModifiableUserProfile, Password] =
+      await RegisterHandler._parseParams(client, req.query);
 
     await RegisterHandler._createUser(
       client,

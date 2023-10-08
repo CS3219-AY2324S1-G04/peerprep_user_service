@@ -2,16 +2,13 @@
  * @file Defines {@link UpdateUserProfileHandler}.
  */
 import express from 'express';
-import { ParsedQs } from 'qs';
 
+import EmailAddress from '../data_structs/email_address';
 import HttpErrorInfo from '../data_structs/http_error_info';
+import SessionToken from '../data_structs/session_token';
 import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
+import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
-import {
-  parseEmail,
-  parseSessionToken,
-  parseUsername,
-} from '../utils/data_parser';
 import Handler, { HttpMethod } from './handler';
 
 /** Handles updating the profile of the user who sent the request. */
@@ -26,39 +23,45 @@ export default class UpdateUserProfileHandler extends Handler {
 
   private static _parseCookie(cookies: {
     [x: string]: string | undefined;
-  }): string {
+  }): SessionToken {
     try {
-      return parseSessionToken(cookies['session-token']);
+      return SessionToken.parse(cookies['session-token']);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }
   }
 
-  private static async _parseAndValidateParams(
+  private static async _parseParams(
     client: DatabaseClient,
     query: qs.ParsedQs,
+    token: SessionToken,
   ): Promise<ClientModifiableUserProfile> {
-    let username: string;
-    let email: string;
+    let username: Username | undefined = undefined;
+    let email: EmailAddress | undefined = undefined;
 
     const invalidInfo: { [key: string]: string } = {};
 
     try {
-      username = await UpdateUserProfileHandler._parseAndValidateUsername(
-        client,
-        query['username'],
-      );
+      username = await Username.parseAndValidate(query['username']);
     } catch (e) {
       invalidInfo['username'] = (e as Error).message;
     }
 
     try {
-      email = await UpdateUserProfileHandler._parseAndValidateEmail(
-        client,
-        query['email'],
-      );
+      email = EmailAddress.parseAndValidate(query['email']);
     } catch (e) {
       invalidInfo['email'] = (e as Error).message;
+    }
+
+    if (
+      username !== undefined &&
+      (await client.isUsernameInUse(username, token))
+    ) {
+      invalidInfo['username'] = 'Username already in use.';
+    }
+
+    if (email !== undefined && (await client.isEmailInUse(email, token))) {
+      invalidInfo['email'] = 'Email already in use.';
     }
 
     if (Object.keys(invalidInfo).length > 0) {
@@ -68,59 +71,13 @@ export default class UpdateUserProfileHandler extends Handler {
     return { username: username!, email: email! };
   }
 
-  private static async _parseAndValidateUsername(
-    client: DatabaseClient,
-    usernameRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
-  ): Promise<string> {
-    const username: string = parseUsername(usernameRaw);
-
-    if (await client.isUsernameInUse(username)) {
-      throw Error('Username already in use.');
-    }
-
-    return username;
-  }
-
-  private static async _parseAndValidateEmail(
-    client: DatabaseClient,
-    emailRaw: string | ParsedQs | string[] | ParsedQs[] | undefined,
-  ): Promise<string> {
-    const email: string = parseEmail(emailRaw);
-
-    if (await client.isEmailInUse(email)) {
-      throw Error('Email already in use.');
-    }
-
-    return email;
-  }
-
   private static async _updateUserProfile(
     client: DatabaseClient,
     userProfile: ClientModifiableUserProfile,
-    token: string,
+    token: SessionToken,
   ): Promise<void> {
-    try {
-      if (!(await client.updateUserProfile(userProfile, token))) {
-        throw new HttpErrorInfo(401);
-      }
-    } catch (e) {
-      if (client.isDuplicateUserProfileUsernameError(e)) {
-        throw new HttpErrorInfo(
-          400,
-          JSON.stringify({
-            username: 'Username already in use.',
-          }),
-        );
-      } else if (client.isDuplicateUserProfileEmailError(e)) {
-        throw new HttpErrorInfo(
-          400,
-          JSON.stringify({
-            email: 'Email already in use.',
-          }),
-        );
-      }
-
-      throw e;
+    if (!(await client.updateUserProfile(userProfile, token))) {
+      throw new HttpErrorInfo(401);
     }
   }
 
@@ -144,9 +101,11 @@ export default class UpdateUserProfileHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: string = UpdateUserProfileHandler._parseCookie(req.cookies);
+    const token: SessionToken = UpdateUserProfileHandler._parseCookie(
+      req.cookies,
+    );
     const userProfile: ClientModifiableUserProfile =
-      await UpdateUserProfileHandler._parseAndValidateParams(client, req.query);
+      await UpdateUserProfileHandler._parseParams(client, req.query, token);
 
     await UpdateUserProfileHandler._updateUserProfile(
       client,

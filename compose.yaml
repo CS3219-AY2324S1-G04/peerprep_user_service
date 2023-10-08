@@ -1,41 +1,38 @@
 services:
-  database:
+  user_service_database:
     image: peerprep_user_service_database
     build: ./database
     networks:
-      network1:
-        ipv4_address: 172.100.0.2
+      - network1
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_DB: ${DATABASE_NAME}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       HASH_COST: ${HASH_COST}
-  api:
+
+  user_service_api:
     depends_on:
-      - database
+      - user_service_database
     image: peerprep_user_service_api
     build: ./api
     networks:
-      network1:
-        ipv4_address: 172.100.0.3
+      - network1
     ports:
       - "${PORT}:${PORT}"
     environment:
-      POSTGRES_HOST: "172.100.0.2"
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_POOL_CONNECTION_TIMEOUT_MILLIS: ${POSTGRES_POOL_CONNECTION_TIMEOUT_MILLIS}
-      POSTGRES_POOL_IDLE_TIMEOUT_MILLIS: ${POSTGRES_POOL_IDLE_TIMEOUT_MILLIS}
-      POSTGRES_POOL_MAX: ${POSTGRES_POOL_MAX}
+      DATABASE_HOST: "user_service_database"
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_CONNECTION_TIMEOUT_MILLIS: ${DATABASE_CONNECTION_TIMEOUT_MILLIS}
+      DATABASE_IDLE_TIMEOUT_MILLIS: ${DATABASE_IDLE_TIMEOUT_MILLIS}
+      DATABASE_MAX_CLIENT_COUNT: ${DATABASE_MAX_CLIENT_COUNT}
       PORT: ${PORT}
       HASH_COST: ${HASH_COST}
       SESSION_EXPIRE_MILLIS: ${SESSION_EXPIRE_MILLIS}
 
 networks:
   network1:
-    ipam:
-      config:
-        - subnet: 172.100.0.0/16
+    name: peerprep
