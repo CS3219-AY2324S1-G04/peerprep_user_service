@@ -14,6 +14,8 @@ import Handler, { HttpMethod } from './handler';
 
 /** Handles user login. */
 export default class LoginHandler extends Handler {
+  private static _cookieExpiry: Date = new Date((Math.pow(2, 31) - 1) * 1000);
+
   private readonly _sessionExpireMillis: number;
 
   public constructor(sessionExpireMillis: number) {
@@ -59,7 +61,7 @@ export default class LoginHandler extends Handler {
     username: Username,
     password: Password,
     sessionExpireMillis: number,
-  ): Promise<[SessionToken, Date]> {
+  ): Promise<SessionToken> {
     await LoginHandler._verifyIdentity(client, username, password);
     return await LoginHandler._createUserSession(
       client,
@@ -107,9 +109,7 @@ export default class LoginHandler extends Handler {
     client: DatabaseClient,
     username: Username,
     sessionExpireMillis: number,
-  ): Promise<[SessionToken, Date]> {
-    const expireTime: Date = new Date(Date.now() + sessionExpireMillis);
-
+  ): Promise<SessionToken> {
     let token: SessionToken;
 
     let isEntryCreated: boolean = false;
@@ -117,7 +117,11 @@ export default class LoginHandler extends Handler {
       token = SessionToken.createNew();
 
       try {
-        await client.createUserSession(token, username, expireTime);
+        await client.createUserSession(
+          token,
+          username,
+          new Date(Date.now() + sessionExpireMillis),
+        );
 
         isEntryCreated = true;
       } catch (e) {
@@ -127,7 +131,7 @@ export default class LoginHandler extends Handler {
       }
     }
 
-    return [token!, expireTime];
+    return token!;
   }
 
   /**
@@ -154,7 +158,7 @@ export default class LoginHandler extends Handler {
       req.query,
     );
 
-    const session: [SessionToken, Date] = await LoginHandler._authenticate(
+    const token: SessionToken = await LoginHandler._authenticate(
       client,
       username,
       password,
@@ -163,7 +167,14 @@ export default class LoginHandler extends Handler {
 
     res
       .status(200)
-      .cookie('session-token', session[0].toString(), { expires: session[1] })
+      .cookie('session-token', token.toString(), {
+        expires: LoginHandler._cookieExpiry,
+        httpOnly: true,
+        sameSite: true,
+      })
+      .cookie('is-logged-in', true, {
+        expires: LoginHandler._cookieExpiry,
+      })
       .send();
   }
 }
