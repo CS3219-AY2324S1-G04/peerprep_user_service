@@ -1,5 +1,5 @@
 /**
- * @file Defines {@link PostgresDatabaseClient}.
+ * @file Defines {@link PgDatabaseClient}.
  */
 import pg from 'pg';
 
@@ -13,7 +13,7 @@ import Username from '../data_structs/username';
 import UserRole, { parseUserRole } from '../enums/user_role';
 import DatabaseClient, { DatabaseClientConfig } from './database_client';
 
-export class PostgresDatabaseClient implements DatabaseClient {
+export class PgDatabaseClient implements DatabaseClient {
   private _pgPool: pg.Pool;
 
   public constructor(config: DatabaseClientConfig) {

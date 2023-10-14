@@ -12,10 +12,10 @@ import RegisterHandler from './handlers/register_handler';
 import UpdateUserProfileHandler from './handlers/update_user_profile_handler';
 import UpdateUserRoleHandler from './handlers/update_user_role_handler';
 import DatabaseClient from './service/database_client';
-import { PostgresDatabaseClient } from './service/postgres_database_client';
+import { PgDatabaseClient } from './service/pg_database_client';
 
 const config: Config = new Config();
-const client: DatabaseClient = new PostgresDatabaseClient({
+const client: DatabaseClient = new PgDatabaseClient({
   password: config.databasePassword,
   user: config.databaseUser,
   host: config.databaseHost,

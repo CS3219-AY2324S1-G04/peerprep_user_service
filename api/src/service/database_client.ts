@@ -10,7 +10,7 @@ import UserProfile from '../data_structs/user_profile';
 import Username from '../data_structs/username';
 import UserRole from '../enums/user_role';
 
-/** Represents the database storing the user information. */
+/** Client for performing database operations. */
 export default interface DatabaseClient {
   /**
    * Checks if username {@link username} is already in use.
