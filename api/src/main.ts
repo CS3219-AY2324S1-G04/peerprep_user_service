@@ -26,8 +26,6 @@ const client: DatabaseClient = new PostgresDatabaseClient({
   maxClientCount: config.databaseMaxClientCount,
 });
 
-// TODO: Change password
-// TODO: List users if admin (requires pagination)
 const app: App = new App(config.port, client, [
   new RegisterHandler(config.hashCost),
   new LoginHandler(config.sessionExpireMillis),
