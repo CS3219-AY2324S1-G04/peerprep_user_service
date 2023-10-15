@@ -1,5 +1,5 @@
 /**
- * @file Defines {@link PgDatabaseClient}.
+ * @file Defines {@link PostgresDatabaseClient}.
  */
 import { DataSource, MoreThan } from 'typeorm';
 
@@ -16,7 +16,7 @@ import UserSessionEntity from '../entities/user_session';
 import UserRole, { parseUserRole } from '../enums/user_role';
 import DatabaseClient, { DatabaseClientConfig } from './database_client';
 
-export class PgDatabaseClient implements DatabaseClient {
+export class PostgresDatabaseClient implements DatabaseClient {
   private _dataSource: DataSource;
 
   /**
