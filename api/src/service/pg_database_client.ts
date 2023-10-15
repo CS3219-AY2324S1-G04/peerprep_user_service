@@ -34,8 +34,8 @@ export class PgDatabaseClient implements DatabaseClient {
     token?: SessionToken,
   ): Promise<boolean> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT 1 FROM User_Profiles WHERE username=$1 AND user_id NOT IN (' +
-        'SELECT user_id FROM User_Sessions WHERE token=$2)',
+      'SELECT 1 FROM user_profile WHERE username=$1 AND user_id NOT IN (' +
+        'SELECT user_id FROM user_session WHERE token=$2)',
       [username.toString(), token?.toString()],
     );
 
@@ -47,8 +47,8 @@ export class PgDatabaseClient implements DatabaseClient {
     token?: SessionToken,
   ): Promise<boolean> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT 1 FROM User_Profiles WHERE email=$1 AND user_id NOT IN (' +
-        'SELECT user_id FROM User_Sessions WHERE token=$2)',
+      'SELECT 1 FROM user_profile WHERE email=$1 AND user_id NOT IN (' +
+        'SELECT user_id FROM user_session WHERE token=$2)',
       [email.toString(), token?.toString()],
     );
 
@@ -59,8 +59,8 @@ export class PgDatabaseClient implements DatabaseClient {
     username: Username,
   ): Promise<string | undefined> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT password_hash FROM User_Credentials WHERE user_id IN (' +
-        '  SELECT user_id FROM User_Profiles WHERE username=$1)',
+      'SELECT password_hash FROM user_credential WHERE user_id IN (' +
+        '  SELECT user_id FROM user_profile WHERE username=$1)',
       [username.toString()],
     );
 
@@ -75,8 +75,8 @@ export class PgDatabaseClient implements DatabaseClient {
     token: SessionToken,
   ): Promise<UserProfile | undefined> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT * FROM User_Profiles WHERE user_id IN (' +
-        '  SELECT user_id FROM User_Sessions ' +
+      'SELECT * FROM user_profile WHERE user_id IN (' +
+        '  SELECT user_id FROM user_session ' +
         '  WHERE token=$1 AND expire_time > CURRENT_TIMESTAMP)',
       [token.toString()],
     );
@@ -97,8 +97,8 @@ export class PgDatabaseClient implements DatabaseClient {
     token: SessionToken,
   ): Promise<UserIdentity | undefined> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT user_id, role FROM User_Profiles WHERE user_id IN (' +
-        '  SELECT user_id FROM User_Sessions ' +
+      'SELECT user_id, role FROM user_profile WHERE user_id IN (' +
+        '  SELECT user_id FROM user_session ' +
         '  WHERE token=$1 AND expire_time > CURRENT_TIMESTAMP)',
       [token.toString()],
     );
@@ -119,9 +119,9 @@ export class PgDatabaseClient implements DatabaseClient {
   ): Promise<void> {
     await this._pgPool.query(
       'WITH user_id_cte AS (' +
-        '  INSERT INTO User_Profiles (username, email) ' +
+        '  INSERT INTO user_profile (username, email) ' +
         '  VALUES ($1, $2) RETURNING user_id) ' +
-        'INSERT INTO User_Credentials SELECT user_id, $3 FROM user_id_cte;',
+        'INSERT INTO user_credential SELECT user_id, $3 FROM user_id_cte;',
       [
         userProfile.username.toString(),
         userProfile.email.toString(),
@@ -136,8 +136,8 @@ export class PgDatabaseClient implements DatabaseClient {
     expireTime: Date,
   ): Promise<void> {
     await this._pgPool.query(
-      'INSERT INTO User_Sessions (token, user_id, expire_time) ' +
-        '  SELECT $1, user_id, $2 FROM User_Profiles WHERE username=$3',
+      'INSERT INTO user_session (token, user_id, expire_time) ' +
+        '  SELECT $1, user_id, $2 FROM user_profile WHERE username=$3',
       [token.toString(), expireTime, username.toString()],
     );
   }
@@ -147,8 +147,8 @@ export class PgDatabaseClient implements DatabaseClient {
     token: SessionToken,
   ): Promise<boolean> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'UPDATE User_Profiles SET username=$1, email=$2 WHERE user_id IN (' +
-        '  SELECT user_id FROM User_Sessions ' +
+      'UPDATE user_profile SET username=$1, email=$2 WHERE user_id IN (' +
+        '  SELECT user_id FROM user_session ' +
         '  WHERE token=$3 AND expire_time > CURRENT_TIMESTAMP)',
       [
         userProfile.username.toString(),
@@ -165,7 +165,7 @@ export class PgDatabaseClient implements DatabaseClient {
     userRole: UserRole,
   ): Promise<boolean> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'UPDATE User_Profiles SET role=$1 WHERE user_id=$2',
+      'UPDATE user_profile SET role=$1 WHERE user_id=$2',
       [userRole.toString(), userId.toString()],
     );
 
@@ -174,8 +174,8 @@ export class PgDatabaseClient implements DatabaseClient {
 
   public async deleteUserProfile(token: SessionToken): Promise<boolean> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'DELETE FROM User_Profiles ' +
-        'WHERE user_id IN (SELECT user_id FROM User_Sessions WHERE token=$1)',
+      'DELETE FROM user_profile ' +
+        'WHERE user_id IN (SELECT user_id FROM user_session WHERE token=$1)',
       [token.toString()],
     );
 
@@ -184,7 +184,7 @@ export class PgDatabaseClient implements DatabaseClient {
 
   public async deleteUserSession(token: SessionToken): Promise<boolean> {
     const result: pg.QueryResult = await this._pgPool.query(
-      'DELETE FROM User_Sessions WHERE token=$1',
+      'DELETE FROM user_session WHERE token=$1',
       [token.toString()],
     );
 
@@ -195,7 +195,7 @@ export class PgDatabaseClient implements DatabaseClient {
     return (
       err instanceof Error &&
       err.message.includes(
-        'duplicate key value violates unique constraint "user_profiles_username_key"',
+        'duplicate key value violates unique constraint "user_profile_username_key"',
       )
     );
   }
@@ -204,7 +204,7 @@ export class PgDatabaseClient implements DatabaseClient {
     return (
       err instanceof Error &&
       err.message.includes(
-        'duplicate key value violates unique constraint "user_profiles_email_key"',
+        'duplicate key value violates unique constraint "user_profile_email_key"',
       )
     );
   }
@@ -213,7 +213,7 @@ export class PgDatabaseClient implements DatabaseClient {
     return (
       err instanceof Error &&
       err.message.includes(
-        'duplicate key value violates unique constraint "user_sessions_pkey"',
+        'duplicate key value violates unique constraint "user_session_pkey"',
       )
     );
   }

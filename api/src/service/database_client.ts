@@ -130,21 +130,21 @@ export default interface DatabaseClient {
   /**
    * @param err - The error to check.
    * @returns True if {@link err} is an {@link Error} caused by a duplicated
-   * user profile username in the user_profiles database relation.
+   * user profile username.
    */
   isDuplicateUserProfileUsernameError(err: unknown): boolean;
 
   /**
    * @param err - The error to check.
    * @returns True if {@link err} is an {@link Error} caused by a duplicated
-   * user profile email in the user_profiles database relation.
+   * user profile email.
    */
   isDuplicateUserProfileEmailError(err: unknown): boolean;
 
   /**
    * @param err - The error to check.
    * @returns True if {@link err} is an {@link Error} caused by a duplicated
-   * session token in the user_sessions database relation.
+   * user session token.
    */
   isDuplicateUserSessionTokenError(err: unknown): boolean;
 }
