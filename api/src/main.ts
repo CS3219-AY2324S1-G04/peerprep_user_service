@@ -37,4 +37,4 @@ const app: App = new App(config.port, client, [
   new GetUserIdentityHandler(),
 ]);
 
-app.start();
+client.initialise().then(() => app.start());

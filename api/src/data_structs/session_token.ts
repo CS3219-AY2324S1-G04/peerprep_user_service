@@ -1,7 +1,7 @@
 /**
  * @file Defines {@link SessionToken}.
  */
-import { v4 as uuidV4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 /** Session token. */
 export default class SessionToken {
@@ -32,7 +32,7 @@ export default class SessionToken {
   }
 
   public static createNew(): SessionToken {
-    return new SessionToken(uuidV4());
+    return new SessionToken(randomUUID());
   }
 
   private static _isTokenString(

@@ -1,7 +1,7 @@
 /**
  * @file Defines {@link PgDatabaseClient}.
  */
-import pg from 'pg';
+import { DataSource, MoreThan } from 'typeorm';
 
 import EmailAddress from '../data_structs/email_address';
 import SessionToken from '../data_structs/session_token';
@@ -10,106 +10,155 @@ import UserId from '../data_structs/user_id';
 import UserIdentity from '../data_structs/user_identity';
 import UserProfile from '../data_structs/user_profile';
 import Username from '../data_structs/username';
+import UserCredentialEntity from '../entities/user_credential';
+import UserProfileEntity from '../entities/user_profile';
+import UserSessionEntity from '../entities/user_session';
 import UserRole, { parseUserRole } from '../enums/user_role';
 import DatabaseClient, { DatabaseClientConfig } from './database_client';
 
 export class PgDatabaseClient implements DatabaseClient {
-  private _pgPool: pg.Pool;
+  private _dataSource: DataSource;
 
+  /**
+   * @param config - Configs for the database client.
+   */
   public constructor(config: DatabaseClientConfig) {
-    this._pgPool = new pg.Pool({
+    this._dataSource = new DataSource({
+      type: 'postgres',
       password: config.password,
-      user: config.user,
+      username: config.user,
       host: config.host,
       port: config.port,
       database: config.databaseName,
-      connectionTimeoutMillis: config.connectionTimeoutMillis,
-      idleTimeoutMillis: config.idleTimeoutMillis,
-      max: config.maxClientCount,
+      entities: [UserProfileEntity, UserCredentialEntity, UserSessionEntity],
+      connectTimeoutMS: config.connectionTimeoutMillis,
+      poolSize: config.maxClientCount,
+      synchronize: false,
     });
+  }
+
+  public async initialise(): Promise<void> {
+    await this._dataSource.initialize();
   }
 
   public async isUsernameInUse(
     username: Username,
     token?: SessionToken,
   ): Promise<boolean> {
-    const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT 1 FROM user_profile WHERE username=$1 AND user_id NOT IN (' +
-        'SELECT user_id FROM user_session WHERE token=$2)',
-      [username.toString(), token?.toString()],
-    );
+    const userProfiles: UserProfileEntity | null = await this._dataSource
+      .getRepository(UserProfileEntity)
+      .findOne({
+        select: { userId: true },
+        where: {
+          username: username.toString(),
+        },
+      });
 
-    return result.rows.length > 0;
+    const userSession: UserSessionEntity | null =
+      token === undefined
+        ? null
+        : await this._dataSource.getRepository(UserSessionEntity).findOne({
+            select: { userId: true },
+            where: {
+              token: token.toString(),
+              expireTime: MoreThan(new Date()),
+            },
+          });
+
+    return userProfiles !== null && userProfiles.userId != userSession?.userId;
   }
 
   public async isEmailInUse(
     email: EmailAddress,
     token?: SessionToken,
   ): Promise<boolean> {
-    const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT 1 FROM user_profile WHERE email=$1 AND user_id NOT IN (' +
-        'SELECT user_id FROM user_session WHERE token=$2)',
-      [email.toString(), token?.toString()],
-    );
+    const userProfiles: UserProfileEntity | null = await this._dataSource
+      .getRepository(UserProfileEntity)
+      .findOne({
+        select: { userId: true },
+        where: {
+          email: email.toString(),
+        },
+      });
 
-    return result.rows.length > 0;
+    const userSession: UserSessionEntity | null =
+      token === undefined
+        ? null
+        : await this._dataSource.getRepository(UserSessionEntity).findOne({
+            select: { userId: true },
+            where: {
+              token: token.toString(),
+              expireTime: MoreThan(new Date()),
+            },
+          });
+
+    return userProfiles !== null && userProfiles.userId != userSession?.userId;
   }
 
   public async fetchPasswordHashFromUsername(
     username: Username,
   ): Promise<string | undefined> {
-    const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT password_hash FROM user_credential WHERE user_id IN (' +
-        '  SELECT user_id FROM user_profile WHERE username=$1)',
-      [username.toString()],
-    );
+    const userProfile: UserProfileEntity | null = await this._dataSource
+      .getRepository(UserProfileEntity)
+      .findOne({
+        select: { userId: true },
+        where: {
+          username: username.toString(),
+        },
+      });
 
-    if (result.rows.length == 0) {
-      return undefined;
-    }
-
-    return result.rows[0]['password_hash'];
+    return userProfile === null
+      ? undefined
+      : (
+          await this._dataSource.getRepository(UserCredentialEntity).findOne({
+            select: { passwordHash: true },
+            where: { userId: userProfile.userId },
+          })
+        )?.passwordHash;
   }
 
   public async fetchUserProfileFromToken(
     token: SessionToken,
   ): Promise<UserProfile | undefined> {
-    const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT * FROM user_profile WHERE user_id IN (' +
-        '  SELECT user_id FROM user_session ' +
-        '  WHERE token=$1 AND expire_time > CURRENT_TIMESTAMP)',
-      [token.toString()],
-    );
+    const userSession: UserSessionEntity | null = await this._dataSource
+      .getRepository(UserSessionEntity)
+      .findOne({
+        select: { userId: true },
+        where: { token: token.toString(), expireTime: MoreThan(new Date()) },
+      });
 
-    if (result.rows.length == 0) {
+    const userProfile: UserProfileEntity | null =
+      userSession === null
+        ? null
+        : await this._dataSource
+            .getRepository(UserProfileEntity)
+            .findOneBy({ userId: userSession.userId });
+
+    if (userProfile === null) {
       return undefined;
     }
 
     return {
-      userId: UserId.parseNumber(result.rows[0]['user_id']),
-      username: Username.parse(result.rows[0]['username']),
-      email: EmailAddress.parse(result.rows[0]['email']),
-      userRole: parseUserRole(result.rows[0]['role']),
+      userId: UserId.parseNumber(userProfile.userId),
+      username: Username.parse(userProfile.username),
+      email: EmailAddress.parse(userProfile.email),
+      userRole: parseUserRole(userProfile.role),
     };
   }
 
   public async fetchUserIdentityFromToken(
     token: SessionToken,
   ): Promise<UserIdentity | undefined> {
-    const result: pg.QueryResult = await this._pgPool.query(
-      'SELECT user_id, role FROM user_profile WHERE user_id IN (' +
-        '  SELECT user_id FROM user_session ' +
-        '  WHERE token=$1 AND expire_time > CURRENT_TIMESTAMP)',
-      [token.toString()],
-    );
+    const userProfile: UserProfile | undefined =
+      await this.fetchUserProfileFromToken(token);
 
-    if (result.rows.length == 0) {
+    if (userProfile === undefined) {
       return undefined;
     }
 
     return {
-      userId: UserId.parseNumber(result.rows[0]['user_id']),
-      userRole: parseUserRole(result.rows[0]['role']),
+      userId: userProfile.userId,
+      userRole: userProfile.userRole,
     };
   }
 
@@ -117,17 +166,17 @@ export class PgDatabaseClient implements DatabaseClient {
     userProfile: ClientModifiableUserProfile,
     passwordHash: string,
   ): Promise<void> {
-    await this._pgPool.query(
-      'WITH user_id_cte AS (' +
-        '  INSERT INTO user_profile (username, email) ' +
-        '  VALUES ($1, $2) RETURNING user_id) ' +
-        'INSERT INTO user_credential SELECT user_id, $3 FROM user_id_cte;',
-      [
-        userProfile.username.toString(),
-        userProfile.email.toString(),
-        passwordHash,
-      ],
-    );
+    const result = await this._dataSource
+      .getRepository(UserProfileEntity)
+      .insert({
+        username: userProfile.username.toString(),
+        email: userProfile.email.toString(),
+      });
+
+    await this._dataSource.getRepository(UserCredentialEntity).insert({
+      userId: result.identifiers[0].userId,
+      passwordHash: passwordHash,
+    });
   }
 
   public async createUserSession(
@@ -135,86 +184,85 @@ export class PgDatabaseClient implements DatabaseClient {
     username: Username,
     expireTime: Date,
   ): Promise<void> {
-    await this._pgPool.query(
-      'INSERT INTO user_session (token, user_id, expire_time) ' +
-        '  SELECT $1, user_id, $2 FROM user_profile WHERE username=$3',
-      [token.toString(), expireTime, username.toString()],
-    );
+    const userProfile: UserProfileEntity = await this._dataSource
+      .getRepository(UserProfileEntity)
+      .findOneByOrFail({ username: username.toString() });
+
+    await this._dataSource.getRepository(UserSessionEntity).insert({
+      token: token.toString(),
+      userId: userProfile.userId,
+      expireTime: expireTime,
+    });
   }
 
   public async updateUserProfile(
     userProfile: ClientModifiableUserProfile,
     token: SessionToken,
   ): Promise<boolean> {
-    const result: pg.QueryResult = await this._pgPool.query(
-      'UPDATE user_profile SET username=$1, email=$2 WHERE user_id IN (' +
-        '  SELECT user_id FROM user_session ' +
-        '  WHERE token=$3 AND expire_time > CURRENT_TIMESTAMP)',
-      [
-        userProfile.username.toString(),
-        userProfile.email.toString(),
-        token.toString(),
-      ],
-    );
+    const userSession: UserSessionEntity | null = await this._dataSource
+      .getRepository(UserSessionEntity)
+      .findOneBy({
+        token: token.toString(),
+        expireTime: MoreThan(new Date()),
+      });
 
-    return result.rowCount > 0;
+    if (userSession === null) {
+      return false;
+    }
+
+    return (
+      ((
+        await this._dataSource
+          .getRepository(UserProfileEntity)
+          .update(userSession.userId, {
+            username: userProfile.username.toString(),
+            email: userProfile.email.toString(),
+          })
+      ).affected ?? 0) > 0
+    );
   }
 
   public async updateUserRole(
     userId: UserId,
     userRole: UserRole,
   ): Promise<boolean> {
-    const result: pg.QueryResult = await this._pgPool.query(
-      'UPDATE user_profile SET role=$1 WHERE user_id=$2',
-      [userRole.toString(), userId.toString()],
+    return (
+      ((
+        await this._dataSource
+          .getRepository(UserProfileEntity)
+          .update(userId.userId, { role: userRole })
+      ).affected ?? 0) > 0
     );
-
-    return result.rowCount > 0;
   }
 
   public async deleteUserProfile(token: SessionToken): Promise<boolean> {
-    const result: pg.QueryResult = await this._pgPool.query(
-      'DELETE FROM user_profile ' +
-        'WHERE user_id IN (SELECT user_id FROM user_session WHERE token=$1)',
-      [token.toString()],
-    );
+    const userSession: UserSessionEntity | null = await this._dataSource
+      .getRepository(UserSessionEntity)
+      .findOneBy({ token: token.toString(), expireTime: MoreThan(new Date()) });
 
-    return result.rowCount > 0;
+    return (
+      ((
+        await this._dataSource
+          .getRepository(UserProfileEntity)
+          .delete({ userId: userSession?.userId })
+      ).affected ?? 0) > 0
+    );
   }
 
   public async deleteUserSession(token: SessionToken): Promise<boolean> {
-    const result: pg.QueryResult = await this._pgPool.query(
-      'DELETE FROM user_session WHERE token=$1',
-      [token.toString()],
-    );
-
-    return result.rowCount > 0;
-  }
-
-  public isDuplicateUserProfileUsernameError(err: unknown): boolean {
     return (
-      err instanceof Error &&
-      err.message.includes(
-        'duplicate key value violates unique constraint "user_profile_username_key"',
-      )
+      ((
+        await this._dataSource
+          .getRepository(UserSessionEntity)
+          .delete(token.toString())
+      ).affected ?? 0) > 0
     );
   }
 
-  public isDuplicateUserProfileEmailError(err: unknown): boolean {
+  public isUniqueConstraintViolated(err: unknown): boolean {
     return (
       err instanceof Error &&
-      err.message.includes(
-        'duplicate key value violates unique constraint "user_profile_email_key"',
-      )
-    );
-  }
-
-  public isDuplicateUserSessionTokenError(err: unknown): boolean {
-    return (
-      err instanceof Error &&
-      err.message.includes(
-        'duplicate key value violates unique constraint "user_session_pkey"',
-      )
+      err.message.includes('duplicate key value violates unique constraint')
     );
   }
 }

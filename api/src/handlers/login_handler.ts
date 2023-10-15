@@ -125,7 +125,7 @@ export default class LoginHandler extends Handler {
 
         isEntryCreated = true;
       } catch (e) {
-        if (!client.isDuplicateUserSessionTokenError(e)) {
+        if (!client.isUniqueConstraintViolated(e)) {
           throw e;
         }
       }

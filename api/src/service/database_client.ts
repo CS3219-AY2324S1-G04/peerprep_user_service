@@ -12,6 +12,9 @@ import UserRole from '../enums/user_role';
 
 /** Client for performing database operations. */
 export default interface DatabaseClient {
+  /** Initialise the client. */
+  initialise(): Promise<void>;
+
   /**
    * Checks if username {@link username} is already in use.
    * @param username - Username to check.
@@ -129,24 +132,10 @@ export default interface DatabaseClient {
 
   /**
    * @param err - The error to check.
-   * @returns True if {@link err} is an {@link Error} caused by a duplicated
-   * user profile username.
+   * @returns True if {@link err} is an {@link Error} caused by a violation of
+   * a unique constraint.
    */
-  isDuplicateUserProfileUsernameError(err: unknown): boolean;
-
-  /**
-   * @param err - The error to check.
-   * @returns True if {@link err} is an {@link Error} caused by a duplicated
-   * user profile email.
-   */
-  isDuplicateUserProfileEmailError(err: unknown): boolean;
-
-  /**
-   * @param err - The error to check.
-   * @returns True if {@link err} is an {@link Error} caused by a duplicated
-   * user session token.
-   */
-  isDuplicateUserSessionTokenError(err: unknown): boolean;
+  isUniqueConstraintViolated(err: unknown): boolean;
 }
 
 /** Configs for {@link DatabaseClient}. */
