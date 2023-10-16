@@ -120,7 +120,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
       userId: UserId.parseNumber(userProfile.userId),
       username: Username.parse(userProfile.username),
       emailAddress: EmailAddress.parse(userProfile.emailAddress),
-      userRole: parseUserRole(userProfile.role),
+      userRole: parseUserRole(userProfile.userRole),
     };
   }
 
@@ -207,7 +207,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
       ((
         await this._dataSource
           .getRepository(UserProfileEntity)
-          .update(userId.userId, { role: userRole })
+          .update(userId.userId, { userRole: userRole })
       ).affected ?? 0) > 0
     );
   }

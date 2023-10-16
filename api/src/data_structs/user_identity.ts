@@ -4,11 +4,11 @@
 import UserRole from '../enums/user_role';
 import UserId from './user_id';
 
-/** User's identity. */
+/** User identity. */
 export default interface UserIdentity {
   /** Unique ID. */
   readonly userId: UserId;
-  /** Role. */
+  /** User role. */
   readonly userRole: UserRole;
 }
 
@@ -16,7 +16,7 @@ export default interface UserIdentity {
 export class JsonUserIdentity {
   /** Unique ID. */
   public readonly userId: number;
-  /** Role. */
+  /** User role. */
   public readonly userRole: string;
 
   public constructor(userIdentity: UserIdentity) {

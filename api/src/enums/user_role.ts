@@ -2,7 +2,7 @@
  * @file Defines {@link UserRole}.
  */
 
-/** User's role. */
+/** User role. */
 enum UserRole {
   user = 'user',
   maintainer = 'maintainer',
@@ -12,7 +12,7 @@ enum UserRole {
 /**
  * Parses {@link rawUserRole} as a user role and check it's validity.
  * @param rawUserRole - The user role to check.
- * @returns The parsed use role.
+ * @returns The parsed user role.
  * @throws Error if parsing fails.
  */
 export function parseUserRole(
@@ -31,7 +31,7 @@ export function parseUserRole(
   );
 
   if (userRole === undefined) {
-    throw new Error('Role is invalid.');
+    throw new Error('User role is invalid.');
   }
 
   return userRole;

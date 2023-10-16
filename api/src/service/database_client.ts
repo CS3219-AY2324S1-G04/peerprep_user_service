@@ -62,11 +62,11 @@ export default interface DatabaseClient {
   ): Promise<UserProfile | undefined>;
 
   /**
-   * Fetches the ID and role of the user who the session token
+   * Fetches the user ID and user role of the user who the session token
    * {@link sessionToken} belongs to.
    * @param sessionToken - Session token belonging to the user.
-   * @returns ID and role of the user if a user who owns the session token
-   * {@link sessionToken} exist. Else, returns undefined.
+   * @returns User ID and user role of the user if a user who owns the session
+   * token {@link sessionToken} exist. Else, returns undefined.
    */
   fetchUserIdentityFromSessionToken(
     sessionToken: SessionToken,
@@ -115,7 +115,7 @@ export default interface DatabaseClient {
   /**
    * Updates the user role of the user with username {@link userId}. The user
    * role will be updated to {@link userRole}.
-   * @param userId - ID of the user whose role is to be updated.
+   * @param userId - User ID of the user whose user role is to be updated.
    * @param userRole - User role to assign.
    * @returns True if a user role was updated. False if no user role was updated
    * due to no user existing with the username {@link userId}.
