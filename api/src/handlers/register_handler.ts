@@ -46,9 +46,9 @@ export default class RegisterHandler extends Handler {
     }
 
     try {
-      emailAddress = EmailAddress.parseAndValidate(query['email']);
+      emailAddress = EmailAddress.parseAndValidate(query['email-address']);
     } catch (e) {
-      invalidInfo['email'] = (e as Error).message;
+      invalidInfo['email-address'] = (e as Error).message;
     }
 
     try {
@@ -65,7 +65,7 @@ export default class RegisterHandler extends Handler {
       emailAddress !== undefined &&
       (await client.isEmailAddressInUse(emailAddress))
     ) {
-      invalidInfo['email'] = 'Email address already in use.';
+      invalidInfo['email-address'] = 'Email address already in use.';
     }
 
     if (Object.keys(invalidInfo).length > 0) {

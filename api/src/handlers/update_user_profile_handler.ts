@@ -48,9 +48,9 @@ export default class UpdateUserProfileHandler extends Handler {
     }
 
     try {
-      emailAddress = EmailAddress.parseAndValidate(query['email']);
+      emailAddress = EmailAddress.parseAndValidate(query['email-address']);
     } catch (e) {
-      invalidInfo['email'] = (e as Error).message;
+      invalidInfo['email-address'] = (e as Error).message;
     }
 
     if (
@@ -64,7 +64,7 @@ export default class UpdateUserProfileHandler extends Handler {
       emailAddress !== undefined &&
       (await client.isEmailAddressInUse(emailAddress, sessionToken))
     ) {
-      invalidInfo['email'] = 'Email already in use.';
+      invalidInfo['email-address'] = 'Email address already in use.';
     }
 
     if (Object.keys(invalidInfo).length > 0) {
