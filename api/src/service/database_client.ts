@@ -86,15 +86,15 @@ export default interface DatabaseClient {
   /**
    * Creates a user session for the user with username {@link username}. The
    * session will have a session token {@link sessionToken} and will expire at
-   * {@link expireTime}.
+   * {@link sessionExpiry}.
    * @param sessionToken - Session token.
    * @param username - Username of the user.
-   * @param expireTime - Time of session expiry.
+   * @param sessionExpiry - Time of session expiry.
    */
   createUserSession(
     sessionToken: SessionToken,
     username: Username,
-    expireTime: Date,
+    sessionExpiry: Date,
   ): Promise<void>;
 
   /**

@@ -35,19 +35,19 @@ export default class UserSession {
   public loginTime: Date;
 
   /** Session expiry time. */
-  @Column({ name: 'expire_time', nullable: false })
-  public expireTime: Date;
+  @Column({ name: 'session_expiry', nullable: false })
+  public sessionExpiry: Date;
 
   public constructor(
     sessionToken: string,
     userProfile: UserProfile,
     loginTime: Date,
-    expireTime: Date,
+    sessionExpiry: Date,
   ) {
     this.sessionToken = sessionToken;
     this.userProfile = userProfile;
     this.userId = userProfile?.userId;
     this.loginTime = loginTime;
-    this.expireTime = expireTime;
+    this.sessionExpiry = sessionExpiry;
   }
 }

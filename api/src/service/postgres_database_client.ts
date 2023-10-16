@@ -160,7 +160,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
   public async createUserSession(
     sessionToken: SessionToken,
     username: Username,
-    expireTime: Date,
+    sessionExpiry: Date,
   ): Promise<void> {
     const userIdFromUsername: number = (
       await this._dataSource.getRepository(UserProfileEntity).findOneOrFail({
@@ -172,7 +172,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     await this._dataSource.getRepository(UserSessionEntity).insert({
       sessionToken: sessionToken.toString(),
       userId: userIdFromUsername,
-      expireTime: expireTime,
+      sessionExpiry: sessionExpiry,
     });
   }
 
@@ -267,7 +267,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
         select: { userId: true },
         where: {
           sessionToken: sessionToken.toString(),
-          expireTime: MoreThan(new Date()),
+          sessionExpiry: MoreThan(new Date()),
         },
       })
     )?.userId;
