@@ -7,6 +7,7 @@ import HttpErrorInfo from '../data_structs/http_error_info';
 import SessionToken from '../data_structs/session_token';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
+import { sessionTokenKey } from '../utils/parameter_keys';
 
 /** Handles deleting the user who sent the request. */
 export default class DeleteUserHandler extends Handler {
@@ -22,7 +23,7 @@ export default class DeleteUserHandler extends Handler {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
-      return SessionToken.parse(cookies['session-token']);
+      return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }

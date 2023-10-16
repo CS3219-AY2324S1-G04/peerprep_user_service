@@ -11,6 +11,12 @@ import UserIdentity from '../data_structs/user_identity';
 import UserRole, { parseUserRole } from '../enums/user_role';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
+import {
+  sessionTokenKey,
+  userIdKey,
+  userIdPathKey,
+  userRoleKey,
+} from '../utils/parameter_keys';
 
 /**
  * Handles updating the user role of the user whose username is specified in the
@@ -23,14 +29,14 @@ export default class UpdateUserRoleHandler extends Handler {
   }
 
   public get path(): string {
-    return '/user-service/users/:userId/user-role';
+    return `/user-service/users/:${userIdPathKey}/user-role`;
   }
 
   private static _parseCookie(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
-      return SessionToken.parse(cookies['session-token']);
+      return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }
@@ -46,15 +52,15 @@ export default class UpdateUserRoleHandler extends Handler {
     const invalidInfo: { [key: string]: string } = {};
 
     try {
-      userId = UserId.parseString(pathParams['user-id']);
+      userId = UserId.parseString(pathParams[userIdPathKey]);
     } catch (e) {
-      invalidInfo['user-id'] = (e as Error).message;
+      invalidInfo[userIdKey] = (e as Error).message;
     }
 
     try {
-      userRole = parseUserRole(queryParams['user-role']);
+      userRole = parseUserRole(queryParams[userRoleKey]);
     } catch (e) {
-      invalidInfo['user-role'] = (e as Error).message;
+      invalidInfo[userRoleKey] = (e as Error).message;
     }
 
     if (Object.keys(invalidInfo).length > 0) {

@@ -11,6 +11,11 @@ import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile'
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
+import {
+  emailAddressKey,
+  passwordKey,
+  usernameKey,
+} from '../utils/parameter_keys';
 
 /** Handles user registration. */
 export default class RegisterHandler extends Handler {
@@ -40,32 +45,32 @@ export default class RegisterHandler extends Handler {
     const invalidInfo: { [key: string]: string } = {};
 
     try {
-      username = Username.parseAndValidate(query['username']);
+      username = Username.parseAndValidate(query[usernameKey]);
     } catch (e) {
-      invalidInfo['username'] = (e as Error).message;
+      invalidInfo[usernameKey] = (e as Error).message;
     }
 
     try {
-      emailAddress = EmailAddress.parseAndValidate(query['email-address']);
+      emailAddress = EmailAddress.parseAndValidate(query[emailAddressKey]);
     } catch (e) {
-      invalidInfo['email-address'] = (e as Error).message;
+      invalidInfo[emailAddressKey] = (e as Error).message;
     }
 
     try {
-      password = Password.parseAndValidate(query['password']);
+      password = Password.parseAndValidate(query[passwordKey]);
     } catch (e) {
-      invalidInfo['password'] = (e as Error).message;
+      invalidInfo[passwordKey] = (e as Error).message;
     }
 
     if (username !== undefined && (await client.isUsernameInUse(username))) {
-      invalidInfo['username'] = 'Username already in use.';
+      invalidInfo[usernameKey] = 'Username already in use.';
     }
 
     if (
       emailAddress !== undefined &&
       (await client.isEmailAddressInUse(emailAddress))
     ) {
-      invalidInfo['email-address'] = 'Email address already in use.';
+      invalidInfo[emailAddressKey] = 'Email address already in use.';
     }
 
     if (Object.keys(invalidInfo).length > 0) {

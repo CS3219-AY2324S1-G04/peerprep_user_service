@@ -11,6 +11,7 @@ import SessionToken from '../data_structs/session_token';
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
+import { passwordKey, usernameKey } from '../utils/parameter_keys';
 
 /** Handles user login. */
 export default class LoginHandler extends Handler {
@@ -38,15 +39,15 @@ export default class LoginHandler extends Handler {
     const invalidInfo: { [key: string]: string } = {};
 
     try {
-      username = Username.parse(query['username']);
+      username = Username.parse(query[usernameKey]);
     } catch (e) {
-      invalidInfo['username'] = (e as Error).message;
+      invalidInfo[usernameKey] = (e as Error).message;
     }
 
     try {
-      password = Password.parse(query['password']);
+      password = Password.parse(query[passwordKey]);
     } catch (e) {
-      invalidInfo['password'] = (e as Error).message;
+      invalidInfo[passwordKey] = (e as Error).message;
     }
 
     if (Object.keys(invalidInfo).length > 0) {
