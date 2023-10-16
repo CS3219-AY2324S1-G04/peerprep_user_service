@@ -10,25 +10,34 @@ import UserProfile from '../data_structs/user_profile';
 import Username from '../data_structs/username';
 import UserRole from '../enums/user_role';
 
-/** Represents the database storing the user information. */
+/** Client for performing database operations. */
 export default interface DatabaseClient {
+  /** Initialise the client. */
+  initialise(): Promise<void>;
+
   /**
    * Checks if username {@link username} is already in use.
    * @param username - Username to check.
-   * @param token - Session token whose corresponding user's username is ignored
-   * in the check.
+   * @param sessionToken - Session token whose corresponding user's username is
+   * ignored in the check.
    * @returns True if the username is in use. Else, returns false.
    */
-  isUsernameInUse(username: Username, token?: SessionToken): Promise<boolean>;
+  isUsernameInUse(
+    username: Username,
+    sessionToken?: SessionToken,
+  ): Promise<boolean>;
 
   /**
-   * Checks if email {@link email} is already in use.
-   * @param email - Email to check.
-   * @param token - Session token whose corresponding user's email is ignored
-   * in the check.
-   * @returns True if the email is in use. Else, returns false.
+   * Checks if email address {@link emailAddress} is already in use.
+   * @param emailAddress - Email address to check.
+   * @param sessionToken - Session token whose corresponding user's email
+   * address is ignored in the check.
+   * @returns True if the email address is in use. Else, returns false.
    */
-  isEmailInUse(email: EmailAddress, token?: SessionToken): Promise<boolean>;
+  isEmailAddressInUse(
+    emailAddress: EmailAddress,
+    sessionToken?: SessionToken,
+  ): Promise<boolean>;
 
   /**
    * Fetches the password hash of the user whose username is {@link username}.
@@ -42,25 +51,25 @@ export default interface DatabaseClient {
   ): Promise<string | undefined>;
 
   /**
-   * Fetches the user profile of the user who the session token {@link token}
-   * belongs to.
-   * @param token - Session token belonging to the user.
+   * Fetches the user profile of the user who the session token
+   * {@link sessionToken} belongs to.
+   * @param sessionToken - Session token belonging to the user.
    * @returns Profile of the user if a user who owns the session token
-   * {@link token} exist. Else, returns undefined.
+   * {@link sessionToken} exist. Else, returns undefined.
    */
-  fetchUserProfileFromToken(
-    token: SessionToken,
+  fetchUserProfileFromSessionToken(
+    sessionToken: SessionToken,
   ): Promise<UserProfile | undefined>;
 
   /**
-   * Fetches the ID and role of the user who the session token {@link token}
-   * belongs to.
-   * @param token - Session token belonging to the user.
+   * Fetches the ID and role of the user who the session token
+   * {@link sessionToken} belongs to.
+   * @param sessionToken - Session token belonging to the user.
    * @returns ID and role of the user if a user who owns the session token
-   * {@link token} exist. Else, returns undefined.
+   * {@link sessionToken} exist. Else, returns undefined.
    */
-  fetchUserIdentityFromToken(
-    token: SessionToken,
+  fetchUserIdentityFromSessionToken(
+    sessionToken: SessionToken,
   ): Promise<UserIdentity | undefined>;
 
   /**
@@ -76,30 +85,31 @@ export default interface DatabaseClient {
 
   /**
    * Creates a user session for the user with username {@link username}. The
-   * session will have a session token {@link token} and will expire at
-   * {@link expireTime}.
-   * @param token - Session token.
+   * session will have a session token {@link sessionToken} and will expire at
+   * {@link sessionExpiry}.
+   * @param sessionToken - Session token.
    * @param username - Username of the user.
-   * @param expireTime - Time of session expiry.
+   * @param sessionExpiry - Time of session expiry.
    */
   createUserSession(
-    token: SessionToken,
+    sessionToken: SessionToken,
     username: Username,
-    expireTime: Date,
+    sessionExpiry: Date,
   ): Promise<void>;
 
   /**
    * Updates the user profile which belongs to the user who owns the session
-   * token {@link token}. The user profile is updated with values in
+   * token {@link sessionToken}. The user profile is updated with values in
    * {@link userProfile}.
    * @param userProfile - Updated information on the user's profile.
-   * @param token - Session token belonging to the user.
+   * @param sessionToken - Session token belonging to the user.
    * @returns True if a user profile was updated. False if no user profile was
-   * updated due to the session token {@link token} being an invalid token.
+   * updated due to the session token {@link sessionToken} being an invalid
+   * token.
    */
   updateUserProfile(
     userProfile: ClientModifiableUserProfile,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<boolean>;
 
   /**
@@ -113,40 +123,27 @@ export default interface DatabaseClient {
   updateUserRole(userId: UserId, userRole: UserRole): Promise<boolean>;
 
   /**
-   * Deletes the user who owns the session token {@link token}.
-   * @param token - Session token belonging to the user to be deleted.
+   * Deletes the user who owns the session token {@link sessionToken}.
+   * @param sessionToken - Session token belonging to the user to be deleted.
    * @returns True if a user was deleted. False if no user was deleted due to
-   * the session token {@link token} being an invalid token.
+   * the session token {@link sessionToken} being an invalid token.
    */
-  deleteUserProfile(token: SessionToken): Promise<boolean>;
+  deleteUserProfile(sessionToken: SessionToken): Promise<boolean>;
   /**
-   * Deletes the user session which has the session token {@link token}.
-   * @param token - Session token of the user session to be deleted.
+   * Deletes the user session which has the session token {@link sessionToken}.
+   * @param sessionToken - Session token of the user session to be deleted.
    * @returns True if a user session was deleted. False if no user session was
-   * deleted due to the session token {@link token} being an invalid token.
+   * deleted due to the session token {@link sessionToken} being an invalid
+   * token.
    */
-  deleteUserSession(token: SessionToken): Promise<boolean>;
+  deleteUserSession(sessionToken: SessionToken): Promise<boolean>;
 
   /**
    * @param err - The error to check.
-   * @returns True if {@link err} is an {@link Error} caused by a duplicated
-   * user profile username in the user_profiles database relation.
+   * @returns True if {@link err} is an {@link Error} caused by a violation of
+   * a unique constraint.
    */
-  isDuplicateUserProfileUsernameError(err: unknown): boolean;
-
-  /**
-   * @param err - The error to check.
-   * @returns True if {@link err} is an {@link Error} caused by a duplicated
-   * user profile email in the user_profiles database relation.
-   */
-  isDuplicateUserProfileEmailError(err: unknown): boolean;
-
-  /**
-   * @param err - The error to check.
-   * @returns True if {@link err} is an {@link Error} caused by a duplicated
-   * session token in the user_sessions database relation.
-   */
-  isDuplicateUserSessionTokenError(err: unknown): boolean;
+  isUniqueConstraintViolated(err: unknown): boolean;
 }
 
 /** Configs for {@link DatabaseClient}. */

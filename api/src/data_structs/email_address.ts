@@ -11,64 +11,82 @@ export default class EmailAddress {
   private static _domainLabelRegexStr: string = `${EmailAddress._domainEdgeChars}(${EmailAddress._domainChars}*${EmailAddress._domainEdgeChars}+)*`;
   private static _domainRegexStr: string = `${EmailAddress._domainLabelRegexStr}(\\.${EmailAddress._domainLabelRegexStr})+`;
 
-  private static _emailLocalPartChars: string =
+  private static _emailAddressUsernameChars: string =
     "[a-zA-Z0-9!#$%&'*+\\-/=?^_`{|}~]";
-  private static _emailRegex: RegExp = RegExp(
-    `^${EmailAddress._emailLocalPartChars}+(\\.${EmailAddress._emailLocalPartChars}+)*@${EmailAddress._domainRegexStr}$`,
+  private static _emailAddressRegex: RegExp = RegExp(
+    `^${EmailAddress._emailAddressUsernameChars}+(\\.${EmailAddress._emailAddressUsernameChars}+)*@${EmailAddress._domainRegexStr}$`,
   );
 
-  public readonly email: string;
+  public readonly emailAddress: string;
 
-  private constructor(email: string) {
-    this.email = email.toLowerCase();
+  private constructor(emailAddress: string) {
+    this.emailAddress = emailAddress.toLowerCase();
   }
 
   /**
-   * Parses {@link rawEmail} as an {@link EmailAddress}.
-   * @param rawEmail - Email address.
+   * Parses {@link rawEmailAddress} as an {@link EmailAddress}.
+   * @param rawEmailAddress - Email address.
    * @returns The parsed {@link EmailAddress}.
    * @throws Error if parsing fails.
    */
   public static parse(
-    rawEmail: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
+    rawEmailAddress:
+      | string
+      | qs.ParsedQs
+      | string[]
+      | qs.ParsedQs[]
+      | undefined,
   ): EmailAddress {
-    if (!EmailAddress._isEmailAddressString(rawEmail)) {
-      throw new Error('Email must be a string.');
+    if (!EmailAddress._isEmailAddressString(rawEmailAddress)) {
+      throw new Error('Email address must be a string.');
     }
 
     if (
-      !EmailAddress._isEmailAddressSpecified(rawEmail as string | undefined)
+      !EmailAddress._isEmailAddressSpecified(
+        rawEmailAddress as string | undefined,
+      )
     ) {
-      throw new Error('Email cannot be empty.');
+      throw new Error('Email address cannot be empty.');
     }
 
-    return new EmailAddress(rawEmail as string);
+    return new EmailAddress(rawEmailAddress as string);
   }
 
   /**
-   * Parses {@link rawEmail} as an {@link EmailAddress} then validates it.
-   * @param rawEmail - Email address.
+   * Parses {@link rawEmailAddress} as an {@link EmailAddress} then validates
+   * it.
+   * @param rawEmailAddress - Email address.
    * @returns The parsed {@link EmailAddress}.
    * @throws Error if parsing or validation fails.
    */
   public static parseAndValidate(
-    rawEmail: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
+    rawEmailAddress:
+      | string
+      | qs.ParsedQs
+      | string[]
+      | qs.ParsedQs[]
+      | undefined,
   ): EmailAddress {
-    const email: EmailAddress = EmailAddress.parse(rawEmail);
-    email.validate();
-    return email;
+    const emailAddress: EmailAddress = EmailAddress.parse(rawEmailAddress);
+    emailAddress.validate();
+    return emailAddress;
   }
 
   private static _isEmailAddressString(
-    rawEmail: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
+    rawEmailAddress:
+      | string
+      | qs.ParsedQs
+      | string[]
+      | qs.ParsedQs[]
+      | undefined,
   ): boolean {
-    return typeof rawEmail === 'string' || rawEmail === undefined;
+    return typeof rawEmailAddress === 'string' || rawEmailAddress === undefined;
   }
 
   private static _isEmailAddressSpecified(
-    rawEmail: string | undefined,
+    rawEmailAddress: string | undefined,
   ): boolean {
-    return rawEmail !== undefined && rawEmail.length > 0;
+    return rawEmailAddress !== undefined && rawEmailAddress.length > 0;
   }
 
   /**
@@ -78,24 +96,24 @@ export default class EmailAddress {
   public validate() {
     if (this._isEmailAddressTooLong()) {
       throw new Error(
-        `Email cannot exceed ${EmailAddress._maxLength} characters.`,
+        `Email address cannot exceed ${EmailAddress._maxLength} characters.`,
       );
     }
 
     if (!this._isEmailAddressFormatCorrect()) {
-      throw new Error('Email is invalid.');
+      throw new Error('Email address is invalid.');
     }
   }
 
   public toString(): string {
-    return this.email;
+    return this.emailAddress;
   }
 
   private _isEmailAddressTooLong() {
-    return this.email.length > EmailAddress._maxLength;
+    return this.emailAddress.length > EmailAddress._maxLength;
   }
 
   private _isEmailAddressFormatCorrect() {
-    return EmailAddress._emailRegex.test(this.email);
+    return EmailAddress._emailAddressRegex.test(this.emailAddress);
   }
 }

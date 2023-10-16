@@ -31,10 +31,10 @@ export default class GetUserProfileHandler extends Handler {
 
   private static async _fetchUserProfile(
     client: DatabaseClient,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<UserProfile> {
     const userProfile: UserProfile | undefined =
-      await client.fetchUserProfileFromToken(token);
+      await client.fetchUserProfileFromSessionToken(sessionToken);
     if (userProfile === undefined) {
       throw new HttpErrorInfo(401);
     }
@@ -60,9 +60,11 @@ export default class GetUserProfileHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: SessionToken = GetUserProfileHandler._parseCookie(req.cookies);
+    const sessionToken: SessionToken = GetUserProfileHandler._parseCookie(
+      req.cookies,
+    );
     const userProfile: UserProfile =
-      await GetUserProfileHandler._fetchUserProfile(client, token);
+      await GetUserProfileHandler._fetchUserProfile(client, sessionToken);
 
     res.status(200).send(JSON.stringify(new JsonUserProfile(userProfile)));
   }

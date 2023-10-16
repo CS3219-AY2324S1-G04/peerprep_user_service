@@ -34,7 +34,7 @@ export default class RegisterHandler extends Handler {
     query: qs.ParsedQs,
   ): Promise<[ClientModifiableUserProfile, Password]> {
     let username: Username | undefined = undefined;
-    let email: EmailAddress | undefined = undefined;
+    let emailAddress: EmailAddress | undefined = undefined;
     let password: Password | undefined = undefined;
 
     const invalidInfo: { [key: string]: string } = {};
@@ -46,7 +46,7 @@ export default class RegisterHandler extends Handler {
     }
 
     try {
-      email = EmailAddress.parseAndValidate(query['email']);
+      emailAddress = EmailAddress.parseAndValidate(query['email']);
     } catch (e) {
       invalidInfo['email'] = (e as Error).message;
     }
@@ -61,15 +61,18 @@ export default class RegisterHandler extends Handler {
       invalidInfo['username'] = 'Username already in use.';
     }
 
-    if (email !== undefined && (await client.isEmailInUse(email))) {
-      invalidInfo['email'] = 'Email already in use.';
+    if (
+      emailAddress !== undefined &&
+      (await client.isEmailAddressInUse(emailAddress))
+    ) {
+      invalidInfo['email'] = 'Email address already in use.';
     }
 
     if (Object.keys(invalidInfo).length > 0) {
       throw new HttpErrorInfo(400, JSON.stringify(invalidInfo));
     }
 
-    return [{ username: username!, email: email! }, password!];
+    return [{ username: username!, emailAddress: emailAddress! }, password!];
   }
 
   private static async _createUser(
@@ -115,8 +118,9 @@ export default class RegisterHandler extends Handler {
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
-   * @throws {HttpErrorInfo} Error 400 if the username, email, or password are
-   * invalid. Message contains a JSON string of the reasons for the error.
+   * @throws {HttpErrorInfo} Error 400 if the username, email address, or
+   * password are invalid. Message contains a JSON string of the reasons for the
+   * error.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
   public override async handleLogic(

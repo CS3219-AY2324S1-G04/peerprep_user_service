@@ -25,6 +25,7 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
     - [Update a User's Role](#update-a-users-role)
     - [Delete a User \[via Session Token\]](#delete-a-user-via-session-token)
     - [Get a User Identity \[via Session Token\]](#get-a-user-identity-via-session-token)
+  - [To Do](#to-do)
 
 ## Quickstart Guide
 
@@ -249,3 +250,12 @@ This is similar to [Get a User Profile \[via Session Token\]](#get-a-user-profil
     ```
 - `401` - Session token was not provided or does not match any existing tokens.
 - `500` - Unexpected error occurred on the server.
+
+## To Do
+- Extend session token expiry whenever token is used
+- Limit character set for username
+- Set session token to be secure
+- API for validating token
+- API for changing password
+- API for listing users if user role is admin
+- API for password recovery

@@ -34,10 +34,10 @@ export default class UpdateUserProfileHandler extends Handler {
   private static async _parseParams(
     client: DatabaseClient,
     query: qs.ParsedQs,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<ClientModifiableUserProfile> {
     let username: Username | undefined = undefined;
-    let email: EmailAddress | undefined = undefined;
+    let emailAddress: EmailAddress | undefined = undefined;
 
     const invalidInfo: { [key: string]: string } = {};
 
@@ -48,19 +48,22 @@ export default class UpdateUserProfileHandler extends Handler {
     }
 
     try {
-      email = EmailAddress.parseAndValidate(query['email']);
+      emailAddress = EmailAddress.parseAndValidate(query['email']);
     } catch (e) {
       invalidInfo['email'] = (e as Error).message;
     }
 
     if (
       username !== undefined &&
-      (await client.isUsernameInUse(username, token))
+      (await client.isUsernameInUse(username, sessionToken))
     ) {
       invalidInfo['username'] = 'Username already in use.';
     }
 
-    if (email !== undefined && (await client.isEmailInUse(email, token))) {
+    if (
+      emailAddress !== undefined &&
+      (await client.isEmailAddressInUse(emailAddress, sessionToken))
+    ) {
       invalidInfo['email'] = 'Email already in use.';
     }
 
@@ -68,15 +71,15 @@ export default class UpdateUserProfileHandler extends Handler {
       throw new HttpErrorInfo(400, JSON.stringify(invalidInfo));
     }
 
-    return { username: username!, email: email! };
+    return { username: username!, emailAddress: emailAddress! };
   }
 
   private static async _updateUserProfile(
     client: DatabaseClient,
     userProfile: ClientModifiableUserProfile,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<void> {
-    if (!(await client.updateUserProfile(userProfile, token))) {
+    if (!(await client.updateUserProfile(userProfile, sessionToken))) {
       throw new HttpErrorInfo(401);
     }
   }
@@ -101,16 +104,20 @@ export default class UpdateUserProfileHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: SessionToken = UpdateUserProfileHandler._parseCookie(
+    const sessionToken: SessionToken = UpdateUserProfileHandler._parseCookie(
       req.cookies,
     );
     const userProfile: ClientModifiableUserProfile =
-      await UpdateUserProfileHandler._parseParams(client, req.query, token);
+      await UpdateUserProfileHandler._parseParams(
+        client,
+        req.query,
+        sessionToken,
+      );
 
     await UpdateUserProfileHandler._updateUserProfile(
       client,
       userProfile,
-      token,
+      sessionToken,
     );
 
     res.sendStatus(200);

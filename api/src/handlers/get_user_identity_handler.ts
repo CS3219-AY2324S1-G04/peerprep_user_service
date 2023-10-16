@@ -43,10 +43,10 @@ export default class GetUserIdentityHandler extends Handler {
 
   private static async _fetchUserIdentity(
     client: DatabaseClient,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<UserIdentity> {
     const userIdentity: UserIdentity | undefined =
-      await client.fetchUserIdentityFromToken(token);
+      await client.fetchUserIdentityFromSessionToken(sessionToken);
     if (userIdentity === undefined) {
       throw new HttpErrorInfo(401);
     }
@@ -72,13 +72,13 @@ export default class GetUserIdentityHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: SessionToken = GetUserIdentityHandler._getSessionToken(
+    const sessionToken: SessionToken = GetUserIdentityHandler._getSessionToken(
       req.query,
       req.cookies,
     );
 
     const userIdentity: UserIdentity =
-      await GetUserIdentityHandler._fetchUserIdentity(client, token);
+      await GetUserIdentityHandler._fetchUserIdentity(client, sessionToken);
 
     res.status(200).send(JSON.stringify(new JsonUserIdentity(userIdentity)));
   }
