@@ -45,96 +45,74 @@ export class PostgresDatabaseClient implements DatabaseClient {
     username: Username,
     token?: SessionToken,
   ): Promise<boolean> {
-    const userProfiles: UserProfileEntity | null = await this._dataSource
-      .getRepository(UserProfileEntity)
-      .findOne({
-        select: { userId: true },
-        where: {
-          username: username.toString(),
-        },
-      });
+    const userIdFromUsername: number | undefined =
+      await this._getUserIdFromUsername(username);
 
-    const userSession: UserSessionEntity | null =
+    if (userIdFromUsername === undefined) {
+      return false;
+    }
+
+    const userIdFromSessionToken: number | undefined =
       token === undefined
-        ? null
-        : await this._dataSource.getRepository(UserSessionEntity).findOne({
-            select: { userId: true },
-            where: {
-              token: token.toString(),
-              expireTime: MoreThan(new Date()),
-            },
-          });
+        ? undefined
+        : await this._getUserIdFromSessionToken(token);
 
-    return userProfiles !== null && userProfiles.userId != userSession?.userId;
+    return userIdFromUsername !== userIdFromSessionToken;
   }
 
   public async isEmailInUse(
     email: EmailAddress,
     token?: SessionToken,
   ): Promise<boolean> {
-    const userProfiles: UserProfileEntity | null = await this._dataSource
-      .getRepository(UserProfileEntity)
-      .findOne({
-        select: { userId: true },
-        where: {
-          email: email.toString(),
-        },
-      });
+    const userIdFromEmail: number | undefined =
+      await this._getUserIdFromEmail(email);
 
-    const userSession: UserSessionEntity | null =
+    if (userIdFromEmail === undefined) {
+      return false;
+    }
+
+    const userIdFromSessionToken: number | undefined =
       token === undefined
-        ? null
-        : await this._dataSource.getRepository(UserSessionEntity).findOne({
-            select: { userId: true },
-            where: {
-              token: token.toString(),
-              expireTime: MoreThan(new Date()),
-            },
-          });
+        ? undefined
+        : await this._getUserIdFromSessionToken(token);
 
-    return userProfiles !== null && userProfiles.userId != userSession?.userId;
+    return userIdFromEmail !== userIdFromSessionToken;
   }
 
   public async fetchPasswordHashFromUsername(
     username: Username,
   ): Promise<string | undefined> {
-    const userProfile: UserProfileEntity | null = await this._dataSource
-      .getRepository(UserProfileEntity)
-      .findOne({
-        select: { userId: true },
-        where: {
-          username: username.toString(),
-        },
-      });
+    const userIdFromUsername: number | undefined =
+      await this._getUserIdFromUsername(username);
 
-    return userProfile === null
-      ? undefined
-      : (
-          await this._dataSource.getRepository(UserCredentialEntity).findOne({
-            select: { passwordHash: true },
-            where: { userId: userProfile.userId },
-          })
-        )?.passwordHash;
+    if (userIdFromUsername === undefined) {
+      return undefined;
+    }
+
+    return (
+      await this._dataSource.getRepository(UserCredentialEntity).findOne({
+        select: { passwordHash: true },
+        where: { userId: userIdFromUsername },
+      })
+    )?.passwordHash;
   }
 
   public async fetchUserProfileFromToken(
     token: SessionToken,
   ): Promise<UserProfile | undefined> {
-    const userSession: UserSessionEntity | null = await this._dataSource
-      .getRepository(UserSessionEntity)
-      .findOne({
-        select: { userId: true },
-        where: { token: token.toString(), expireTime: MoreThan(new Date()) },
-      });
+    const userIdFromSessionToken: number | undefined =
+      await this._getUserIdFromSessionToken(token);
 
-    const userProfile: UserProfileEntity | null =
-      userSession === null
-        ? null
-        : await this._dataSource
-            .getRepository(UserProfileEntity)
-            .findOneBy({ userId: userSession.userId });
+    if (userIdFromSessionToken === undefined) {
+      return undefined;
+    }
 
-    if (userProfile === null) {
+    const userProfile: UserProfileEntity | undefined =
+      (await this._dataSource
+        .getRepository(UserProfileEntity)
+        .findOneBy({ userId: userIdFromSessionToken })) ?? undefined;
+
+    if (userProfile === undefined) {
       return undefined;
     }
 
@@ -184,13 +162,16 @@ export class PostgresDatabaseClient implements DatabaseClient {
     username: Username,
     expireTime: Date,
   ): Promise<void> {
-    const userProfile: UserProfileEntity = await this._dataSource
-      .getRepository(UserProfileEntity)
-      .findOneByOrFail({ username: username.toString() });
+    const userIdFromUsername: number = (
+      await this._dataSource.getRepository(UserProfileEntity).findOneOrFail({
+        select: { userId: true },
+        where: { username: username.toString() },
+      })
+    ).userId;
 
     await this._dataSource.getRepository(UserSessionEntity).insert({
       token: token.toString(),
-      userId: userProfile.userId,
+      userId: userIdFromUsername,
       expireTime: expireTime,
     });
   }
@@ -199,14 +180,10 @@ export class PostgresDatabaseClient implements DatabaseClient {
     userProfile: ClientModifiableUserProfile,
     token: SessionToken,
   ): Promise<boolean> {
-    const userSession: UserSessionEntity | null = await this._dataSource
-      .getRepository(UserSessionEntity)
-      .findOneBy({
-        token: token.toString(),
-        expireTime: MoreThan(new Date()),
-      });
+    const userIdFromSessionToken: number | undefined =
+      await this._getUserIdFromSessionToken(token);
 
-    if (userSession === null) {
+    if (userIdFromSessionToken === undefined) {
       return false;
     }
 
@@ -214,7 +191,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
       ((
         await this._dataSource
           .getRepository(UserProfileEntity)
-          .update(userSession.userId, {
+          .update(userIdFromSessionToken, {
             username: userProfile.username.toString(),
             email: userProfile.email.toString(),
           })
@@ -236,15 +213,18 @@ export class PostgresDatabaseClient implements DatabaseClient {
   }
 
   public async deleteUserProfile(token: SessionToken): Promise<boolean> {
-    const userSession: UserSessionEntity | null = await this._dataSource
-      .getRepository(UserSessionEntity)
-      .findOneBy({ token: token.toString(), expireTime: MoreThan(new Date()) });
+    const userIdFromSessionToken: number | undefined =
+      await this._getUserIdFromSessionToken(token);
+
+    if (userIdFromSessionToken === undefined) {
+      return false;
+    }
 
     return (
       ((
         await this._dataSource
           .getRepository(UserProfileEntity)
-          .delete({ userId: userSession?.userId })
+          .delete({ userId: userIdFromSessionToken })
       ).affected ?? 0) > 0
     );
   }
@@ -264,5 +244,45 @@ export class PostgresDatabaseClient implements DatabaseClient {
       err instanceof Error &&
       err.message.includes('duplicate key value violates unique constraint')
     );
+  }
+
+  private async _getUserIdFromUsername(
+    username: Username,
+  ): Promise<number | undefined> {
+    return (
+      await this._dataSource.getRepository(UserProfileEntity).findOne({
+        select: { userId: true },
+        where: {
+          username: username.toString(),
+        },
+      })
+    )?.userId;
+  }
+
+  private async _getUserIdFromSessionToken(
+    token: SessionToken,
+  ): Promise<number | undefined> {
+    return (
+      await this._dataSource.getRepository(UserSessionEntity).findOne({
+        select: { userId: true },
+        where: {
+          token: token.toString(),
+          expireTime: MoreThan(new Date()),
+        },
+      })
+    )?.userId;
+  }
+
+  private async _getUserIdFromEmail(
+    email: EmailAddress,
+  ): Promise<number | undefined> {
+    return (
+      await this._dataSource.getRepository(UserProfileEntity).findOne({
+        select: { userId: true },
+        where: {
+          email: email.toString(),
+        },
+      })
+    )?.userId;
   }
 }
