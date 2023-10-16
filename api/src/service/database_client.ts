@@ -28,14 +28,14 @@ export default interface DatabaseClient {
   ): Promise<boolean>;
 
   /**
-   * Checks if email {@link email} is already in use.
-   * @param email - Email to check.
-   * @param sessionToken - Session token whose corresponding user's email is
-   * ignored in the check.
-   * @returns True if the email is in use. Else, returns false.
+   * Checks if email address {@link emailAddress} is already in use.
+   * @param emailAddress - Email address to check.
+   * @param sessionToken - Session token whose corresponding user's email
+   * address is ignored in the check.
+   * @returns True if the email address is in use. Else, returns false.
    */
-  isEmailInUse(
-    email: EmailAddress,
+  isEmailAddressInUse(
+    emailAddress: EmailAddress,
     sessionToken?: SessionToken,
   ): Promise<boolean>;
 

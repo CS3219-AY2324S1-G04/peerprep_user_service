@@ -15,9 +15,14 @@ export default class UserProfile {
   @Column({ name: 'username', type: 'text', unique: true, nullable: false })
   public username: string;
 
-  /** Email. */
-  @Column({ name: 'email', type: 'text', unique: true, nullable: false })
-  public email: string;
+  /** Email address. */
+  @Column({
+    name: 'email_address',
+    type: 'text',
+    unique: true,
+    nullable: false,
+  })
+  public emailAddress: string;
 
   /** Role. */
   @Column({
@@ -33,12 +38,12 @@ export default class UserProfile {
   public constructor(
     userId: number,
     username: string,
-    email: string,
+    emailAddress: string,
     role: UserRole,
   ) {
     this.userId = userId;
     this.username = username;
-    this.email = email;
+    this.emailAddress = emailAddress;
     this.role = role;
   }
 }

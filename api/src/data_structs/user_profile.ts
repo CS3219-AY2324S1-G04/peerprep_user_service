@@ -16,13 +16,13 @@ export class JsonUserProfile
   implements JsonUserIdentity, JsonClientModifiableUserProfile
 {
   public readonly username: string;
-  public readonly email: string;
+  public readonly emailAddress: string;
   public readonly userId: number;
   public readonly userRole: string;
 
   public constructor(userProfile: UserProfile) {
     this.username = userProfile.username.username;
-    this.email = userProfile.email.email;
+    this.emailAddress = userProfile.emailAddress.emailAddress;
     this.userId = userProfile.userId.userId;
     this.userRole = userProfile.userRole;
   }

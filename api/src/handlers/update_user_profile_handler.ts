@@ -37,7 +37,7 @@ export default class UpdateUserProfileHandler extends Handler {
     sessionToken: SessionToken,
   ): Promise<ClientModifiableUserProfile> {
     let username: Username | undefined = undefined;
-    let email: EmailAddress | undefined = undefined;
+    let emailAddress: EmailAddress | undefined = undefined;
 
     const invalidInfo: { [key: string]: string } = {};
 
@@ -48,7 +48,7 @@ export default class UpdateUserProfileHandler extends Handler {
     }
 
     try {
-      email = EmailAddress.parseAndValidate(query['email']);
+      emailAddress = EmailAddress.parseAndValidate(query['email']);
     } catch (e) {
       invalidInfo['email'] = (e as Error).message;
     }
@@ -61,8 +61,8 @@ export default class UpdateUserProfileHandler extends Handler {
     }
 
     if (
-      email !== undefined &&
-      (await client.isEmailInUse(email, sessionToken))
+      emailAddress !== undefined &&
+      (await client.isEmailAddressInUse(emailAddress, sessionToken))
     ) {
       invalidInfo['email'] = 'Email already in use.';
     }
@@ -71,7 +71,7 @@ export default class UpdateUserProfileHandler extends Handler {
       throw new HttpErrorInfo(400, JSON.stringify(invalidInfo));
     }
 
-    return { username: username!, email: email! };
+    return { username: username!, emailAddress: emailAddress! };
   }
 
   private static async _updateUserProfile(

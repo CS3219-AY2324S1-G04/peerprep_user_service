@@ -8,14 +8,14 @@ import Username from './username';
 export default interface ClientModifiableUserProfile {
   /** Username. */
   readonly username: Username;
-  /** Email. */
-  readonly email: EmailAddress;
+  /** Email address. */
+  readonly emailAddress: EmailAddress;
 }
 
 /** JSON string compatible {@link ClientModifiableUserProfile}. */
 export interface JsonClientModifiableUserProfile {
   /** Username. */
   readonly username: string;
-  /** Email. */
-  readonly email: string;
+  /** Email address. */
+  readonly emailAddress: string;
 }

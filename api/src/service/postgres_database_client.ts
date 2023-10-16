@@ -60,14 +60,14 @@ export class PostgresDatabaseClient implements DatabaseClient {
     return userIdFromUsername !== userIdFromSessionToken;
   }
 
-  public async isEmailInUse(
-    email: EmailAddress,
+  public async isEmailAddressInUse(
+    emailAddress: EmailAddress,
     sessionToken?: SessionToken,
   ): Promise<boolean> {
-    const userIdFromEmail: number | undefined =
-      await this._getUserIdFromEmail(email);
+    const userIdFromEmailAddress: number | undefined =
+      await this._getUserIdFromEmailAddress(emailAddress);
 
-    if (userIdFromEmail === undefined) {
+    if (userIdFromEmailAddress === undefined) {
       return false;
     }
 
@@ -76,7 +76,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
         ? undefined
         : await this._getUserIdFromSessionToken(sessionToken);
 
-    return userIdFromEmail !== userIdFromSessionToken;
+    return userIdFromEmailAddress !== userIdFromSessionToken;
   }
 
   public async fetchPasswordHashFromUsername(
@@ -119,7 +119,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     return {
       userId: UserId.parseNumber(userProfile.userId),
       username: Username.parse(userProfile.username),
-      email: EmailAddress.parse(userProfile.email),
+      emailAddress: EmailAddress.parse(userProfile.emailAddress),
       userRole: parseUserRole(userProfile.role),
     };
   }
@@ -148,7 +148,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
       .getRepository(UserProfileEntity)
       .insert({
         username: userProfile.username.toString(),
-        email: userProfile.email.toString(),
+        emailAddress: userProfile.emailAddress.toString(),
       });
 
     await this._dataSource.getRepository(UserCredentialEntity).insert({
@@ -193,7 +193,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
           .getRepository(UserProfileEntity)
           .update(userIdFromSessionToken, {
             username: userProfile.username.toString(),
-            email: userProfile.email.toString(),
+            emailAddress: userProfile.emailAddress.toString(),
           })
       ).affected ?? 0) > 0
     );
@@ -273,14 +273,14 @@ export class PostgresDatabaseClient implements DatabaseClient {
     )?.userId;
   }
 
-  private async _getUserIdFromEmail(
-    email: EmailAddress,
+  private async _getUserIdFromEmailAddress(
+    emailAddress: EmailAddress,
   ): Promise<number | undefined> {
     return (
       await this._dataSource.getRepository(UserProfileEntity).findOne({
         select: { userId: true },
         where: {
-          email: email.toString(),
+          emailAddress: emailAddress.toString(),
         },
       })
     )?.userId;
