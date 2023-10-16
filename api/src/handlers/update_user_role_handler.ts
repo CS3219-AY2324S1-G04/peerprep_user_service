@@ -13,9 +13,9 @@ import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
 
 /**
- * Handles updating the role of the user whose username is specified in the
+ * Handles updating the user role of the user whose username is specified in the
  * request. The user who sent the request must have the {@link UserRole.admin}
- * role.
+ * user role.
  */
 export default class UpdateUserRoleHandler extends Handler {
   public get method(): HttpMethod {
@@ -23,7 +23,7 @@ export default class UpdateUserRoleHandler extends Handler {
   }
 
   public get path(): string {
-    return '/user-service/users/:userId/role';
+    return '/user-service/users/:userId/user-role';
   }
 
   private static _parseCookie(cookies: {
@@ -46,15 +46,15 @@ export default class UpdateUserRoleHandler extends Handler {
     const invalidInfo: { [key: string]: string } = {};
 
     try {
-      userId = UserId.parseString(pathParams['userId']);
+      userId = UserId.parseString(pathParams['user-id']);
     } catch (e) {
-      invalidInfo['userId'] = (e as Error).message;
+      invalidInfo['user-id'] = (e as Error).message;
     }
 
     try {
-      userRole = parseUserRole(queryParams['role']);
+      userRole = parseUserRole(queryParams['user-role']);
     } catch (e) {
-      invalidInfo['role'] = (e as Error).message;
+      invalidInfo['user-role'] = (e as Error).message;
     }
 
     if (Object.keys(invalidInfo).length > 0) {
@@ -87,9 +87,10 @@ export default class UpdateUserRoleHandler extends Handler {
   }
 
   /**
-   * Updates the role of the user whose user ID is specified in the request.
-   * The session token stored in the request cookie must belong to a user who
-   * has the user role {@link UserRole.admin}. Sends a HTTP 200 response.
+   * Updates the user role of the user whose user ID is specified in the
+   * request. The session token stored in the request cookie must belong to a
+   * user who has the user role {@link UserRole.admin}. Sends a HTTP 200
+   * response.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.

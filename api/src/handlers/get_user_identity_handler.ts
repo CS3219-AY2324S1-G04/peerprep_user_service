@@ -11,7 +11,8 @@ import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
 
 /**
- * Handles getting the identity of the user who owns a specified session token.
+ * Handles getting the user identity of the user who owns a specified session
+ * token.
  */
 export default class GetUserIdentityHandler extends Handler {
   public override get method(): HttpMethod {
@@ -55,9 +56,9 @@ export default class GetUserIdentityHandler extends Handler {
   }
 
   /**
-   * Gets the ID and role of the user who owns the session token specified in
-   * the request query or in the request cookie. Sends a HTTP 200 response whose
-   * body is a JSON string containing the user's identity.
+   * Gets the user ID and user role of the user who owns the session token
+   * specified in the request query or in the request cookie. Sends a HTTP 200
+   * response whose body is a JSON string containing the user's identity.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.

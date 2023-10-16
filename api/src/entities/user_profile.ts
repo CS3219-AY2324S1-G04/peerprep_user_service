@@ -24,26 +24,26 @@ export default class UserProfile {
   })
   public emailAddress: string;
 
-  /** Role. */
+  /** User role. */
   @Column({
-    name: 'role',
+    name: 'user_role',
     type: 'enum',
     enum: UserRole,
     enumName: 'user_role',
     nullable: false,
     default: UserRole.user,
   })
-  public role: UserRole;
+  public userRole: UserRole;
 
   public constructor(
     userId: number,
     username: string,
     emailAddress: string,
-    role: UserRole,
+    userRole: UserRole,
   ) {
     this.userId = userId;
     this.username = username;
     this.emailAddress = emailAddress;
-    this.role = role;
+    this.userRole = userRole;
   }
 }

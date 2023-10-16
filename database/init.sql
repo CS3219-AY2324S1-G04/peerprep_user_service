@@ -4,7 +4,7 @@ CREATE TABLE user_profile (
   user_id SERIAL PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   email_address TEXT UNIQUE NOT NULL,
-  role user_role NOT NULL DEFAULT 'user'
+  user_role user_role NOT NULL DEFAULT 'user'
 );
 
 CREATE TABLE user_credential (

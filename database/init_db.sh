@@ -18,7 +18,7 @@ password_hash=$(htpasswd -bnBC $HASH_COST "" $ADMIN_PASSWORD | sed 's/:$2y/$2b/'
 admin_email_address=$(echo $ADMIN_EMAIL | tr '[:upper:]' '[:lower:]')
 
 psql -U $POSTGRES_USER -d $POSTGRES_DB -f /init.sql -c \
-"INSERT INTO user_profile (username, email_address, role) VALUES ('admin', '$admin_email_address', 'admin');
+"INSERT INTO user_profile (username, email_address, user_role) VALUES ('admin', '$admin_email_address', 'admin');
 INSERT INTO user_credential VALUES (1, '$password_hash');"
 
 echo "Initialisation completed!"
