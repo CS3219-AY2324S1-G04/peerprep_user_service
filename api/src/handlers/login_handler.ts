@@ -110,15 +110,15 @@ export default class LoginHandler extends Handler {
     username: Username,
     sessionExpireMillis: number,
   ): Promise<SessionToken> {
-    let token: SessionToken;
+    let sessionToken: SessionToken;
 
     let isEntryCreated: boolean = false;
     while (!isEntryCreated) {
-      token = SessionToken.createNew();
+      sessionToken = SessionToken.createNew();
 
       try {
         await client.createUserSession(
-          token,
+          sessionToken,
           username,
           new Date(Date.now() + sessionExpireMillis),
         );
@@ -131,7 +131,7 @@ export default class LoginHandler extends Handler {
       }
     }
 
-    return token!;
+    return sessionToken!;
   }
 
   /**
@@ -158,7 +158,7 @@ export default class LoginHandler extends Handler {
       req.query,
     );
 
-    const token: SessionToken = await LoginHandler._authenticate(
+    const sessionToken: SessionToken = await LoginHandler._authenticate(
       client,
       username,
       password,
@@ -167,7 +167,7 @@ export default class LoginHandler extends Handler {
 
     res
       .status(200)
-      .cookie('session-token', token.toString(), {
+      .cookie('session-token', sessionToken.toString(), {
         expires: LoginHandler._cookieExpiry,
         httpOnly: true,
         sameSite: true,

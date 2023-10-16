@@ -66,10 +66,10 @@ export default class UpdateUserRoleHandler extends Handler {
 
   private static async _validatePermission(
     client: DatabaseClient,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<void> {
     const userIdentity: UserIdentity | undefined =
-      await client.fetchUserIdentityFromToken(token);
+      await client.fetchUserIdentityFromSessionToken(sessionToken);
 
     if (userIdentity?.userRole !== UserRole.admin) {
       throw new HttpErrorInfo(401);
@@ -111,11 +111,13 @@ export default class UpdateUserRoleHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: SessionToken = UpdateUserRoleHandler._parseCookie(req.cookies);
+    const sessionToken: SessionToken = UpdateUserRoleHandler._parseCookie(
+      req.cookies,
+    );
     const [userId, userRole]: [UserId, UserRole] =
       UpdateUserRoleHandler._parseParams(req.params, req.query);
 
-    await UpdateUserRoleHandler._validatePermission(client, token);
+    await UpdateUserRoleHandler._validatePermission(client, sessionToken);
 
     await UpdateUserRoleHandler._updateUserRole(client, userId, userRole);
 

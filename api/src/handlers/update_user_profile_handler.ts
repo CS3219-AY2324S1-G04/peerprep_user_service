@@ -34,7 +34,7 @@ export default class UpdateUserProfileHandler extends Handler {
   private static async _parseParams(
     client: DatabaseClient,
     query: qs.ParsedQs,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<ClientModifiableUserProfile> {
     let username: Username | undefined = undefined;
     let email: EmailAddress | undefined = undefined;
@@ -55,12 +55,15 @@ export default class UpdateUserProfileHandler extends Handler {
 
     if (
       username !== undefined &&
-      (await client.isUsernameInUse(username, token))
+      (await client.isUsernameInUse(username, sessionToken))
     ) {
       invalidInfo['username'] = 'Username already in use.';
     }
 
-    if (email !== undefined && (await client.isEmailInUse(email, token))) {
+    if (
+      email !== undefined &&
+      (await client.isEmailInUse(email, sessionToken))
+    ) {
       invalidInfo['email'] = 'Email already in use.';
     }
 
@@ -74,9 +77,9 @@ export default class UpdateUserProfileHandler extends Handler {
   private static async _updateUserProfile(
     client: DatabaseClient,
     userProfile: ClientModifiableUserProfile,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<void> {
-    if (!(await client.updateUserProfile(userProfile, token))) {
+    if (!(await client.updateUserProfile(userProfile, sessionToken))) {
       throw new HttpErrorInfo(401);
     }
   }
@@ -101,16 +104,20 @@ export default class UpdateUserProfileHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: SessionToken = UpdateUserProfileHandler._parseCookie(
+    const sessionToken: SessionToken = UpdateUserProfileHandler._parseCookie(
       req.cookies,
     );
     const userProfile: ClientModifiableUserProfile =
-      await UpdateUserProfileHandler._parseParams(client, req.query, token);
+      await UpdateUserProfileHandler._parseParams(
+        client,
+        req.query,
+        sessionToken,
+      );
 
     await UpdateUserProfileHandler._updateUserProfile(
       client,
       userProfile,
-      token,
+      sessionToken,
     );
 
     res.sendStatus(200);

@@ -15,8 +15,8 @@ import UserProfile from './user_profile';
 @Entity({ name: 'user_session' })
 export default class UserSession {
   /** Session token. */
-  @PrimaryColumn({ name: 'token', type: 'char', length: '36' })
-  public token: string;
+  @PrimaryColumn({ name: 'session_token', type: 'char', length: '36' })
+  public sessionToken: string;
 
   /** Profile of user who owns the session. */
   @ManyToOne(() => UserProfile, (userProfile) => userProfile.userId, {
@@ -39,12 +39,12 @@ export default class UserSession {
   public expireTime: Date;
 
   public constructor(
-    token: string,
+    sessionToken: string,
     userProfile: UserProfile,
     loginTime: Date,
     expireTime: Date,
   ) {
-    this.token = token;
+    this.sessionToken = sessionToken;
     this.userProfile = userProfile;
     this.userId = userProfile?.userId;
     this.loginTime = loginTime;

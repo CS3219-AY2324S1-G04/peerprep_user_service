@@ -30,9 +30,9 @@ export default class DeleteUserHandler extends Handler {
 
   private static async _deleteUserProfile(
     client: DatabaseClient,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ) {
-    if (!(await client.deleteUserProfile(token))) {
+    if (!(await client.deleteUserProfile(sessionToken))) {
       throw new HttpErrorInfo(401);
     }
   }
@@ -53,8 +53,10 @@ export default class DeleteUserHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const token: SessionToken = DeleteUserHandler._parseCookie(req.cookies);
-    await DeleteUserHandler._deleteUserProfile(client, token);
+    const sessionToken: SessionToken = DeleteUserHandler._parseCookie(
+      req.cookies,
+    );
+    await DeleteUserHandler._deleteUserProfile(client, sessionToken);
 
     res.sendStatus(200);
   }

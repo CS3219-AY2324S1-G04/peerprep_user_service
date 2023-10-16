@@ -43,7 +43,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
 
   public async isUsernameInUse(
     username: Username,
-    token?: SessionToken,
+    sessionToken?: SessionToken,
   ): Promise<boolean> {
     const userIdFromUsername: number | undefined =
       await this._getUserIdFromUsername(username);
@@ -53,16 +53,16 @@ export class PostgresDatabaseClient implements DatabaseClient {
     }
 
     const userIdFromSessionToken: number | undefined =
-      token === undefined
+      sessionToken === undefined
         ? undefined
-        : await this._getUserIdFromSessionToken(token);
+        : await this._getUserIdFromSessionToken(sessionToken);
 
     return userIdFromUsername !== userIdFromSessionToken;
   }
 
   public async isEmailInUse(
     email: EmailAddress,
-    token?: SessionToken,
+    sessionToken?: SessionToken,
   ): Promise<boolean> {
     const userIdFromEmail: number | undefined =
       await this._getUserIdFromEmail(email);
@@ -72,9 +72,9 @@ export class PostgresDatabaseClient implements DatabaseClient {
     }
 
     const userIdFromSessionToken: number | undefined =
-      token === undefined
+      sessionToken === undefined
         ? undefined
-        : await this._getUserIdFromSessionToken(token);
+        : await this._getUserIdFromSessionToken(sessionToken);
 
     return userIdFromEmail !== userIdFromSessionToken;
   }
@@ -97,11 +97,11 @@ export class PostgresDatabaseClient implements DatabaseClient {
     )?.passwordHash;
   }
 
-  public async fetchUserProfileFromToken(
-    token: SessionToken,
+  public async fetchUserProfileFromSessionToken(
+    sessionToken: SessionToken,
   ): Promise<UserProfile | undefined> {
     const userIdFromSessionToken: number | undefined =
-      await this._getUserIdFromSessionToken(token);
+      await this._getUserIdFromSessionToken(sessionToken);
 
     if (userIdFromSessionToken === undefined) {
       return undefined;
@@ -124,11 +124,11 @@ export class PostgresDatabaseClient implements DatabaseClient {
     };
   }
 
-  public async fetchUserIdentityFromToken(
-    token: SessionToken,
+  public async fetchUserIdentityFromSessionToken(
+    sessionToken: SessionToken,
   ): Promise<UserIdentity | undefined> {
     const userProfile: UserProfile | undefined =
-      await this.fetchUserProfileFromToken(token);
+      await this.fetchUserProfileFromSessionToken(sessionToken);
 
     if (userProfile === undefined) {
       return undefined;
@@ -158,7 +158,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
   }
 
   public async createUserSession(
-    token: SessionToken,
+    sessionToken: SessionToken,
     username: Username,
     expireTime: Date,
   ): Promise<void> {
@@ -170,7 +170,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     ).userId;
 
     await this._dataSource.getRepository(UserSessionEntity).insert({
-      token: token.toString(),
+      sessionToken: sessionToken.toString(),
       userId: userIdFromUsername,
       expireTime: expireTime,
     });
@@ -178,10 +178,10 @@ export class PostgresDatabaseClient implements DatabaseClient {
 
   public async updateUserProfile(
     userProfile: ClientModifiableUserProfile,
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<boolean> {
     const userIdFromSessionToken: number | undefined =
-      await this._getUserIdFromSessionToken(token);
+      await this._getUserIdFromSessionToken(sessionToken);
 
     if (userIdFromSessionToken === undefined) {
       return false;
@@ -212,9 +212,9 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
-  public async deleteUserProfile(token: SessionToken): Promise<boolean> {
+  public async deleteUserProfile(sessionToken: SessionToken): Promise<boolean> {
     const userIdFromSessionToken: number | undefined =
-      await this._getUserIdFromSessionToken(token);
+      await this._getUserIdFromSessionToken(sessionToken);
 
     if (userIdFromSessionToken === undefined) {
       return false;
@@ -229,12 +229,12 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
-  public async deleteUserSession(token: SessionToken): Promise<boolean> {
+  public async deleteUserSession(sessionToken: SessionToken): Promise<boolean> {
     return (
       ((
         await this._dataSource
           .getRepository(UserSessionEntity)
-          .delete(token.toString())
+          .delete(sessionToken.toString())
       ).affected ?? 0) > 0
     );
   }
@@ -260,13 +260,13 @@ export class PostgresDatabaseClient implements DatabaseClient {
   }
 
   private async _getUserIdFromSessionToken(
-    token: SessionToken,
+    sessionToken: SessionToken,
   ): Promise<number | undefined> {
     return (
       await this._dataSource.getRepository(UserSessionEntity).findOne({
         select: { userId: true },
         where: {
-          token: token.toString(),
+          sessionToken: sessionToken.toString(),
           expireTime: MoreThan(new Date()),
         },
       })
