@@ -9,6 +9,7 @@ import SessionToken from '../data_structs/session_token';
 import UserIdentity, { JsonUserIdentity } from '../data_structs/user_identity';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
+import { sessionTokenKey } from '../utils/parameter_keys';
 
 /**
  * Handles getting the user identity of the user who owns a specified session
@@ -30,13 +31,13 @@ export default class GetUserIdentityHandler extends Handler {
     },
   ) {
     try {
-      return SessionToken.parse(query['session-token']);
+      return SessionToken.parse(query[sessionTokenKey]);
     } catch (e) {
       // Look for session token in cookies instead
     }
 
     try {
-      return SessionToken.parse(cookies['session-token']);
+      return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }

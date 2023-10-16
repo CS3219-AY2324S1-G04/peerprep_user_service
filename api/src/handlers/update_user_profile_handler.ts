@@ -10,6 +10,11 @@ import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile'
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
+import {
+  emailAddressKey,
+  sessionTokenKey,
+  usernameKey,
+} from '../utils/parameter_keys';
 
 /** Handles updating the profile of the user who sent the request. */
 export default class UpdateUserProfileHandler extends Handler {
@@ -25,7 +30,7 @@ export default class UpdateUserProfileHandler extends Handler {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
-      return SessionToken.parse(cookies['session-token']);
+      return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }
@@ -42,29 +47,29 @@ export default class UpdateUserProfileHandler extends Handler {
     const invalidInfo: { [key: string]: string } = {};
 
     try {
-      username = await Username.parseAndValidate(query['username']);
+      username = await Username.parseAndValidate(query[usernameKey]);
     } catch (e) {
-      invalidInfo['username'] = (e as Error).message;
+      invalidInfo[usernameKey] = (e as Error).message;
     }
 
     try {
-      emailAddress = EmailAddress.parseAndValidate(query['email']);
+      emailAddress = EmailAddress.parseAndValidate(query[emailAddressKey]);
     } catch (e) {
-      invalidInfo['email'] = (e as Error).message;
+      invalidInfo[emailAddressKey] = (e as Error).message;
     }
 
     if (
       username !== undefined &&
       (await client.isUsernameInUse(username, sessionToken))
     ) {
-      invalidInfo['username'] = 'Username already in use.';
+      invalidInfo[usernameKey] = 'Username already in use.';
     }
 
     if (
       emailAddress !== undefined &&
       (await client.isEmailAddressInUse(emailAddress, sessionToken))
     ) {
-      invalidInfo['email'] = 'Email already in use.';
+      invalidInfo[emailAddressKey] = 'Email address already in use.';
     }
 
     if (Object.keys(invalidInfo).length > 0) {

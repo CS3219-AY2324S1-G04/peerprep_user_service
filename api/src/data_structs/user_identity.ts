@@ -15,12 +15,14 @@ export default interface UserIdentity {
 /** JSON string compatible {@link UserIdentity}. */
 export class JsonUserIdentity {
   /** Unique ID. */
-  public readonly userId: number;
-  /** User role. */
-  public readonly userRole: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  public readonly 'user-id': number;
+  // /** User role. */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  public readonly 'user-role': string;
 
   public constructor(userIdentity: UserIdentity) {
-    this.userId = userIdentity.userId.userId;
-    this.userRole = userIdentity.userRole;
+    this['user-id'] = userIdentity.userId.userId;
+    this['user-role'] = userIdentity.userRole;
   }
 }

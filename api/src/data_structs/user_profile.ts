@@ -16,14 +16,17 @@ export class JsonUserProfile
   implements JsonUserIdentity, JsonClientModifiableUserProfile
 {
   public readonly username: string;
-  public readonly emailAddress: string;
-  public readonly userId: number;
-  public readonly userRole: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  public readonly 'email-address': string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  public readonly 'user-id': number;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  public readonly 'user-role': string;
 
   public constructor(userProfile: UserProfile) {
-    this.username = userProfile.username.username;
-    this.emailAddress = userProfile.emailAddress.emailAddress;
-    this.userId = userProfile.userId.userId;
-    this.userRole = userProfile.userRole;
+    this['username'] = userProfile.username.username;
+    this['email-address'] = userProfile.emailAddress.emailAddress;
+    this['user-id'] = userProfile.userId.userId;
+    this['user-role'] = userProfile.userRole;
   }
 }

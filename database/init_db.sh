@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if ! [[ $ADMIN_EMAIL =~ ^[^[:space:]]+@[a-z0-9.-]+[a-z0-9-]$ ]]; then
-    echo "ERROR: ADMIN_EMAIL does not conform to the email address format."
+if ! [[ $ADMIN_EMAIL_ADDRESS =~ ^[^[:space:]]+@[a-z0-9.-]+[a-z0-9-]$ ]]; then
+    echo "ERROR: ADMIN_EMAIL_ADDRESS does not conform to the email address format."
     exit 1
 fi
 
@@ -15,7 +15,7 @@ if [[ $ADMIN_PASSWORD = "" ]]; then
 fi
 
 password_hash=$(htpasswd -bnBC $HASH_COST "" $ADMIN_PASSWORD | sed 's/:$2y/$2b/')
-admin_email_address=$(echo $ADMIN_EMAIL | tr '[:upper:]' '[:lower:]')
+admin_email_address=$(echo $ADMIN_EMAIL_ADDRESS | tr '[:upper:]' '[:lower:]')
 
 psql -U $POSTGRES_USER -d $POSTGRES_DB -f /init.sql -c \
 "INSERT INTO user_profile (username, email_address, user_role) VALUES ('admin', '$admin_email_address', 'admin');

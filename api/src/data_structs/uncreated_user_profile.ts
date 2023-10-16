@@ -17,5 +17,6 @@ export interface JsonClientModifiableUserProfile {
   /** Username. */
   readonly username: string;
   /** Email address. */
-  readonly emailAddress: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  readonly 'email-address': string;
 }

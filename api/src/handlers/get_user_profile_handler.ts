@@ -8,6 +8,7 @@ import SessionToken from '../data_structs/session_token';
 import UserProfile, { JsonUserProfile } from '../data_structs/user_profile';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
+import { sessionTokenKey } from '../utils/parameter_keys';
 
 /** Handles getting the profile of the user who sent the request. */
 export default class GetUserProfileHandler extends Handler {
@@ -23,7 +24,7 @@ export default class GetUserProfileHandler extends Handler {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
-      return SessionToken.parse(cookies['session-token']);
+      return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
       throw new HttpErrorInfo(401);
     }
