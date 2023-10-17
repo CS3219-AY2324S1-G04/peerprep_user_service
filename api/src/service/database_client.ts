@@ -51,6 +51,17 @@ export default interface DatabaseClient {
   ): Promise<string | undefined>;
 
   /**
+   * Fetches the password hash of the user who owns the session token
+   * {@link sessionToken}.
+   * @param sessionToken - Session token belonging to the user.
+   * @returns Password hash of the user if a user who owns the session token
+   * {@link sessionToken} exist. Else, returns undefined.
+   */
+  fetchPasswordHashFromSessionToken(
+    sessionToken: SessionToken,
+  ): Promise<string | undefined>;
+
+  /**
    * Fetches the user profile of the user who the session token
    * {@link sessionToken} belongs to.
    * @param sessionToken - Session token belonging to the user.

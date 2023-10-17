@@ -230,6 +230,10 @@ The user making the request must have the "admin" user role.
 
 Deletes the user who owns the specified session token.
 
+**Query Parameters**
+
+- `password` - Password for verifying the user.
+
 **Cookies**
 
 - `session-token` - Session token.
@@ -237,7 +241,7 @@ Deletes the user who owns the specified session token.
 **Response**
 
 - `200` - Success.
-- `401` - Session token was not provided or does not match any existing session tokens.
+- `401` - Session token was not provided, or does not match any existing session tokens, or password is incorrect.
 - `500` - Unexpected error occurred on the server.
 
 ### Get a User Identity [via Session Token]
@@ -248,7 +252,7 @@ Gets the user ID and user role of the user who owns the specified session token.
 
 This is similar to [Get a User Profile \[via Session Token\]](#get-a-user-profile-via-session-token) but sends less information and allows the session token to be specified via a query parameter. It is mainly to be use by other services to determine the existence and user role of a user.
 
-**Parameters**
+**Query Parameters**
 
 - `session-token` - Session token. This is preferred if the HTTP request is made from another service. If specified, there is no need to specify it again in the request cookie.
 
