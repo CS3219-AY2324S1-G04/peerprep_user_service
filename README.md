@@ -21,6 +21,7 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
   - [Delete a Session \[via Session Token\]](#delete-a-session-via-session-token)
   - [Get a User Profile \[via Session Token\]](#get-a-user-profile-via-session-token)
   - [Update a User Profile \[via Session Token\]](#update-a-user-profile-via-session-token)
+  - [Change a User's Password \[via Session Token\]](#change-a-users-password-via-session-token)
   - [Update a User's Role](#update-a-users-role)
   - [Delete a User \[via Session Token\]](#delete-a-user-via-session-token)
   - [Get a User Identity \[via Session Token\]](#get-a-user-identity-via-session-token)
@@ -190,6 +191,36 @@ Note that all fields of the user profile must be provided including fields that 
 - `401` - Session token was not provided or does not match any existing session tokens.
 - `500` - Unexpected error occurred on the server.
 
+### Change a User's Password [via Session Token]
+
+> [PUT] `/user-service/user/password`
+
+Changes the password of the user who owns the specified session token.
+
+Since this is a high threat operation, the user must verify their identity by providing their current password.
+
+**Query Parameters**
+
+- `password` - Password for verifying the user.
+- `new-password` - New password to change to.
+
+**Cookies**
+
+- `session-token` - Session token.
+
+**Response**
+
+- `200` - Success.
+- `400` - New password is not a valid password. The reason for the invalidity is provided in the response body.
+  - Example response body:
+    ```json
+    {
+      "new-password": "Password cannot be empty."
+    }
+    ```
+- `401` - Session token was not provided, or does not match any existing session tokens, or password is incorrect.
+- `500` - Unexpected error occurred on the server.
+
 ### Update a User's Role
 
 > [PUT] `/user-service/users/:user-id/user-role`
@@ -229,6 +260,8 @@ The user making the request must have the "admin" user role.
 > [DELETE] `/user-service/user`
 
 Deletes the user who owns the specified session token.
+
+Since this is a high threat operation, the user must verify their identity by providing their password.
 
 **Query Parameters**
 
