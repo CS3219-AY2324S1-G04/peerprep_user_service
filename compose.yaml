@@ -3,7 +3,7 @@ services:
     image: peerprep_user_service_database
     build: ./database
     networks:
-      - network1
+      - peerprep_network
     environment:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_USER: ${DATABASE_USER}
@@ -16,7 +16,7 @@ services:
     image: peerprep_user_service_api
     build: ./api
     networks:
-      - network1
+      - peerprep_network
     ports:
       - "${PORT}:3000"
     environment:
@@ -35,5 +35,5 @@ services:
     restart: unless-stopped
 
 networks:
-  network1:
+  peerprep_network:
     name: peerprep
