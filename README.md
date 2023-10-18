@@ -21,7 +21,7 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
   - [Delete a Session \[via Session Token\]](#delete-a-session-via-session-token)
   - [Get a User Profile \[via Session Token\]](#get-a-user-profile-via-session-token)
   - [Update a User Profile \[via Session Token\]](#update-a-user-profile-via-session-token)
-  - [Change a User's Password \[via Session Token\]](#change-a-users-password-via-session-token)
+  - [Update a User's Password \[via Session Token\]](#update-a-users-password-via-session-token)
   - [Update a User's Role](#update-a-users-role)
   - [Delete a User \[via Session Token\]](#delete-a-user-via-session-token)
   - [Get a User Identity \[via Session Token\]](#get-a-user-identity-via-session-token)
@@ -191,18 +191,18 @@ Note that all fields of the user profile must be provided including fields that 
 - `401` - Session token was not provided or does not match any existing session tokens.
 - `500` - Unexpected error occurred on the server.
 
-### Change a User's Password [via Session Token]
+### Update a User's Password [via Session Token]
 
 > [PUT] `/user-service/user/password`
 
-Changes the password of the user who owns the specified session token.
+Updates the password of the user who owns the specified session token.
 
 Since this is a high threat operation, the user must verify their identity by providing their current password.
 
 **Query Parameters**
 
 - `password` - Password for verifying the user.
-- `new-password` - New password to change to.
+- `new-password` - New password to update to.
 
 **Cookies**
 
