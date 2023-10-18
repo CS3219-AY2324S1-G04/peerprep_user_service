@@ -11,6 +11,8 @@ export const userIdKey: string = 'user-id';
 export const userRoleKey: string = 'user-role';
 /** Password key. */
 export const passwordKey: string = 'password';
+/** Password key. */
+export const newPasswordKey: string = 'new-password';
 /** Session token key. */
 export const sessionTokenKey: string = 'session-token';
 
@@ -19,10 +21,12 @@ export const sessionTokenKey: string = 'session-token';
 export const userIdPathKey: string = 'userId';
 
 export default {
-  usernameParam: usernameKey,
-  emailAddressParam: emailAddressKey,
-  userIdParam: userIdKey,
-  userRoleParam: userRoleKey,
-  sessionTokenParam: sessionTokenKey,
-  userIdPathParam: userIdPathKey,
+  usernameKey,
+  emailAddressKey,
+  userIdKey,
+  userRoleKey,
+  passwordKey,
+  newPasswordKey,
+  sessionTokenKey,
+  userIdPathKey,
 };

@@ -82,7 +82,7 @@ export default class DeleteUserHandler extends Handler {
   private static async _deleteUserProfile(
     client: DatabaseClient,
     sessionToken: SessionToken,
-  ) {
+  ): Promise<void> {
     if (!(await client.deleteUserProfile(sessionToken))) {
       throw new HttpErrorInfo(401);
     }
