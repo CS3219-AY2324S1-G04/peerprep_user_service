@@ -124,6 +124,20 @@ export default interface DatabaseClient {
   ): Promise<boolean>;
 
   /**
+   * Updates the password hash of the user who owns the session token
+   * {@link sessionToken}. The password hash is updated to {@link passwordHash}.
+   * @param passwordHash - Updated password hash.
+   * @param sessionToken - Session token belonging to the user.
+   * @returns True if a password hash was updated. False if not password hash
+   * was updated due to the session token {@link sessionToken}  being an
+   * invalid token.
+   */
+  updatePasswordHash(
+    passwordHash: string,
+    sessionToken: SessionToken,
+  ): Promise<boolean>;
+
+  /**
    * Updates the user role of the user with username {@link userId}. The user
    * role will be updated to {@link userRole}.
    * @param userId - User ID of the user whose user role is to be updated.

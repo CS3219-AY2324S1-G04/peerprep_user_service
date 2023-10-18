@@ -3,6 +3,7 @@
  */
 import App from './app';
 import Config from './data_structs/config';
+import UpdatePasswordHandler from './handlers/update_password_handler';
 import DeleteUserHandler from './handlers/delete_user_handler';
 import GetUserIdentityHandler from './handlers/get_user_identity_handler';
 import GetUserProfileHandler from './handlers/get_user_profile_handler';
@@ -32,6 +33,7 @@ const app: App = new App(config.port, client, [
   new LogoutHandler(),
   new GetUserProfileHandler(),
   new UpdateUserProfileHandler(),
+  new UpdatePasswordHandler(config.hashCost),
   new UpdateUserRoleHandler(),
   new DeleteUserHandler(),
   new GetUserIdentityHandler(),

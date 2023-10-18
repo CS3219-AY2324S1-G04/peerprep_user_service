@@ -207,6 +207,28 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  public async updatePasswordHash(
+    passwordHash: string,
+    sessionToken: SessionToken,
+  ): Promise<boolean> {
+    const userIdFromSessionToken: number | undefined =
+      await this._getUserIdFromSessionToken(sessionToken);
+
+    if (userIdFromSessionToken === undefined) {
+      return false;
+    }
+
+    return (
+      ((
+        await this._dataSource
+          .getRepository(UserCredentialEntity)
+          .update(userIdFromSessionToken, {
+            passwordHash: passwordHash,
+          })
+      ).affected ?? 0) > 0
+    );
+  }
+
   public async updateUserRole(
     userId: UserId,
     userRole: UserRole,
