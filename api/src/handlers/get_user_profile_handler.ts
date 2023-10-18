@@ -5,7 +5,9 @@ import express from 'express';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
 import SessionToken from '../data_structs/session_token';
-import UserProfile, { JsonUserProfile } from '../data_structs/user_profile';
+import UserProfile, {
+  jsonStringifyUserProfile,
+} from '../data_structs/user_profile';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
 import { sessionTokenKey } from '../utils/parameter_keys';
@@ -67,6 +69,6 @@ export default class GetUserProfileHandler extends Handler {
     const userProfile: UserProfile =
       await GetUserProfileHandler._fetchUserProfile(client, sessionToken);
 
-    res.status(200).send(JSON.stringify(new JsonUserProfile(userProfile)));
+    res.status(200).send(jsonStringifyUserProfile(userProfile));
   }
 }

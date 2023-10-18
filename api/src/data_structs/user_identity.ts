@@ -2,6 +2,7 @@
  * @file Defines {@link UserIdentity}.
  */
 import UserRole from '../enums/user_role';
+import { userIdKey, userRoleKey } from '../utils/parameter_keys';
 import UserId from './user_id';
 
 /** User identity. */
@@ -12,17 +13,15 @@ export default interface UserIdentity {
   readonly userRole: UserRole;
 }
 
-/** JSON string compatible {@link UserIdentity}. */
-export class JsonUserIdentity {
-  /** Unique ID. */
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  public readonly 'user-id': number;
-  // /** User role. */
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  public readonly 'user-role': string;
-
-  public constructor(userIdentity: UserIdentity) {
-    this['user-id'] = userIdentity.userId.toNumber();
-    this['user-role'] = userIdentity.userRole;
-  }
+/**
+ * Create a JSON string using the contents of {@link userIdentity}. The
+ * key names in the JSON string uses the REST API parameter names.
+ * @param userIdentity - User identity to stringify.
+ * @returns JSON string of the user identity {@link userIdentity}.
+ */
+export function jsonStringifyUserIdentity(userIdentity: UserIdentity) {
+  return {
+    [userIdKey]: userIdentity.userId.toNumber(),
+    [userRoleKey]: userIdentity.userRole.toString(),
+  };
 }
