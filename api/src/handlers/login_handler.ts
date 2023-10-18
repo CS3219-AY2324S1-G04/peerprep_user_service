@@ -10,7 +10,11 @@ import SessionToken from '../data_structs/session_token';
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
-import { passwordKey, usernameKey } from '../utils/parameter_keys';
+import {
+  passwordKey,
+  sessionTokenKey,
+  usernameKey,
+} from '../utils/parameter_keys';
 import PasswordHash from '../data_structs/password_hash';
 
 /** Handles user login. */
@@ -162,13 +166,10 @@ export default class LoginHandler extends Handler {
 
     res
       .status(200)
-      .cookie('session-token', sessionToken.toString(), {
+      .cookie(sessionTokenKey, sessionToken.toString(), {
         expires: LoginHandler._cookieExpiry,
         httpOnly: true,
         sameSite: true,
-      })
-      .cookie('is-logged-in', true, {
-        expires: LoginHandler._cookieExpiry,
       })
       .send();
   }
