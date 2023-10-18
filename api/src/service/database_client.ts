@@ -2,6 +2,7 @@
  * @file Defines {@link DatabaseClient}.
  */
 import EmailAddress from '../data_structs/email_address';
+import PasswordHash from '../data_structs/password_hash';
 import SessionToken from '../data_structs/session_token';
 import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import UserId from '../data_structs/user_id';
@@ -48,7 +49,7 @@ export default interface DatabaseClient {
    */
   fetchPasswordHashFromUsername(
     username: Username,
-  ): Promise<string | undefined>;
+  ): Promise<PasswordHash | undefined>;
 
   /**
    * Fetches the password hash of the user who owns the session token
@@ -59,7 +60,7 @@ export default interface DatabaseClient {
    */
   fetchPasswordHashFromSessionToken(
     sessionToken: SessionToken,
-  ): Promise<string | undefined>;
+  ): Promise<PasswordHash | undefined>;
 
   /**
    * Fetches the user profile of the user who the session token
@@ -91,7 +92,7 @@ export default interface DatabaseClient {
    */
   createUserProfileAndCredential(
     userProfile: ClientModifiableUserProfile,
-    passwordHash: string,
+    passwordHash: PasswordHash,
   ): Promise<void>;
 
   /**
@@ -133,7 +134,7 @@ export default interface DatabaseClient {
    * invalid token.
    */
   updatePasswordHash(
-    passwordHash: string,
+    passwordHash: PasswordHash,
     sessionToken: SessionToken,
   ): Promise<boolean>;
 

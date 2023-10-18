@@ -55,4 +55,8 @@ export default class UserId {
   public toString(): string {
     return this.userId.toString();
   }
+
+  public toNumber(): number {
+    return this.userId;
+  }
 }

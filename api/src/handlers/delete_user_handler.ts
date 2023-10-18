@@ -1,7 +1,6 @@
 /**
  * @file Defines {@link DeleteUserHandler}.
  */
-import bcrypt from 'bcrypt';
 import express from 'express';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
@@ -10,6 +9,7 @@ import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
 import { passwordKey, sessionTokenKey } from '../utils/parameter_keys';
 import Password from '../data_structs/password';
+import PasswordHash from '../data_structs/password_hash';
 
 /** Handles deleting the user who sent the request. */
 export default class DeleteUserHandler extends Handler {
@@ -48,12 +48,10 @@ export default class DeleteUserHandler extends Handler {
     sessionToken: SessionToken,
     password: Password,
   ): Promise<void> {
-    const passwordHash: string = await DeleteUserHandler._fetchPasswordHash(
-      client,
-      sessionToken,
-    );
+    const passwordHash: PasswordHash =
+      await DeleteUserHandler._fetchPasswordHash(client, sessionToken);
 
-    if (!(await DeleteUserHandler._doesPasswordMatch(password, passwordHash))) {
+    if (!(await passwordHash.isMatch(password))) {
       throw new HttpErrorInfo(401);
     }
   }
@@ -61,8 +59,8 @@ export default class DeleteUserHandler extends Handler {
   private static async _fetchPasswordHash(
     client: DatabaseClient,
     sessionToken: SessionToken,
-  ): Promise<string> {
-    const passwordHash: string | undefined =
+  ): Promise<PasswordHash> {
+    const passwordHash: PasswordHash | undefined =
       await client.fetchPasswordHashFromSessionToken(sessionToken);
 
     if (passwordHash === undefined) {
@@ -70,13 +68,6 @@ export default class DeleteUserHandler extends Handler {
     }
 
     return passwordHash;
-  }
-
-  private static async _doesPasswordMatch(
-    password: Password,
-    passwordHash: string,
-  ): Promise<boolean> {
-    return await bcrypt.compare(password.toString(), passwordHash);
   }
 
   private static async _deleteUserProfile(
