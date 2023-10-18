@@ -49,6 +49,7 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
 - `PORT` - Port to listen on.
 - `HASH_COST` - Cost factor of the password hashing algorithm.
 - `SESSION_EXPIRE_MILLIS` - Number of milliseconds a login session can last for.
+- `IS_DEV_ENV` - Boolean for whether developer features should be turned on.
 
 ### Database
 

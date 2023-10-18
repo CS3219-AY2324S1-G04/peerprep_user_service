@@ -11,6 +11,7 @@ services:
       ADMIN_EMAIL_ADDRESS: ${ADMIN_EMAIL_ADDRESS}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       HASH_COST: ${HASH_COST}
+      IS_DEV_ENV: ${IS_DEV_ENV}
 
   user_service_api:
     image: peerprep_user_service_api
