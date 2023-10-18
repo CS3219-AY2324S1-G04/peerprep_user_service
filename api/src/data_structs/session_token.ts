@@ -5,10 +5,10 @@ import { randomUUID } from 'crypto';
 
 /** Session token. */
 export default class SessionToken {
-  public readonly sessionToken: string;
+  private readonly _sessionToken: string;
 
   private constructor(sessionToken: string) {
-    this.sessionToken = sessionToken;
+    this._sessionToken = sessionToken;
   }
 
   /**
@@ -62,6 +62,6 @@ export default class SessionToken {
   }
 
   public toString(): string {
-    return this.sessionToken;
+    return this._sessionToken;
   }
 }

@@ -17,10 +17,10 @@ export default class EmailAddress {
     `^${EmailAddress._emailAddressUsernameChars}+(\\.${EmailAddress._emailAddressUsernameChars}+)*@${EmailAddress._domainRegexStr}$`,
   );
 
-  public readonly emailAddress: string;
+  private readonly _emailAddress: string;
 
   private constructor(emailAddress: string) {
-    this.emailAddress = emailAddress.toLowerCase();
+    this._emailAddress = emailAddress.toLowerCase();
   }
 
   /**
@@ -106,14 +106,14 @@ export default class EmailAddress {
   }
 
   public toString(): string {
-    return this.emailAddress;
+    return this._emailAddress;
   }
 
   private _isEmailAddressTooLong() {
-    return this.emailAddress.length > EmailAddress._maxLength;
+    return this._emailAddress.length > EmailAddress._maxLength;
   }
 
   private _isEmailAddressFormatCorrect() {
-    return EmailAddress._emailAddressRegex.test(this.emailAddress);
+    return EmailAddress._emailAddressRegex.test(this._emailAddress);
   }
 }

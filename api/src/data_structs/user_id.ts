@@ -6,10 +6,10 @@
 export default class UserId {
   private static _regex: RegExp = RegExp('^[1-9][0-9]*$');
 
-  public readonly userId: number;
+  private readonly _userId: number;
 
   public constructor(userId: number) {
-    this.userId = userId;
+    this._userId = userId;
   }
 
   /**
@@ -53,6 +53,10 @@ export default class UserId {
   }
 
   public toString(): string {
-    return this.userId.toString();
+    return this._userId.toString();
+  }
+
+  public toNumber(): number {
+    return this._userId;
   }
 }

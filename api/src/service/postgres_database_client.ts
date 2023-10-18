@@ -15,6 +15,7 @@ import UserProfileEntity from '../entities/user_profile';
 import UserSessionEntity from '../entities/user_session';
 import UserRole, { parseUserRole } from '../enums/user_role';
 import DatabaseClient, { DatabaseClientConfig } from './database_client';
+import PasswordHash from '../data_structs/password_hash';
 
 export class PostgresDatabaseClient implements DatabaseClient {
   private _dataSource: DataSource;
@@ -45,80 +46,84 @@ export class PostgresDatabaseClient implements DatabaseClient {
     username: Username,
     sessionToken?: SessionToken,
   ): Promise<boolean> {
-    const userIdFromUsername: number | undefined =
+    const userIdFromUsername: UserId | undefined =
       await this._getUserIdFromUsername(username);
 
     if (userIdFromUsername === undefined) {
       return false;
     }
 
-    const userIdFromSessionToken: number | undefined =
+    const userIdFromSessionToken: UserId | undefined =
       sessionToken === undefined
         ? undefined
         : await this._getUserIdFromSessionToken(sessionToken);
 
-    return userIdFromUsername !== userIdFromSessionToken;
+    return (
+      userIdFromUsername?.toNumber() !== userIdFromSessionToken?.toNumber()
+    );
   }
 
   public async isEmailAddressInUse(
     emailAddress: EmailAddress,
     sessionToken?: SessionToken,
   ): Promise<boolean> {
-    const userIdFromEmailAddress: number | undefined =
+    const userIdFromEmailAddress: UserId | undefined =
       await this._getUserIdFromEmailAddress(emailAddress);
 
     if (userIdFromEmailAddress === undefined) {
       return false;
     }
 
-    const userIdFromSessionToken: number | undefined =
+    const userIdFromSessionToken: UserId | undefined =
       sessionToken === undefined
         ? undefined
         : await this._getUserIdFromSessionToken(sessionToken);
 
-    return userIdFromEmailAddress !== userIdFromSessionToken;
+    return (
+      userIdFromEmailAddress?.toNumber() !== userIdFromSessionToken?.toNumber()
+    );
   }
 
   public async fetchPasswordHashFromUsername(
     username: Username,
-  ): Promise<string | undefined> {
-    const userId: number | undefined =
+  ): Promise<PasswordHash | undefined> {
+    const userId: UserId | undefined =
       await this._getUserIdFromUsername(username);
 
     if (userId === undefined) {
       return undefined;
     }
 
-    return this._getPasswordHashFromUserId(new UserId(userId));
+    return await this._getPasswordHashFromUserId(userId);
   }
 
   public async fetchPasswordHashFromSessionToken(
     sessionToken: SessionToken,
-  ): Promise<string | undefined> {
-    const userId: number | undefined =
+  ): Promise<PasswordHash | undefined> {
+    const userId: UserId | undefined =
       await this._getUserIdFromSessionToken(sessionToken);
 
     if (userId === undefined) {
       return undefined;
     }
 
-    return this._getPasswordHashFromUserId(new UserId(userId));
+    return this._getPasswordHashFromUserId(userId);
   }
 
   public async fetchUserProfileFromSessionToken(
     sessionToken: SessionToken,
   ): Promise<UserProfile | undefined> {
-    const userIdFromSessionToken: number | undefined =
+    const userId: UserId | undefined =
       await this._getUserIdFromSessionToken(sessionToken);
 
-    if (userIdFromSessionToken === undefined) {
+    if (userId === undefined) {
       return undefined;
     }
 
     const userProfile: UserProfileEntity | undefined =
       (await this._dataSource
         .getRepository(UserProfileEntity)
-        .findOneBy({ userId: userIdFromSessionToken })) ?? undefined;
+        .findOneBy({ userId: userId.toNumber() })) ?? undefined;
 
     if (userProfile === undefined) {
       return undefined;
@@ -150,7 +155,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
 
   public async createUserProfileAndCredential(
     userProfile: ClientModifiableUserProfile,
-    passwordHash: string,
+    passwordHash: PasswordHash,
   ): Promise<void> {
     const result = await this._dataSource
       .getRepository(UserProfileEntity)
@@ -161,7 +166,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
 
     await this._dataSource.getRepository(UserCredentialEntity).insert({
       userId: result.identifiers[0].userId,
-      passwordHash: passwordHash,
+      passwordHash: passwordHash.toString(),
     });
   }
 
@@ -170,7 +175,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     username: Username,
     sessionExpiry: Date,
   ): Promise<void> {
-    const userIdFromUsername: number = (
+    const userId: number = (
       await this._dataSource.getRepository(UserProfileEntity).findOneOrFail({
         select: { userId: true },
         where: { username: username.toString() },
@@ -179,7 +184,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
 
     await this._dataSource.getRepository(UserSessionEntity).insert({
       sessionToken: sessionToken.toString(),
-      userId: userIdFromUsername,
+      userId: userId,
       sessionExpiry: sessionExpiry,
     });
   }
@@ -188,10 +193,10 @@ export class PostgresDatabaseClient implements DatabaseClient {
     userProfile: ClientModifiableUserProfile,
     sessionToken: SessionToken,
   ): Promise<boolean> {
-    const userIdFromSessionToken: number | undefined =
+    const userId: UserId | undefined =
       await this._getUserIdFromSessionToken(sessionToken);
 
-    if (userIdFromSessionToken === undefined) {
+    if (userId === undefined) {
       return false;
     }
 
@@ -199,7 +204,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
       ((
         await this._dataSource
           .getRepository(UserProfileEntity)
-          .update(userIdFromSessionToken, {
+          .update(userId.toNumber(), {
             username: userProfile.username.toString(),
             emailAddress: userProfile.emailAddress.toString(),
           })
@@ -208,13 +213,13 @@ export class PostgresDatabaseClient implements DatabaseClient {
   }
 
   public async updatePasswordHash(
-    passwordHash: string,
+    passwordHash: PasswordHash,
     sessionToken: SessionToken,
   ): Promise<boolean> {
-    const userIdFromSessionToken: number | undefined =
+    const userId: UserId | undefined =
       await this._getUserIdFromSessionToken(sessionToken);
 
-    if (userIdFromSessionToken === undefined) {
+    if (userId === undefined) {
       return false;
     }
 
@@ -222,8 +227,8 @@ export class PostgresDatabaseClient implements DatabaseClient {
       ((
         await this._dataSource
           .getRepository(UserCredentialEntity)
-          .update(userIdFromSessionToken, {
-            passwordHash: passwordHash,
+          .update(userId.toNumber(), {
+            passwordHash: passwordHash.toString(),
           })
       ).affected ?? 0) > 0
     );
@@ -237,16 +242,16 @@ export class PostgresDatabaseClient implements DatabaseClient {
       ((
         await this._dataSource
           .getRepository(UserProfileEntity)
-          .update(userId.userId, { userRole: userRole })
+          .update(userId.toNumber(), { userRole: userRole })
       ).affected ?? 0) > 0
     );
   }
 
   public async deleteUserProfile(sessionToken: SessionToken): Promise<boolean> {
-    const userIdFromSessionToken: number | undefined =
+    const userId: UserId | undefined =
       await this._getUserIdFromSessionToken(sessionToken);
 
-    if (userIdFromSessionToken === undefined) {
+    if (userId === undefined) {
       return false;
     }
 
@@ -254,7 +259,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
       ((
         await this._dataSource
           .getRepository(UserProfileEntity)
-          .delete({ userId: userIdFromSessionToken })
+          .delete({ userId: userId.toNumber() })
       ).affected ?? 0) > 0
     );
   }
@@ -278,8 +283,8 @@ export class PostgresDatabaseClient implements DatabaseClient {
 
   private async _getUserIdFromUsername(
     username: Username,
-  ): Promise<number | undefined> {
-    return (
+  ): Promise<UserId | undefined> {
+    const userId: number | undefined = (
       await this._dataSource.getRepository(UserProfileEntity).findOne({
         select: { userId: true },
         where: {
@@ -287,12 +292,14 @@ export class PostgresDatabaseClient implements DatabaseClient {
         },
       })
     )?.userId;
+
+    return userId === undefined ? undefined : new UserId(userId);
   }
 
   private async _getUserIdFromSessionToken(
     sessionToken: SessionToken,
-  ): Promise<number | undefined> {
-    return (
+  ): Promise<UserId | undefined> {
+    const userId: number | undefined = (
       await this._dataSource.getRepository(UserSessionEntity).findOne({
         select: { userId: true },
         where: {
@@ -301,12 +308,14 @@ export class PostgresDatabaseClient implements DatabaseClient {
         },
       })
     )?.userId;
+
+    return userId === undefined ? undefined : new UserId(userId);
   }
 
   private async _getUserIdFromEmailAddress(
     emailAddress: EmailAddress,
-  ): Promise<number | undefined> {
-    return (
+  ): Promise<UserId | undefined> {
+    const userId: number | undefined = (
       await this._dataSource.getRepository(UserProfileEntity).findOne({
         select: { userId: true },
         where: {
@@ -314,16 +323,22 @@ export class PostgresDatabaseClient implements DatabaseClient {
         },
       })
     )?.userId;
+
+    return userId === undefined ? undefined : new UserId(userId);
   }
 
   private async _getPasswordHashFromUserId(
     userId: UserId,
-  ): Promise<string | undefined> {
-    return (
+  ): Promise<PasswordHash | undefined> {
+    const passwordHash: string | undefined = (
       await this._dataSource.getRepository(UserCredentialEntity).findOne({
         select: { passwordHash: true },
-        where: { userId: userId.userId },
+        where: { userId: userId.toNumber() },
       })
     )?.passwordHash;
+
+    return passwordHash === undefined
+      ? undefined
+      : new PasswordHash(passwordHash);
   }
 }

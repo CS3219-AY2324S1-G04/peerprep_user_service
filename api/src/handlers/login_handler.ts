@@ -1,7 +1,6 @@
 /**
  * @file Defines {@link LoginHandler}.
  */
-import bcrypt from 'bcrypt';
 import express from 'express';
 import qs from 'qs';
 
@@ -12,6 +11,7 @@ import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
 import { passwordKey, usernameKey } from '../utils/parameter_keys';
+import PasswordHash from '../data_structs/password_hash';
 
 /** Handles user login. */
 export default class LoginHandler extends Handler {
@@ -76,12 +76,12 @@ export default class LoginHandler extends Handler {
     username: Username,
     password: Password,
   ): Promise<void> {
-    const passwordHash: string = await LoginHandler._fetchPasswordHash(
+    const passwordHash: PasswordHash = await LoginHandler._fetchPasswordHash(
       client,
       username,
     );
 
-    if (!(await LoginHandler._doesPasswordMatch(password, passwordHash))) {
+    if (!(await passwordHash.isMatch(password))) {
       throw new HttpErrorInfo(401);
     }
   }
@@ -89,21 +89,15 @@ export default class LoginHandler extends Handler {
   private static async _fetchPasswordHash(
     client: DatabaseClient,
     username: Username,
-  ): Promise<string> {
-    const passwordHash: string | undefined =
+  ): Promise<PasswordHash> {
+    const passwordHash: PasswordHash | undefined =
       await client.fetchPasswordHashFromUsername(username);
+
     if (passwordHash === undefined) {
       throw new HttpErrorInfo(401);
     }
 
     return passwordHash;
-  }
-
-  private static async _doesPasswordMatch(
-    password: Password,
-    passwordHash: string,
-  ): Promise<boolean> {
-    return await bcrypt.compare(password.toString(), passwordHash);
   }
 
   private static async _createUserSession(

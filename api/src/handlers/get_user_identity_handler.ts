@@ -6,7 +6,9 @@ import qs from 'qs';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
 import SessionToken from '../data_structs/session_token';
-import UserIdentity, { JsonUserIdentity } from '../data_structs/user_identity';
+import UserIdentity, {
+  jsonStringifyUserIdentity,
+} from '../data_structs/user_identity';
 import DatabaseClient from '../service/database_client';
 import Handler, { HttpMethod } from './handler';
 import { sessionTokenKey } from '../utils/parameter_keys';
@@ -82,6 +84,6 @@ export default class GetUserIdentityHandler extends Handler {
     const userIdentity: UserIdentity =
       await GetUserIdentityHandler._fetchUserIdentity(client, sessionToken);
 
-    res.status(200).send(JSON.stringify(new JsonUserIdentity(userIdentity)));
+    res.status(200).send(jsonStringifyUserIdentity(userIdentity));
   }
 }

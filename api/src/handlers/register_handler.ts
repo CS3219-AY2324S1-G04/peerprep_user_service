@@ -1,7 +1,6 @@
 /**
  * @file Defines {@link RegisterHandler}.
  */
-import bcrypt from 'bcrypt';
 import express from 'express';
 
 import EmailAddress from '../data_structs/email_address';
@@ -16,6 +15,7 @@ import {
   passwordKey,
   usernameKey,
 } from '../utils/parameter_keys';
+import PasswordHash from '../data_structs/password_hash';
 
 /** Handles user registration. */
 export default class RegisterHandler extends Handler {
@@ -84,11 +84,11 @@ export default class RegisterHandler extends Handler {
     client: DatabaseClient,
     userProfile: ClientModifiableUserProfile,
     password: Password,
-    hashSaltRounds: number,
+    hashCost: number,
   ): Promise<void> {
-    const passwordHash: string = await RegisterHandler._hashPassword(
+    const passwordHash: PasswordHash = await PasswordHash.hash(
       password,
-      hashSaltRounds,
+      hashCost,
     );
 
     await RegisterHandler._createUserProfileAndCredential(
@@ -98,20 +98,10 @@ export default class RegisterHandler extends Handler {
     );
   }
 
-  private static async _hashPassword(
-    password: Password,
-    hashSaltRounds: number,
-  ): Promise<string> {
-    return await bcrypt.hash(
-      password.toString(),
-      await bcrypt.genSalt(hashSaltRounds),
-    );
-  }
-
   private static async _createUserProfileAndCredential(
     client: DatabaseClient,
     userProfile: ClientModifiableUserProfile,
-    passwordHash: string,
+    passwordHash: PasswordHash,
   ): Promise<void> {
     await client.createUserProfileAndCredential(userProfile, passwordHash);
   }

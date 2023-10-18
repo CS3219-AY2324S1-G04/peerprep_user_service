@@ -18,10 +18,10 @@ export default class Password {
     Password._numerics +
     Password._specialCharacters;
 
-  public readonly password: string;
+  private readonly _password: string;
 
   private constructor(password: string) {
-    this.password = password;
+    this._password = password;
   }
 
   /**
@@ -101,27 +101,27 @@ export default class Password {
   }
 
   public toString(): string {
-    return this.password;
+    return this._password;
   }
 
   private _isPasswordTooShort(): boolean {
-    return this.password.length < Password._minLength;
+    return this._password.length < Password._minLength;
   }
 
   private _isPasswordTooLong(): boolean {
-    return this.password.length > Password._maxLength;
+    return this._password.length > Password._maxLength;
   }
 
   private _arePasswordCharactersValid(): boolean {
-    return !RegExp(`[^${Password._validCharacters}]`).test(this.password);
+    return !RegExp(`[^${Password._validCharacters}]`).test(this._password);
   }
 
   private _doesPasswordHaveRequiredCharacters(): boolean {
     return (
-      RegExp(`[${Password._lowerCaseAlphabets}]`).test(this.password) &&
-      RegExp(`[${Password._upperCaseAlphabets}]`).test(this.password) &&
-      RegExp(`[${Password._numerics}]`).test(this.password) &&
-      RegExp(`[${Password._specialCharacters}]`).test(this.password)
+      RegExp(`[${Password._lowerCaseAlphabets}]`).test(this._password) &&
+      RegExp(`[${Password._upperCaseAlphabets}]`).test(this._password) &&
+      RegExp(`[${Password._numerics}]`).test(this._password) &&
+      RegExp(`[${Password._specialCharacters}]`).test(this._password)
     );
   }
 }
