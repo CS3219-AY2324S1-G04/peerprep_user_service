@@ -6,14 +6,14 @@
 export default class Username {
   private static _maxLength: number = 255;
 
-  public readonly username: string;
+  private readonly _username: string;
 
   private constructor(username: string) {
-    this.username = username;
+    this._username = username;
   }
 
   /**
-   * Parses {@link username} as a username.
+   * Parses {@link rawUsername} as a username.
    * @param rawUsername - Username.
    * @returns The parsed username.
    * @throws Error if parsing fails.
@@ -71,10 +71,10 @@ export default class Username {
   }
 
   public toString(): string {
-    return this.username;
+    return this._username;
   }
 
   private _isUsernameTooLong() {
-    return this.username.length > Username._maxLength;
+    return this._username.length > Username._maxLength;
   }
 }

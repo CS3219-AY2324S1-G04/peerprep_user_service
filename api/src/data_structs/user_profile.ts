@@ -24,9 +24,9 @@ export class JsonUserProfile
   public readonly 'user-role': string;
 
   public constructor(userProfile: UserProfile) {
-    this['username'] = userProfile.username.username;
-    this['email-address'] = userProfile.emailAddress.emailAddress;
-    this['user-id'] = userProfile.userId.userId;
+    this['username'] = userProfile.username.toString();
+    this['email-address'] = userProfile.emailAddress.toString();
+    this['user-id'] = userProfile.userId.toNumber();
     this['user-role'] = userProfile.userRole;
   }
 }

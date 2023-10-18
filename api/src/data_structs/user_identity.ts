@@ -22,7 +22,7 @@ export class JsonUserIdentity {
   public readonly 'user-role': string;
 
   public constructor(userIdentity: UserIdentity) {
-    this['user-id'] = userIdentity.userId.userId;
+    this['user-id'] = userIdentity.userId.toNumber();
     this['user-role'] = userIdentity.userRole;
   }
 }

@@ -6,10 +6,10 @@ import Password from './password';
 
 /** Password hash. */
 export default class PasswordHash {
-  public readonly passwordHash: string;
+  private readonly _passwordHash: string;
 
   public constructor(passwordHash: string) {
-    this.passwordHash = passwordHash;
+    this._passwordHash = passwordHash;
   }
 
   /**
@@ -33,10 +33,10 @@ export default class PasswordHash {
    * false.
    */
   public async isMatch(password: Password): Promise<boolean> {
-    return await bcrypt.compare(password.toString(), this.passwordHash);
+    return await bcrypt.compare(password.toString(), this._passwordHash);
   }
 
   public toString(): string {
-    return this.passwordHash;
+    return this._passwordHash;
   }
 }
