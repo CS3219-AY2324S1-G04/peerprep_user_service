@@ -19,7 +19,7 @@ services:
     networks:
       - peerprep_network
     ports:
-      - "${PORT}:3000"
+      - "${PORT}:9000"
     environment:
       DATABASE_HOST: "user_service_database"
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
@@ -28,7 +28,7 @@ services:
       DATABASE_CONNECTION_TIMEOUT_MILLIS: ${DATABASE_CONNECTION_TIMEOUT_MILLIS}
       DATABASE_IDLE_TIMEOUT_MILLIS: ${DATABASE_IDLE_TIMEOUT_MILLIS}
       DATABASE_MAX_CLIENT_COUNT: ${DATABASE_MAX_CLIENT_COUNT}
-      PORT: 3000
+      PORT: 9000
       HASH_COST: ${HASH_COST}
       SESSION_EXPIRE_MILLIS: ${SESSION_EXPIRE_MILLIS}
     depends_on:
