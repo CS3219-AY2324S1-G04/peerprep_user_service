@@ -48,8 +48,11 @@ export default class Config {
    */
   public static readonly sessionExpireMillisEnvVar: string =
     'SESSION_EXPIRE_MILLIS';
-  /** Name of the environment variable corresponding to {@link isDevEnv}. */
-  public static readonly devEnvEnvVar: string = 'ENABLE_DEV_MODE';
+  /**
+   * Name of the environment variable which contains the mode the app is running
+   * in. This is use for determining {@link isDevEnv}.
+   */
+  public static readonly appModeEnvVar: string = 'NODE_ENV';
 
   /** Default value for {@link databaseUser}. */
   public static readonly defaultDatabaseUser: string = 'postgres';
@@ -66,13 +69,11 @@ export default class Config {
   /** Default value for {@link databaseMaxClientCount}. */
   public static readonly defaultDatabaseMaxClientCount: number = 20;
   /** Default value for {@link port}. */
-  public static readonly defaultPort: number = 3000;
+  public static readonly defaultPort: number = 9000;
   /** Default value for {@link hashCost}. */
   public static readonly defaultHashCost: number = 10;
   /** Default value for {@link sessionExpireMillis}. */
   public static readonly defaultSessionExpireMillis: number = 604800000;
-  /** Default value for {@link isDevEnv}. */
-  public static readonly defaultIsDevEnv: boolean = false;
 
   /** Password of the database.*/
   public readonly databasePassword: string;
@@ -150,8 +151,7 @@ export default class Config {
     this.sessionExpireMillis =
       Config._parseInt(env[Config.sessionExpireMillisEnvVar]) ??
       Config.defaultSessionExpireMillis;
-    this.isDevEnv =
-      Config._parseBoolean(env[Config.devEnvEnvVar]) ?? Config.defaultIsDevEnv;
+    this.isDevEnv = env[Config.appModeEnvVar] === 'development';
   }
 
   private static _parseString(raw: string | undefined): string | undefined {
