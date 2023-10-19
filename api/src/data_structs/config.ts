@@ -20,7 +20,6 @@ export default class Config {
    * Name of the environment variable corresponding to {@link databaseName}.
    */
   public static readonly databaseNameEnvVar: string = 'DATABASE_NAME';
-
   /**
    * Name of the environment variable corresponding to
    * {@link databaseConnectionTimeoutMillis}.
@@ -39,7 +38,6 @@ export default class Config {
    */
   public static readonly databaseMaxClientCountEnvVar: string =
     'DATABASE_MAX_CLIENT_COUNT';
-
   /** Name of the environment variable corresponding to {@link port}. */
   public static readonly portEnvVar: string = 'PORT';
   /** Name of the environment variable corresponding to {@link hashCost}. */
@@ -50,6 +48,11 @@ export default class Config {
    */
   public static readonly sessionExpireMillisEnvVar: string =
     'SESSION_EXPIRE_MILLIS';
+  /**
+   * Name of the environment variable which contains the mode the app is running
+   * in. This is use for determining {@link isDevEnv}.
+   */
+  public static readonly appModeEnvVar: string = 'NODE_ENV';
 
   /** Default value for {@link databaseUser}. */
   public static readonly defaultDatabaseUser: string = 'postgres';
@@ -59,16 +62,14 @@ export default class Config {
   public static readonly defaultDatabasePort: number = 5432;
   /** Default value for {@link databaseName}. */
   public static readonly defaultDatabaseName: string = 'user';
-
   /** Default value for {@link databaseConnectionTimeoutMillis}. */
   public static readonly defaultDatabaseConnectionTimeoutMillis: number = 0;
   /** Default value for {@link databaseIdleTimeoutMillis}. */
   public static readonly defaultDatabaseIdleTimeoutMillis: number = 10000;
   /** Default value for {@link databaseMaxClientCount}. */
   public static readonly defaultDatabaseMaxClientCount: number = 20;
-
   /** Default value for {@link port}. */
-  public static readonly defaultPort: number = 3000;
+  public static readonly defaultPort: number = 9000;
   /** Default value for {@link hashCost}. */
   public static readonly defaultHashCost: number = 10;
   /** Default value for {@link sessionExpireMillis}. */
@@ -84,7 +85,6 @@ export default class Config {
   public readonly databasePort: number;
   /** Name of the database. */
   public readonly databaseName: string;
-
   /**
    * Number of milliseconds for a client to connect to the database before
    * timing out.
@@ -97,13 +97,14 @@ export default class Config {
   public readonly databaseIdleTimeoutMillis: number;
   /** Max number of clients. */
   public readonly databaseMaxClientCount: number;
-
   /** Port that the app will listen on. */
   public readonly port: number;
   /** Cost factor of the password hashing algorithm. */
   public readonly hashCost: number;
   /** Number of milliseconds a user login session can last for. */
   public readonly sessionExpireMillis: number;
+  /** Boolean for whether developer features should be enabled. */
+  public readonly isDevEnv: boolean;
 
   /**
    * Constructs a Config and assigns to each field, the value stored in their
@@ -135,7 +136,6 @@ export default class Config {
     this.databaseName =
       Config._parseString(env[Config.databaseNameEnvVar]) ??
       Config.defaultDatabaseName;
-
     this.databaseConnectionTimeoutMillis =
       Config._parseInt(env[Config.databaseConnectionTimeoutMillisEnvVar]) ??
       Config.defaultDatabaseConnectionTimeoutMillis;
@@ -145,13 +145,13 @@ export default class Config {
     this.databaseMaxClientCount =
       Config._parseInt(env[Config.databaseMaxClientCountEnvVar]) ??
       Config.defaultDatabaseMaxClientCount;
-
     this.port = Config._parseInt(env[Config.portEnvVar]) ?? Config.defaultPort;
     this.hashCost =
       Config._parseInt(env[Config.hashCostEnvVar]) ?? Config.defaultHashCost;
     this.sessionExpireMillis =
       Config._parseInt(env[Config.sessionExpireMillisEnvVar]) ??
       Config.defaultSessionExpireMillis;
+    this.isDevEnv = env[Config.appModeEnvVar] === 'development';
   }
 
   private static _parseString(raw: string | undefined): string | undefined {
@@ -173,5 +173,13 @@ export default class Config {
     }
 
     return val;
+  }
+
+  private static _parseBoolean(raw: string | undefined): boolean | undefined {
+    if (raw === undefined) {
+      return undefined;
+    }
+
+    return raw.toLowerCase().trim() === 'true';
   }
 }
