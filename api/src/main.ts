@@ -27,16 +27,21 @@ const client: DatabaseClient = new PostgresDatabaseClient({
   maxClientCount: config.databaseMaxClientCount,
 });
 
-const app: App = new App(config.port, client, [
-  new RegisterHandler(config.hashCost),
-  new LoginHandler(config.sessionExpireMillis),
-  new LogoutHandler(),
-  new GetUserProfileHandler(),
-  new UpdateUserProfileHandler(),
-  new UpdatePasswordHandler(config.hashCost),
-  new UpdateUserRoleHandler(),
-  new DeleteUserHandler(),
-  new GetUserIdentityHandler(),
-]);
+const app: App = new App(
+  config.port,
+  client,
+  [
+    new RegisterHandler(config.hashCost),
+    new LoginHandler(config.sessionExpireMillis),
+    new LogoutHandler(),
+    new GetUserProfileHandler(),
+    new UpdateUserProfileHandler(),
+    new UpdatePasswordHandler(config.hashCost),
+    new UpdateUserRoleHandler(),
+    new DeleteUserHandler(),
+    new GetUserIdentityHandler(),
+  ],
+  config.isDevEnv,
+);
 
 client.initialise().then(() => app.start());

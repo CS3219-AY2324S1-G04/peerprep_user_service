@@ -3,6 +3,7 @@
  */
 import cookieParser from 'cookie-parser';
 import express from 'express';
+import cors from 'cors';
 
 import Handler, { HttpMethod } from './handlers/handler';
 import DatabaseClient from './service/database_client';
@@ -18,14 +19,20 @@ export default class App {
    * @param port - Port to listen on.
    * @param client - Client for communicating with the database.
    * @param handlers - Handlers for handling API requests.
+   * @param isDevEnv - True if the app is running in a development environment.
    */
   public constructor(
     port: number,
     client: DatabaseClient,
     handlers: Handler[],
+    isDevEnv: boolean,
   ) {
     this._app = express();
     this._app.use(cookieParser());
+
+    if (isDevEnv) {
+      this._enableDevFeatures();
+    }
 
     this._port = port;
     this._database = client;
@@ -65,6 +72,15 @@ export default class App {
     this._app.listen(this._port, '0.0.0.0', () => {
       console.log(`App is listening on ${this._port}`);
     });
+  }
+
+  private _enableDevFeatures(): void {
+    this._app.use(
+      cors({
+        origin: new RegExp('http://localhost:[0-9]+'),
+        credentials: true,
+      }),
+    );
   }
 
   private _wrapHandle(
