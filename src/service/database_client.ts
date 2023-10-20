@@ -16,6 +16,12 @@ export default interface DatabaseClient {
   /** Initialise the client. */
   initialise(): Promise<void>;
 
+  /** Synchronises the entities on the database to match that of the client. */
+  synchronise(): Promise<void>;
+
+  /** Disconnects from the database. */
+  disconnect(): Promise<void>;
+
   /**
    * Checks if username {@link username} is already in use.
    * @param username - Username to check.

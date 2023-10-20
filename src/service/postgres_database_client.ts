@@ -11,9 +11,9 @@ import UserId from '../data_structs/user_id';
 import UserIdentity from '../data_structs/user_identity';
 import UserProfile from '../data_structs/user_profile';
 import Username from '../data_structs/username';
-import UserCredentialEntity from '../entities/user_credential';
-import UserProfileEntity from '../entities/user_profile';
-import UserSessionEntity from '../entities/user_session';
+import UserCredentialEntity from '../database/entities/user_credential';
+import UserProfileEntity from '../database/entities/user_profile';
+import UserSessionEntity from '../database/entities/user_session';
 import UserRole, { parseUserRole } from '../enums/user_role';
 import DatabaseClient, { DatabaseClientConfig } from './database_client';
 
@@ -40,6 +40,14 @@ export class PostgresDatabaseClient implements DatabaseClient {
 
   public async initialise(): Promise<void> {
     await this._dataSource.initialize();
+  }
+
+  public async synchronise(): Promise<void> {
+    await this._dataSource.synchronize();
+  }
+
+  public async disconnect(): Promise<void> {
+    await this._dataSource.destroy();
   }
 
   public async isUsernameInUse(

@@ -1,5 +1,5 @@
 {
-  "name": "peerprep_user_service_api",
+  "name": "peerprep_user_service",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",

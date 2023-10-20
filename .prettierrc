@@ -6,7 +6,7 @@
   "plugins": ["@trivago/prettier-plugin-sort-imports"],
   "overrides": [
     {
-      "files": "src/entities/*.ts",
+      "files": "**/entities/*.ts",
       "options": {
         "parser": "babel-ts"
       }
