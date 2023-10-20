@@ -1,39 +1,61 @@
 services:
   user_service_database:
-    image: peerprep_user_service_database
-    build: ./database
+    image: postgres:16-bookworm
     networks:
       - peerprep_network
     environment:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_DB: ${DATABASE_NAME}
-      ADMIN_EMAIL_ADDRESS: ${ADMIN_EMAIL_ADDRESS}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      HASH_COST: ${HASH_COST}
-      NODE_ENV: ${NODE_ENV}
 
-  user_service_api:
-    image: peerprep_user_service_api
-    build: ./api
+  user_service_database_initialiser:
+    image: peerprep_user_service_database_initialiser
+    build:
+      context: .
+      dockerfile: database_initialiser.dockerfile
     networks:
       - peerprep_network
-    ports:
-      - "${PORT}:9000"
     environment:
-      DATABASE_HOST: "user_service_database"
+      DATABASE_HOST: 'user_service_database'
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_PORT: 5432
       DATABASE_CONNECTION_TIMEOUT_MILLIS: ${DATABASE_CONNECTION_TIMEOUT_MILLIS}
       DATABASE_IDLE_TIMEOUT_MILLIS: ${DATABASE_IDLE_TIMEOUT_MILLIS}
       DATABASE_MAX_CLIENT_COUNT: ${DATABASE_MAX_CLIENT_COUNT}
-      PORT: 9000
       HASH_COST: ${HASH_COST}
-      SESSION_EXPIRE_MILLIS: ${SESSION_EXPIRE_MILLIS}
+      ADMIN_EMAIL_ADDRESS: ${ADMIN_EMAIL_ADDRESS}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     depends_on:
       - user_service_database
-    restart: unless-stopped
+    restart: on-failure
+
+  user_service_api:
+    image: peerprep_user_service_api
+    build:
+      context: .
+      dockerfile: api.dockerfile
+    networks:
+      - peerprep_network
+    ports:
+      - '${PORT}:9000'
+    environment:
+      DATABASE_HOST: 'user_service_database'
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_PORT: 5432
+      DATABASE_CONNECTION_TIMEOUT_MILLIS: ${DATABASE_CONNECTION_TIMEOUT_MILLIS}
+      DATABASE_IDLE_TIMEOUT_MILLIS: ${DATABASE_IDLE_TIMEOUT_MILLIS}
+      DATABASE_MAX_CLIENT_COUNT: ${DATABASE_MAX_CLIENT_COUNT}
+      HASH_COST: ${HASH_COST}
+      PORT: 9000
+      SESSION_EXPIRE_MILLIS: ${SESSION_EXPIRE_MILLIS}
+      NODE_ENV: ${NODE_ENV}
+    depends_on:
+      - user_service_database
+    restart: on-failure
 
 networks:
   peerprep_network:

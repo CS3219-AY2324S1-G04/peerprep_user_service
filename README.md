@@ -2,19 +2,18 @@
 
 Handles the storing and retrieving of user information.
 
-The build script `build_image.sh` produces 2 docker images.
-- `peerprep_user_service_database` - Database for storing user information.
+The build script `build_images.sh` produces 2 docker images.
+- `peerprep_user_service_database_initialiser` - Initialises a separate database container by creating the necessary relations and a default PeerPrep admin account.
 - `peerprep_user_service_api` - REST API for interacting with the database.
-
-Note that when a `peerprep_user_service_database` container is created, a default PeerPrep admin user account, with user name `admin`, is created as well.
 
 ## Table of Contents
 
 - [Quickstart Guide](#quickstart-guide)
 - [Environment Variables](#environment-variables)
+  - [Common](#common)
   - [API](#api)
+  - [Database Initialiser](#database-initialiser)
   - [Database](#database)
-  - [Docker Compose](#docker-compose)
 - [REST API](#rest-api)
   - [Create a User](#create-a-user)
   - [Create a Session](#create-a-session)
@@ -30,42 +29,48 @@ Note that when a `peerprep_user_service_database` container is created, a defaul
 ## Quickstart Guide
 
 1. Clone this repository.
-2. Build the docker images by running: `./build_image.sh`
-3. Modify the `.env` file as per needed. Refer to [Environment Variables](#environment-variables) for a list of configs. It is recommended that you modify `DATABASE_PASSWORD` and `ADMIN_EMAIL_ADDRESS`.
+2. Build the docker images by running: `./build_images.sh`
+3. Modify the ".env" file as per needed. It is recommended that you modify `DATABASE_PASSWORD`, `ADMIN_EMAIL_ADDRESS`, and `ADMIN_PASSWORD`. Refer to [Environment Variables](#environment-variables) for a list of configs.
 4. Create the docker containers by running: `docker compose up`
 
 ## Environment Variables
 
-### API
+### Common
 
-- `DATABASE_HOST` - Address of the database host.
+These are environment variables used by both the `peerprep_user_service_database_initialiser` image and the `peerprep_user_service_api` image:
+
+- `DATABASE_HOST` - Address of the database host. (no need to specify if using "compose.yaml")
 - `DATABASE_PASSWORD` - Password of the database.
 - `DATABASE_USER` - User on the database host.
 - `DATABASE_NAME` - Name of the database.
-- `DATABASE_PORT` - Port the database is listening on.
+- `DATABASE_PORT` - Port the database is listening on. (no need to specify if using "compose.yaml")
 - `DATABASE_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
 - `DATABASE_IDLE_TIMEOUT_MILLIS` - Number of milliseconds a database client can remain idle for before being disconnected.
 - `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
-- `PORT` - Port to listen on.
 - `HASH_COST` - Cost factor of the password hashing algorithm.
+
+### API
+
+These are environment variables used by the `peerprep_user_service_api` image:
+
+- `PORT` - Port to listen on.
 - `SESSION_EXPIRE_MILLIS` - Number of milliseconds a login session can last for.
 - `NODE_ENV` - Sets the mode the app is running in ("development" or "production")
 
-### Database
+### Database Initialiser
 
-- `POSTGRES_PASSWORD` - Password of the database.
-- `POSTGRES_USER` - User on the database host.
-- `POSTGRES_DB` - Name of the database.
+These are environment variables used by the `peerprep_user_service_database_initialiser` image:
+
 - `ADMIN_EMAIL_ADDRESS` - Email address of the default PeerPrep admin user.
 - `ADMIN_PASSWORD` - Password of the default PeerPrep admin user.
-- `HASH_COST` - Cost factor of the password hashing algorithm.
 
-### Docker Compose
+### Database
 
-The following describe how certain environment variables in ".env" are used:
-- `DATABASE_PASSWORD` - Value is used for API's `DATABASE_PASSWORD` and database's `POSTGRES_PASSWORD`
-- `DATABASE_USER` - Value is used for API's `DATABASE_USER` and database's `POSTGRES_USER`
-- `DATABASE_NAME` - Value is used for API's `DATABASE_NAME` and database's `POSTGRES_DB`
+These are some point to note for configuring the `postgres` image:
+
+- `POSTGRES_PASSWORD` - Must match `DATABASE_PASSWORD` of the API and Database Initialiser containers.
+- `POSTGRES_USER` - Must match `DATABASE_USER` of the API and Database Initialiser containers.
+- `POSTGRES_DB` - Must match `DATABASE_NAME` of the API and Database Initialiser containers.
 
 ## REST API
 
@@ -313,6 +318,5 @@ This is similar to [Get a User Profile \[via Session Token\]](#get-a-user-profil
 - Sync frontend and backend parameter value validation
 - Set session token to be secure
 - API for validating session token
-- API for changing password
 - API for listing users if user role is admin
 - API for password recovery

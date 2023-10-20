@@ -1,11 +1,10 @@
 /**
- * @file Defines {@link Config}.
+ * @file Defines {@link DatabaseConfig}.
  */
 import assert from 'assert';
 
-// TODO: Make names unspecific to Postgres
-/** Represents the app's configs. */
-export default class Config {
+/** Configs for the database. */
+export default class DatabaseConfig {
   /**
    * Name of the environment variable corresponding to {@link databasePassword}.
    */
@@ -38,21 +37,8 @@ export default class Config {
    */
   public static readonly databaseMaxClientCountEnvVar: string =
     'DATABASE_MAX_CLIENT_COUNT';
-  /** Name of the environment variable corresponding to {@link port}. */
-  public static readonly portEnvVar: string = 'PORT';
   /** Name of the environment variable corresponding to {@link hashCost}. */
   public static readonly hashCostEnvVar: string = 'HASH_COST';
-  /**
-   * Name of the environment variable corresponding to
-   * {@link sessionExpireMillis}.
-   */
-  public static readonly sessionExpireMillisEnvVar: string =
-    'SESSION_EXPIRE_MILLIS';
-  /**
-   * Name of the environment variable which contains the mode the app is running
-   * in. This is use for determining {@link isDevEnv}.
-   */
-  public static readonly appModeEnvVar: string = 'NODE_ENV';
 
   /** Default value for {@link databaseUser}. */
   public static readonly defaultDatabaseUser: string = 'postgres';
@@ -68,12 +54,8 @@ export default class Config {
   public static readonly defaultDatabaseIdleTimeoutMillis: number = 10000;
   /** Default value for {@link databaseMaxClientCount}. */
   public static readonly defaultDatabaseMaxClientCount: number = 20;
-  /** Default value for {@link port}. */
-  public static readonly defaultPort: number = 9000;
   /** Default value for {@link hashCost}. */
   public static readonly defaultHashCost: number = 10;
-  /** Default value for {@link sessionExpireMillis}. */
-  public static readonly defaultSessionExpireMillis: number = 604800000;
 
   /** Password of the database.*/
   public readonly databasePassword: string;
@@ -97,14 +79,8 @@ export default class Config {
   public readonly databaseIdleTimeoutMillis: number;
   /** Max number of clients. */
   public readonly databaseMaxClientCount: number;
-  /** Port that the app will listen on. */
-  public readonly port: number;
   /** Cost factor of the password hashing algorithm. */
   public readonly hashCost: number;
-  /** Number of milliseconds a user login session can last for. */
-  public readonly sessionExpireMillis: number;
-  /** Boolean for whether developer features should be enabled. */
-  public readonly isDevEnv: boolean;
 
   /**
    * Constructs a Config and assigns to each field, the value stored in their
@@ -117,41 +93,40 @@ export default class Config {
    */
   public constructor(env: NodeJS.ProcessEnv = process.env) {
     assert(
-      env[Config.databasePasswordEnvVar] !== undefined,
-      `Postgres database password not specified via the environment variable "${Config.databasePasswordEnvVar}".`,
+      env[DatabaseConfig.databasePasswordEnvVar] !== undefined,
+      `Postgres database password not specified via the environment variable "${DatabaseConfig.databasePasswordEnvVar}".`,
     );
 
-    this.databasePassword = Config._parseString(
-      env[Config.databasePasswordEnvVar],
+    this.databasePassword = DatabaseConfig._parseString(
+      env[DatabaseConfig.databasePasswordEnvVar],
     ) as string;
     this.databaseUser =
-      Config._parseString(env[Config.databaseUserEnvVar]) ??
-      Config.defaultDatabaseUser;
+      DatabaseConfig._parseString(env[DatabaseConfig.databaseUserEnvVar]) ??
+      DatabaseConfig.defaultDatabaseUser;
     this.databaseHost =
-      Config._parseString(env[Config.databaseHostEnvVar]) ??
-      Config.defaultDatabaseHost;
+      DatabaseConfig._parseString(env[DatabaseConfig.databaseHostEnvVar]) ??
+      DatabaseConfig.defaultDatabaseHost;
     this.databasePort =
-      Config._parseInt(env[Config.databasePortEnvVar]) ??
-      Config.defaultDatabasePort;
+      DatabaseConfig._parseInt(env[DatabaseConfig.databasePortEnvVar]) ??
+      DatabaseConfig.defaultDatabasePort;
     this.databaseName =
-      Config._parseString(env[Config.databaseNameEnvVar]) ??
-      Config.defaultDatabaseName;
+      DatabaseConfig._parseString(env[DatabaseConfig.databaseNameEnvVar]) ??
+      DatabaseConfig.defaultDatabaseName;
     this.databaseConnectionTimeoutMillis =
-      Config._parseInt(env[Config.databaseConnectionTimeoutMillisEnvVar]) ??
-      Config.defaultDatabaseConnectionTimeoutMillis;
+      DatabaseConfig._parseInt(
+        env[DatabaseConfig.databaseConnectionTimeoutMillisEnvVar],
+      ) ?? DatabaseConfig.defaultDatabaseConnectionTimeoutMillis;
     this.databaseIdleTimeoutMillis =
-      Config._parseInt(env[Config.databaseIdleTimeoutMillisEnvVar]) ??
-      Config.defaultDatabaseIdleTimeoutMillis;
+      DatabaseConfig._parseInt(
+        env[DatabaseConfig.databaseIdleTimeoutMillisEnvVar],
+      ) ?? DatabaseConfig.defaultDatabaseIdleTimeoutMillis;
     this.databaseMaxClientCount =
-      Config._parseInt(env[Config.databaseMaxClientCountEnvVar]) ??
-      Config.defaultDatabaseMaxClientCount;
-    this.port = Config._parseInt(env[Config.portEnvVar]) ?? Config.defaultPort;
+      DatabaseConfig._parseInt(
+        env[DatabaseConfig.databaseMaxClientCountEnvVar],
+      ) ?? DatabaseConfig.defaultDatabaseMaxClientCount;
     this.hashCost =
-      Config._parseInt(env[Config.hashCostEnvVar]) ?? Config.defaultHashCost;
-    this.sessionExpireMillis =
-      Config._parseInt(env[Config.sessionExpireMillisEnvVar]) ??
-      Config.defaultSessionExpireMillis;
-    this.isDevEnv = env[Config.appModeEnvVar] === 'development';
+      DatabaseConfig._parseInt(env[DatabaseConfig.hashCostEnvVar]) ??
+      DatabaseConfig.defaultHashCost;
   }
 
   private static _parseString(raw: string | undefined): string | undefined {

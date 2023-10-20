@@ -2,7 +2,7 @@
 
 image_tag="peerprep_user_service_api"
 export_dir="./docker_build"
-export_file="$export_dir/peerprep_user_service_api.tar"
+export_file="$export_dir/$image_tag.tar"
 
 echo "Transpiling Typescript ..."
 
@@ -16,7 +16,7 @@ fi
 echo "Building image ..."
 echo
 
-docker image build . --tag=$image_tag
+docker image build . --tag=$image_tag --file api.dockerfile
 
 if [[ $? -ne 0 ]]; then
     echo "Build failed!"
