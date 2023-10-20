@@ -4,6 +4,7 @@
 import { DataSource, MoreThan } from 'typeorm';
 
 import EmailAddress from '../data_structs/email_address';
+import PasswordHash from '../data_structs/password_hash';
 import SessionToken from '../data_structs/session_token';
 import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import UserId from '../data_structs/user_id';
@@ -15,7 +16,6 @@ import UserProfileEntity from '../entities/user_profile';
 import UserSessionEntity from '../entities/user_session';
 import UserRole, { parseUserRole } from '../enums/user_role';
 import DatabaseClient, { DatabaseClientConfig } from './database_client';
-import PasswordHash from '../data_structs/password_hash';
 
 export class PostgresDatabaseClient implements DatabaseClient {
   private _dataSource: DataSource;

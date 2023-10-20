@@ -10,8 +10,8 @@ import UserIdentity, {
   jsonStringifyUserIdentity,
 } from '../data_structs/user_identity';
 import DatabaseClient from '../service/database_client';
-import Handler, { HttpMethod } from './handler';
 import { sessionTokenKey } from '../utils/parameter_keys';
+import Handler, { HttpMethod } from './handler';
 
 /**
  * Handles getting the user identity of the user who owns a specified session

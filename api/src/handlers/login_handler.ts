@@ -6,16 +6,16 @@ import qs from 'qs';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
 import Password from '../data_structs/password';
+import PasswordHash from '../data_structs/password_hash';
 import SessionToken from '../data_structs/session_token';
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
-import Handler, { HttpMethod } from './handler';
 import {
   passwordKey,
   sessionTokenKey,
   usernameKey,
 } from '../utils/parameter_keys';
-import PasswordHash from '../data_structs/password_hash';
+import Handler, { HttpMethod } from './handler';
 
 /** Handles user login. */
 export default class LoginHandler extends Handler {

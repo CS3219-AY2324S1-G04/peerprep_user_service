@@ -2,8 +2,8 @@
  * @file Defines {@link App}.
  */
 import cookieParser from 'cookie-parser';
-import express from 'express';
 import cors from 'cors';
+import express from 'express';
 
 import Handler, { HttpMethod } from './handlers/handler';
 import DatabaseClient from './service/database_client';

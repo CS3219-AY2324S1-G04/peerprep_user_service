@@ -6,16 +6,16 @@ import express from 'express';
 import EmailAddress from '../data_structs/email_address';
 import HttpErrorInfo from '../data_structs/http_error_info';
 import Password from '../data_structs/password';
+import PasswordHash from '../data_structs/password_hash';
 import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
-import Handler, { HttpMethod } from './handler';
 import {
   emailAddressKey,
   passwordKey,
   usernameKey,
 } from '../utils/parameter_keys';
-import PasswordHash from '../data_structs/password_hash';
+import Handler, { HttpMethod } from './handler';
 
 /** Handles user registration. */
 export default class RegisterHandler extends Handler {
