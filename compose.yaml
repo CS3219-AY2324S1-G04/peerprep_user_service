@@ -10,6 +10,9 @@ services:
 
   user_service_database_initialiser:
     image: peerprep_user_service_database_initialiser
+    build:
+      context: .
+      dockerfile: database_initialiser.dockerfile
     networks:
       - peerprep_network
     environment:
@@ -30,6 +33,9 @@ services:
 
   user_service_api:
     image: peerprep_user_service_api
+    build:
+      context: .
+      dockerfile: api.dockerfile
     networks:
       - peerprep_network
     ports:
