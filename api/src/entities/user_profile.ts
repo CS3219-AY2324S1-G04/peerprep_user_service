@@ -2,6 +2,7 @@
  * @file Defines {@link UserProfile}.
  */
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
 import UserRole from '../enums/user_role';
 
 /** Entity in the database for storing user profiles. */

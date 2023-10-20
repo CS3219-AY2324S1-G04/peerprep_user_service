@@ -10,13 +10,13 @@ import UserId from '../data_structs/user_id';
 import UserIdentity from '../data_structs/user_identity';
 import UserRole, { parseUserRole } from '../enums/user_role';
 import DatabaseClient from '../service/database_client';
-import Handler, { HttpMethod } from './handler';
 import {
   sessionTokenKey,
   userIdKey,
   userIdPathKey,
   userRoleKey,
 } from '../utils/parameter_keys';
+import Handler, { HttpMethod } from './handler';
 
 /**
  * Handles updating the user role of the user whose username is specified in the

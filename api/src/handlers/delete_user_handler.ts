@@ -4,12 +4,12 @@
 import express from 'express';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
-import SessionToken from '../data_structs/session_token';
-import DatabaseClient from '../service/database_client';
-import Handler, { HttpMethod } from './handler';
-import { passwordKey, sessionTokenKey } from '../utils/parameter_keys';
 import Password from '../data_structs/password';
 import PasswordHash from '../data_structs/password_hash';
+import SessionToken from '../data_structs/session_token';
+import DatabaseClient from '../service/database_client';
+import { passwordKey, sessionTokenKey } from '../utils/parameter_keys';
+import Handler, { HttpMethod } from './handler';
 
 /** Handles deleting the user who sent the request. */
 export default class DeleteUserHandler extends Handler {

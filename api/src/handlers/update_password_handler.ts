@@ -2,17 +2,18 @@
  * @file Defines {@link UpdatePasswordHandler}.
  */
 import express from 'express';
-import DatabaseClient from '../service/database_client';
-import Handler, { HttpMethod } from './handler';
+
 import HttpErrorInfo from '../data_structs/http_error_info';
-import SessionToken from '../data_structs/session_token';
 import Password from '../data_structs/password';
+import PasswordHash from '../data_structs/password_hash';
+import SessionToken from '../data_structs/session_token';
+import DatabaseClient from '../service/database_client';
 import {
   newPasswordKey,
   passwordKey,
   sessionTokenKey,
 } from '../utils/parameter_keys';
-import PasswordHash from '../data_structs/password_hash';
+import Handler, { HttpMethod } from './handler';
 
 /** Handles changing the password of the user who sent the request. */
 export default class UpdatePasswordHandler extends Handler {

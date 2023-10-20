@@ -9,12 +9,12 @@ import SessionToken from '../data_structs/session_token';
 import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
-import Handler, { HttpMethod } from './handler';
 import {
   emailAddressKey,
   sessionTokenKey,
   usernameKey,
 } from '../utils/parameter_keys';
+import Handler, { HttpMethod } from './handler';
 
 /** Handles updating the profile of the user who sent the request. */
 export default class UpdateUserProfileHandler extends Handler {

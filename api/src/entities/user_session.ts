@@ -9,6 +9,7 @@ import {
   ManyToOne,
   PrimaryColumn,
 } from 'typeorm';
+
 import UserProfile from './user_profile';
 
 /** Entity in the database for storing user sessions. */

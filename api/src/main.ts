@@ -3,13 +3,13 @@
  */
 import App from './app';
 import Config from './data_structs/config';
-import UpdatePasswordHandler from './handlers/update_password_handler';
 import DeleteUserHandler from './handlers/delete_user_handler';
 import GetUserIdentityHandler from './handlers/get_user_identity_handler';
 import GetUserProfileHandler from './handlers/get_user_profile_handler';
 import LoginHandler from './handlers/login_handler';
 import LogoutHandler from './handlers/logout_handler';
 import RegisterHandler from './handlers/register_handler';
+import UpdatePasswordHandler from './handlers/update_password_handler';
 import UpdateUserProfileHandler from './handlers/update_user_profile_handler';
 import UpdateUserRoleHandler from './handlers/update_user_role_handler';
 import DatabaseClient from './service/database_client';

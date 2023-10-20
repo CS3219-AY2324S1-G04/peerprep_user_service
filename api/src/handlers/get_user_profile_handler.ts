@@ -9,8 +9,8 @@ import UserProfile, {
   jsonStringifyUserProfile,
 } from '../data_structs/user_profile';
 import DatabaseClient from '../service/database_client';
-import Handler, { HttpMethod } from './handler';
 import { sessionTokenKey } from '../utils/parameter_keys';
+import Handler, { HttpMethod } from './handler';
 
 /** Handles getting the profile of the user who sent the request. */
 export default class GetUserProfileHandler extends Handler {

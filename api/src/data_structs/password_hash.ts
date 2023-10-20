@@ -2,6 +2,7 @@
  * @file Defines {@link PasswordHash}.
  */
 import bcrypt from 'bcrypt';
+
 import Password from './password';
 
 /** Password hash. */
