@@ -1,5 +1,5 @@
 /**
- * @file Defines {@link RegisterHandler}.
+ * @file Defines {@link CreateUserHandler}.
  */
 import express from 'express';
 
@@ -17,8 +17,8 @@ import {
 } from '../utils/parameter_keys';
 import Handler, { HttpMethod } from './handler';
 
-/** Handles user registration. */
-export default class RegisterHandler extends Handler {
+/** Handles creating user. */
+export default class CreateUserHandler extends Handler {
   private readonly _hashSaltRounds: number;
 
   public constructor(hashSaltRounds: number) {
@@ -91,7 +91,7 @@ export default class RegisterHandler extends Handler {
       hashCost,
     );
 
-    await RegisterHandler._createUserProfileAndCredential(
+    await CreateUserHandler._createUserProfileAndCredential(
       client,
       userProfile,
       passwordHash,
@@ -125,9 +125,9 @@ export default class RegisterHandler extends Handler {
     client: DatabaseClient,
   ): Promise<void> {
     const [userProfile, password]: [ClientModifiableUserProfile, Password] =
-      await RegisterHandler._parseParams(client, req.query);
+      await CreateUserHandler._parseParams(client, req.query);
 
-    await RegisterHandler._createUser(
+    await CreateUserHandler._createUser(
       client,
       userProfile,
       password,

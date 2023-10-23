@@ -255,6 +255,19 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  public async updateUserSessionExpiry(
+    sessionToken: SessionToken,
+    sessionExpiry: Date,
+  ): Promise<boolean> {
+    return (
+      ((
+        await this._dataSource
+          .getRepository(UserSessionEntity)
+          .update(sessionToken.toString(), { sessionExpiry: sessionExpiry })
+      ).affected ?? 0) > 0
+    );
+  }
+
   public async deleteUserProfile(sessionToken: SessionToken): Promise<boolean> {
     const userId: UserId | undefined =
       await this._getUserIdFromSessionToken(sessionToken);
