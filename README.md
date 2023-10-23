@@ -17,6 +17,7 @@ The build script `build_images.sh` produces 2 docker images.
 - [REST API](#rest-api)
   - [Create a User](#create-a-user)
   - [Create a Session](#create-a-session)
+  - [Keep Session Alive](#keep-session-alive)
   - [Delete a Session \[via Session Token\]](#delete-a-session-via-session-token)
   - [Get a User Profile \[via Session Token\]](#get-a-user-profile-via-session-token)
   - [Update a User Profile \[via Session Token\]](#update-a-user-profile-via-session-token)
@@ -123,6 +124,22 @@ Creates a new user session.
     }
     ```
 - `401` - Username is not in use or the username and password do not match.
+- `500` - Unexpected error occurred on the server.
+
+### Keep Session Alive
+
+> [POST] `/user-service/session/keep-alive`
+
+Extends the expiry of the session whose session token is specified.
+
+**Cookies**
+
+- `session-token` - Session token.
+
+**Response**
+
+- `200` - Success.
+- `401` - Session token was not provided or does not match any existing session tokens.
 - `500` - Unexpected error occurred on the server.
 
 ### Delete a Session [via Session Token]
