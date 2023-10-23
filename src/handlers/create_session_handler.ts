@@ -1,5 +1,5 @@
 /**
- * @file Defines {@link LoginHandler}.
+ * @file Defines {@link CreateSessionHandler}.
  */
 import express from 'express';
 import qs from 'qs';
@@ -17,8 +17,8 @@ import {
 } from '../utils/parameter_keys';
 import Handler, { HttpMethod } from './handler';
 
-/** Handles user login. */
-export default class LoginHandler extends Handler {
+/** Handles creating session. */
+export default class CreateSessionHandler extends Handler {
   private static _cookieExpiry: Date = new Date((Math.pow(2, 31) - 1) * 1000);
 
   private readonly _sessionExpireMillis: number;
@@ -67,8 +67,8 @@ export default class LoginHandler extends Handler {
     password: Password,
     sessionExpireMillis: number,
   ): Promise<SessionToken> {
-    await LoginHandler._verifyIdentity(client, username, password);
-    return await LoginHandler._createUserSession(
+    await CreateSessionHandler._verifyIdentity(client, username, password);
+    return await CreateSessionHandler._createUserSession(
       client,
       username,
       sessionExpireMillis,
@@ -80,10 +80,8 @@ export default class LoginHandler extends Handler {
     username: Username,
     password: Password,
   ): Promise<void> {
-    const passwordHash: PasswordHash = await LoginHandler._fetchPasswordHash(
-      client,
-      username,
-    );
+    const passwordHash: PasswordHash =
+      await CreateSessionHandler._fetchPasswordHash(client, username);
 
     if (!(await passwordHash.isMatch(password))) {
       throw new HttpErrorInfo(401);
@@ -153,11 +151,10 @@ export default class LoginHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const [username, password]: [Username, Password] = LoginHandler._parseQuery(
-      req.query,
-    );
+    const [username, password]: [Username, Password] =
+      CreateSessionHandler._parseQuery(req.query);
 
-    const sessionToken: SessionToken = await LoginHandler._authenticate(
+    const sessionToken: SessionToken = await CreateSessionHandler._authenticate(
       client,
       username,
       password,
@@ -167,7 +164,7 @@ export default class LoginHandler extends Handler {
     res
       .status(200)
       .cookie(sessionTokenKey, sessionToken.toString(), {
-        expires: LoginHandler._cookieExpiry,
+        expires: CreateSessionHandler._cookieExpiry,
         httpOnly: true,
         sameSite: true,
       })

@@ -1,5 +1,5 @@
 /**
- * @file Defines {@link LogoutHandler}.
+ * @file Defines {@link DeleteSessionHandler}.
  */
 import express from 'express';
 
@@ -9,8 +9,8 @@ import DatabaseClient from '../service/database_client';
 import { sessionTokenKey } from '../utils/parameter_keys';
 import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
-/** Handles user logout. */
-export default class LogoutHandler extends Handler {
+/** Handles deleting session. */
+export default class DeleteSessionHandler extends Handler {
   public override get method(): HttpMethod {
     return HttpMethod.delete;
   }
@@ -55,8 +55,10 @@ export default class LogoutHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = LogoutHandler._parseCookie(req.cookies);
-    await LogoutHandler._deleteUserSession(client, sessionToken);
+    const sessionToken: SessionToken = DeleteSessionHandler._parseCookie(
+      req.cookies,
+    );
+    await DeleteSessionHandler._deleteUserSession(client, sessionToken);
 
     res.sendStatus(200);
   }
