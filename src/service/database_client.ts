@@ -155,6 +155,17 @@ export default interface DatabaseClient {
   updateUserRole(userId: UserId, userRole: UserRole): Promise<boolean>;
 
   /**
+   * Updates the expiry, to {@link sessionExpiry}, for the session whose token
+   * is {@link sessionToken}.
+   * @param sessionToken - Session token.
+   * @param sessionExpiry - Time of session expiry.
+   */
+  updateUserSessionExpiry(
+    sessionToken: SessionToken,
+    sessionExpiry: Date,
+  ): Promise<boolean>;
+
+  /**
    * Deletes the user who owns the session token {@link sessionToken}.
    * @param sessionToken - Session token belonging to the user to be deleted.
    * @returns True if a user was deleted. False if no user was deleted due to
