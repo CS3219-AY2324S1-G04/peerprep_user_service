@@ -11,7 +11,7 @@ import UserIdentity, {
 } from '../data_structs/user_identity';
 import DatabaseClient from '../service/database_client';
 import { sessionTokenKey } from '../utils/parameter_keys';
-import Handler, { HttpMethod } from './handler';
+import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /**
  * Handles getting the user identity of the user who owns a specified session
@@ -41,7 +41,7 @@ export default class GetUserIdentityHandler extends Handler {
     try {
       return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 
@@ -52,7 +52,7 @@ export default class GetUserIdentityHandler extends Handler {
     const userIdentity: UserIdentity | undefined =
       await client.fetchUserIdentityFromSessionToken(sessionToken);
     if (userIdentity === undefined) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
 
     return userIdentity;

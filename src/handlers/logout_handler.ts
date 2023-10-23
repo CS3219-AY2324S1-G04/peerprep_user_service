@@ -7,7 +7,7 @@ import HttpErrorInfo from '../data_structs/http_error_info';
 import SessionToken from '../data_structs/session_token';
 import DatabaseClient from '../service/database_client';
 import { sessionTokenKey } from '../utils/parameter_keys';
-import Handler, { HttpMethod } from './handler';
+import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /** Handles user logout. */
 export default class LogoutHandler extends Handler {
@@ -25,7 +25,7 @@ export default class LogoutHandler extends Handler {
     try {
       return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 
@@ -34,7 +34,7 @@ export default class LogoutHandler extends Handler {
     sessionToken: SessionToken,
   ): Promise<void> {
     if (!(await client.deleteUserSession(sessionToken))) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 
