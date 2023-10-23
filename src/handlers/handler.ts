@@ -66,3 +66,8 @@ export enum HttpMethod {
   put,
   delete,
 }
+
+export const authenticationErrorMessages = {
+  invalidSession: 'Session is invalid.',
+  incorrectPassword: 'Password is incorrect.',
+};

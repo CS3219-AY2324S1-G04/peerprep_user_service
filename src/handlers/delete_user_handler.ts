@@ -9,7 +9,7 @@ import PasswordHash from '../data_structs/password_hash';
 import SessionToken from '../data_structs/session_token';
 import DatabaseClient from '../service/database_client';
 import { passwordKey, sessionTokenKey } from '../utils/parameter_keys';
-import Handler, { HttpMethod } from './handler';
+import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /** Handles deleting the user who sent the request. */
 export default class DeleteUserHandler extends Handler {
@@ -27,7 +27,10 @@ export default class DeleteUserHandler extends Handler {
     try {
       password = Password.parse(query[passwordKey]);
     } catch (e) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(
+        401,
+        authenticationErrorMessages.incorrectPassword,
+      );
     }
 
     return password!;
@@ -39,7 +42,7 @@ export default class DeleteUserHandler extends Handler {
     try {
       return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 
@@ -52,7 +55,10 @@ export default class DeleteUserHandler extends Handler {
       await DeleteUserHandler._fetchPasswordHash(client, sessionToken);
 
     if (!(await passwordHash.isMatch(password))) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(
+        401,
+        authenticationErrorMessages.incorrectPassword,
+      );
     }
   }
 
@@ -64,7 +70,7 @@ export default class DeleteUserHandler extends Handler {
       await client.fetchPasswordHashFromSessionToken(sessionToken);
 
     if (passwordHash === undefined) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
 
     return passwordHash;
@@ -75,7 +81,7 @@ export default class DeleteUserHandler extends Handler {
     sessionToken: SessionToken,
   ): Promise<void> {
     if (!(await client.deleteUserProfile(sessionToken))) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 

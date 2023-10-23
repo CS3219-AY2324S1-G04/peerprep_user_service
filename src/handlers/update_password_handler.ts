@@ -13,7 +13,7 @@ import {
   passwordKey,
   sessionTokenKey,
 } from '../utils/parameter_keys';
-import Handler, { HttpMethod } from './handler';
+import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /** Handles changing the password of the user who sent the request. */
 export default class UpdatePasswordHandler extends Handler {
@@ -38,12 +38,11 @@ export default class UpdatePasswordHandler extends Handler {
     try {
       return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 
   private static async _parseParams(
-    client: DatabaseClient,
     query: qs.ParsedQs,
   ): Promise<[Password, Password]> {
     let password: Password;
@@ -52,7 +51,10 @@ export default class UpdatePasswordHandler extends Handler {
     try {
       password = Password.parse(query[passwordKey]);
     } catch (e) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(
+        401,
+        authenticationErrorMessages.incorrectPassword,
+      );
     }
 
     try {
@@ -78,7 +80,10 @@ export default class UpdatePasswordHandler extends Handler {
       await UpdatePasswordHandler._fetchPasswordHash(client, sessionToken);
 
     if (!(await passwordHash.isMatch(password))) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(
+        401,
+        authenticationErrorMessages.incorrectPassword,
+      );
     }
   }
 
@@ -90,7 +95,7 @@ export default class UpdatePasswordHandler extends Handler {
       await client.fetchPasswordHashFromSessionToken(sessionToken);
 
     if (passwordHash === undefined) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
 
     return passwordHash;
@@ -108,7 +113,7 @@ export default class UpdatePasswordHandler extends Handler {
     );
 
     if (!(await client.updatePasswordHash(newPasswordHash, sessionToken))) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 
@@ -135,7 +140,7 @@ export default class UpdatePasswordHandler extends Handler {
       req.cookies,
     );
     const [password, newPassword]: [Password, Password] =
-      await UpdatePasswordHandler._parseParams(client, req.query);
+      await UpdatePasswordHandler._parseParams(req.query);
 
     await UpdatePasswordHandler._validatePassword(
       client,

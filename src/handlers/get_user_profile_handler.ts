@@ -10,7 +10,7 @@ import UserProfile, {
 } from '../data_structs/user_profile';
 import DatabaseClient from '../service/database_client';
 import { sessionTokenKey } from '../utils/parameter_keys';
-import Handler, { HttpMethod } from './handler';
+import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /** Handles getting the profile of the user who sent the request. */
 export default class GetUserProfileHandler extends Handler {
@@ -28,7 +28,7 @@ export default class GetUserProfileHandler extends Handler {
     try {
       return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 
@@ -39,7 +39,7 @@ export default class GetUserProfileHandler extends Handler {
     const userProfile: UserProfile | undefined =
       await client.fetchUserProfileFromSessionToken(sessionToken);
     if (userProfile === undefined) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
 
     return userProfile;

@@ -14,7 +14,7 @@ import {
   sessionTokenKey,
   usernameKey,
 } from '../utils/parameter_keys';
-import Handler, { HttpMethod } from './handler';
+import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /** Handles updating the profile of the user who sent the request. */
 export default class UpdateUserProfileHandler extends Handler {
@@ -32,7 +32,7 @@ export default class UpdateUserProfileHandler extends Handler {
     try {
       return SessionToken.parse(cookies[sessionTokenKey]);
     } catch (e) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 
@@ -85,7 +85,7 @@ export default class UpdateUserProfileHandler extends Handler {
     sessionToken: SessionToken,
   ): Promise<void> {
     if (!(await client.updateUserProfile(userProfile, sessionToken))) {
-      throw new HttpErrorInfo(401);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
     }
   }
 
