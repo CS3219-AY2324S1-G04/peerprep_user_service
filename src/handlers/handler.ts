@@ -1,7 +1,7 @@
 /**
  * @file Defines {@link Handler}.
  */
-import express from 'express';
+import express, { CookieOptions } from 'express';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
 import DatabaseClient from '../service/database_client';
@@ -67,7 +67,15 @@ export enum HttpMethod {
   delete,
 }
 
+/** Error messages for HTTP 401 Unauthorised response. */
 export const authenticationErrorMessages = {
   invalidSession: 'Session is invalid.',
   incorrectPassword: 'Password is incorrect.',
+};
+
+/** Options for session cookie. */
+export const sessionCookieOptions: CookieOptions = {
+  expires: new Date((Math.pow(2, 31) - 1) * 1000),
+  httpOnly: true,
+  sameSite: true,
 };

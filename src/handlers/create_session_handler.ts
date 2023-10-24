@@ -15,12 +15,10 @@ import {
   sessionTokenKey,
   usernameKey,
 } from '../utils/parameter_keys';
-import Handler, { HttpMethod } from './handler';
+import Handler, { HttpMethod, sessionCookieOptions } from './handler';
 
 /** Handles creating session. */
 export default class CreateSessionHandler extends Handler {
-  private static _cookieExpiry: Date = new Date((Math.pow(2, 31) - 1) * 1000);
-
   private readonly _sessionExpireMillis: number;
 
   public constructor(sessionExpireMillis: number) {
@@ -163,11 +161,7 @@ export default class CreateSessionHandler extends Handler {
 
     res
       .status(200)
-      .cookie(sessionTokenKey, sessionToken.toString(), {
-        expires: CreateSessionHandler._cookieExpiry,
-        httpOnly: true,
-        sameSite: true,
-      })
+      .cookie(sessionTokenKey, sessionToken.toString(), sessionCookieOptions)
       .send();
   }
 }
