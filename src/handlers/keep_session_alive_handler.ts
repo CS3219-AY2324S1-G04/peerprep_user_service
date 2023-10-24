@@ -7,7 +7,11 @@ import HttpErrorInfo from '../data_structs/http_error_info';
 import SessionToken from '../data_structs/session_token';
 import DatabaseClient from '../service/database_client';
 import { sessionTokenKey } from '../utils/parameter_keys';
-import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
+import Handler, {
+  HttpMethod,
+  authenticationErrorMessages,
+  sessionCookieOptions,
+} from './handler';
 
 /**
  * Handles extending the expiry of the session whose token was included in the
@@ -81,6 +85,9 @@ export default class KeepSessionAliveHandler extends Handler {
       this._sessionExpireMillis,
     );
 
-    res.sendStatus(200);
+    res
+      .status(200)
+      .cookie(sessionTokenKey, sessionToken.toString(), sessionCookieOptions)
+      .send();
   }
 }
