@@ -3,7 +3,7 @@
 Handles the storing and retrieving of user information.
 
 The build script `build_images.sh` produces 2 docker images.
-- `peerprep_user_service_database_initialiser` - Initialises a separate database container by creating the necessary relations and a default PeerPrep admin account.
+- `peerprep_user_service_database_initialiser` - Initialises a separate database container by creating the necessary entities and a default PeerPrep admin account.
 - `peerprep_user_service_api` - REST API for interacting with the database.
 
 ## Table of Contents
