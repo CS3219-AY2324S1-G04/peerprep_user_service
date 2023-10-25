@@ -9,6 +9,7 @@ The build script `build_images.sh` produces 2 docker images.
 ## Table of Contents
 
 - [Quickstart Guide](#quickstart-guide)
+- [Build Script](#build-script)
 - [Environment Variables](#environment-variables)
   - [Common](#common)
   - [API](#api)
@@ -33,6 +34,14 @@ The build script `build_images.sh` produces 2 docker images.
 2. Build the docker images by running: `./build_images.sh`
 3. Modify the ".env" file as per needed. It is recommended that you modify `DATABASE_PASSWORD`, `ADMIN_EMAIL_ADDRESS`, and `ADMIN_PASSWORD`. Refer to [Environment Variables](#environment-variables) for a list of configs.
 4. Create the docker containers by running: `docker compose up`
+
+## Build Script
+
+`build_images.sh` is a build script for building the Docker images and optionally pushing them to Docker Hub. To see the arguments offered by the script, run:
+
+```
+./build_images.sh -h
+```
 
 ## Environment Variables
 
