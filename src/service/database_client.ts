@@ -27,6 +27,9 @@ export default interface DatabaseClient {
    */
   doEntitiesExist(): Promise<boolean>;
 
+  /** Deletes all known entities. */
+  deleteEntities(): Promise<void>;
+
   /**
    * Checks if username {@link username} is already in use.
    * @param username - Username to check.

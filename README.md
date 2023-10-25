@@ -62,6 +62,7 @@ These are environment variables used by the `peerprep_user_service_api` image:
 
 These are environment variables used by the `peerprep_user_service_database_initialiser` image:
 
+- `SHOULD_FORCE_INITIALISATION` - Set to "true" if initialisation should be done even if entities already exist. Do not set to "true" in production as it might cause loss of data.
 - `ADMIN_EMAIL_ADDRESS` - Email address of the default PeerPrep admin user.
 - `ADMIN_PASSWORD` - Password of the default PeerPrep admin user.
 

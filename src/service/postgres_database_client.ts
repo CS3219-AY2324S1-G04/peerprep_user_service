@@ -68,6 +68,19 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  public async deleteEntities(): Promise<void> {
+    const userSessionEntityName: string =
+      this._dataSource.getRepository(UserSessionEntity).metadata.tableName;
+    const userCredentialEntityName: string =
+      this._dataSource.getRepository(UserCredentialEntity).metadata.tableName;
+    const userProfileEntityName: string =
+      this._dataSource.getRepository(UserProfileEntity).metadata.tableName;
+
+    await this._dataSource.query(
+      `DROP TABLE IF EXISTS ${userSessionEntityName}, ${userCredentialEntityName}, ${userProfileEntityName}`,
+    );
+  }
+
   public async isUsernameInUse(
     username: Username,
     sessionToken?: SessionToken,
