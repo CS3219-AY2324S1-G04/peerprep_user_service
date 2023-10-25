@@ -26,13 +26,25 @@ const client: DatabaseClient = new PostgresDatabaseClient({
 });
 
 client.initialise().then(async () => {
-  // TODO: Exit if table is not empty
+  if (await client.doEntitiesExist()) {
+    console.log('One or more entities to be created already exist.');
 
-  console.log('Synchronising ...');
+    if (databaseInitialiserConfig.shouldForceInitialisation) {
+      console.log('Deleting existing entities ...');
+      await client.deleteEntities();
+      console.log('Deleted existing entities!');
+    } else {
+      console.log('Initialisation aborted!');
+      await client.disconnect();
+      return;
+    }
+  }
+
+  console.log('Creating entities ...');
 
   await client.synchronise();
 
-  console.log('Synchronised!');
+  console.log('Created entities!');
   console.log('Creating admin user ...');
 
   await client.createUserProfileAndCredential(

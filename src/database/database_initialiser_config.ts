@@ -8,6 +8,12 @@ import Password from '../data_structs/password';
 export default class DatabaseInitialiserConfig {
   /**
    * Name of the environment variable corresponding to
+   * {@link shouldForceInitialisation}.
+   */
+  public static readonly shouldForceInitialisationEnvVar: string =
+    'SHOULD_FORCE_INITIALISATION';
+  /**
+   * Name of the environment variable corresponding to
    * {@link adminEmailAddress}.
    */
   public static readonly adminEmailAddressEnvVar: string =
@@ -17,6 +23,8 @@ export default class DatabaseInitialiserConfig {
    */
   public static readonly adminPasswordEnvVar: string = 'ADMIN_PASSWORD';
 
+  /** Should initialisation be done even if entities exist. */
+  public readonly shouldForceInitialisation: boolean;
   /** Default admin user's email address. */
   public readonly adminEmailAddress: EmailAddress;
   /** Default admin user's password. */
@@ -28,6 +36,8 @@ export default class DatabaseInitialiserConfig {
    * @param env - Environment variables.
    */
   public constructor(env: NodeJS.ProcessEnv = process.env) {
+    this.shouldForceInitialisation =
+      env[DatabaseInitialiserConfig.shouldForceInitialisationEnvVar] === 'true';
     this.adminEmailAddress = EmailAddress.parse(
       env[DatabaseInitialiserConfig.adminEmailAddressEnvVar],
     );
