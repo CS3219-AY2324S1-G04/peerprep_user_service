@@ -50,6 +50,24 @@ export class PostgresDatabaseClient implements DatabaseClient {
     await this._dataSource.destroy();
   }
 
+  public async doEntitiesExist(): Promise<boolean> {
+    return (
+      (
+        await this._dataSource.query(
+          'SELECT 1 FROM information_schema.tables WHERE table_name IN ($1, $2, $3)',
+          [
+            this._dataSource.getRepository(UserSessionEntity).metadata
+              .tableName,
+            this._dataSource.getRepository(UserCredentialEntity).metadata
+              .tableName,
+            this._dataSource.getRepository(UserProfileEntity).metadata
+              .tableName,
+          ],
+        )
+      ).length > 0
+    );
+  }
+
   public async isUsernameInUse(
     username: Username,
     sessionToken?: SessionToken,

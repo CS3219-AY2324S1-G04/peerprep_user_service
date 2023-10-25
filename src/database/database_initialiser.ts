@@ -26,7 +26,12 @@ const client: DatabaseClient = new PostgresDatabaseClient({
 });
 
 client.initialise().then(async () => {
-  // TODO: Exit if table is not empty
+  if (await client.doEntitiesExist()) {
+    console.log('One or more entities to be created already exist.');
+    console.log('Initialisation aborted!');
+
+    return;
+  }
 
   console.log('Synchronising ...');
 

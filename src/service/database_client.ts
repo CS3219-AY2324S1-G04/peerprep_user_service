@@ -23,6 +23,11 @@ export default interface DatabaseClient {
   disconnect(): Promise<void>;
 
   /**
+   * @returns True if one or more of the entities exist. Else, returns false.
+   */
+  doEntitiesExist(): Promise<boolean>;
+
+  /**
    * Checks if username {@link username} is already in use.
    * @param username - Username to check.
    * @param sessionToken - Session token whose corresponding user's username is
