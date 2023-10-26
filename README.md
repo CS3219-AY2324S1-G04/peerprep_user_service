@@ -37,7 +37,7 @@ The build script `build_images.sh` produces 2 docker images.
 
 ## Build Script
 
-`build_images.sh` is a build script for building the Docker images and optionally pushing them to Docker Hub. To see the arguments offered by the script, run:
+`build_images.sh` is a build script for building the Docker images and optionally pushing them to the container registry. To get more information about the script, run:
 
 ```
 ./build_images.sh -h
