@@ -3,12 +3,13 @@
 Handles the storing and retrieving of user information.
 
 The build script `build_images.sh` produces 2 docker images.
-- `peerprep_user_service_database_initialiser` - Initialises a separate database container by creating the necessary relations and a default PeerPrep admin account.
+- `peerprep_user_service_database_initialiser` - Initialises a separate database container by creating the necessary entities and a default PeerPrep admin account.
 - `peerprep_user_service_api` - REST API for interacting with the database.
 
 ## Table of Contents
 
 - [Quickstart Guide](#quickstart-guide)
+- [Build Script](#build-script)
 - [Environment Variables](#environment-variables)
   - [Common](#common)
   - [API](#api)
@@ -33,6 +34,14 @@ The build script `build_images.sh` produces 2 docker images.
 2. Build the docker images by running: `./build_images.sh`
 3. Modify the ".env" file as per needed. It is recommended that you modify `DATABASE_PASSWORD`, `ADMIN_EMAIL_ADDRESS`, and `ADMIN_PASSWORD`. Refer to [Environment Variables](#environment-variables) for a list of configs.
 4. Create the docker containers by running: `docker compose up`
+
+## Build Script
+
+`build_images.sh` is a build script for building the Docker images and optionally pushing them to the container registry. To get more information about the script, run:
+
+```
+./build_images.sh -h
+```
 
 ## Environment Variables
 
