@@ -10,31 +10,31 @@ services:
     restart: unless-stopped
 
   user_service_database_initialiser:
-    image: peerprep_user_service_database_initialiser
+    image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_database_initialiser
     build:
       context: .
       dockerfile: database_initialiser.dockerfile
     networks:
       - peerprep_network
     environment:
-      DATABASE_HOST: 'user_service_database'
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_USER: ${DATABASE_USER}
-      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOST: 'user_service_database'
       DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_CONNECTION_TIMEOUT_MILLIS: ${DATABASE_CONNECTION_TIMEOUT_MILLIS}
       DATABASE_IDLE_TIMEOUT_MILLIS: ${DATABASE_IDLE_TIMEOUT_MILLIS}
       DATABASE_MAX_CLIENT_COUNT: ${DATABASE_MAX_CLIENT_COUNT}
       HASH_COST: ${HASH_COST}
-      SHOULD_FORCE_INITIALISATION: ${SHOULD_FORCE_INITIALISATION}
       ADMIN_EMAIL_ADDRESS: ${ADMIN_EMAIL_ADDRESS}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SHOULD_FORCE_INITIALISATION: ${SHOULD_FORCE_INITIALISATION}
     depends_on:
       - user_service_database
     restart: on-failure
 
   user_service_api:
-    image: peerprep_user_service_api
+    image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_api
     build:
       context: .
       dockerfile: api.dockerfile
@@ -43,17 +43,17 @@ services:
     ports:
       - '${PORT}:9000'
     environment:
-      DATABASE_HOST: 'user_service_database'
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_USER: ${DATABASE_USER}
-      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOST: 'user_service_database'
       DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_CONNECTION_TIMEOUT_MILLIS: ${DATABASE_CONNECTION_TIMEOUT_MILLIS}
       DATABASE_IDLE_TIMEOUT_MILLIS: ${DATABASE_IDLE_TIMEOUT_MILLIS}
       DATABASE_MAX_CLIENT_COUNT: ${DATABASE_MAX_CLIENT_COUNT}
       HASH_COST: ${HASH_COST}
-      PORT: 9000
       SESSION_EXPIRE_MILLIS: ${SESSION_EXPIRE_MILLIS}
+      PORT: 9000
       NODE_ENV: ${NODE_ENV}
     depends_on:
       - user_service_database

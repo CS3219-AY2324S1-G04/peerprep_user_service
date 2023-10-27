@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-api-deployment
+  namespace: peerprep
+  labels:
+    app: user-service-api
+spec:
+  selector:
+    matchLabels:
+      app: user-service-api
+  template:
+    metadata:
+      namespace: peerprep
+      labels:
+        app: user-service-api
+    spec:
+      containers:
+        - name: user-service-api
+          image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_api
+          ports:
+            - containerPort: 9000
+          env:
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-database-secret
+                  key: database-user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-database-secret
+                  key: database-password
+            - name: DATABASE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-database-secret
+                  key: database-host
+            - name: DATABASE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-database-secret
+                  key: database-port
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-database-secret
+                  key: database-name
+            - name: DATABASE_CONNECTION_TIMEOUT_MILLIS
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-database-client-config-map
+                  key: database-connection-timeout-millis
+            - name: DATABASE_IDLE_TIMEOUT_MILLIS
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-database-client-config-map
+                  key: database-idle-timeout-millis
+            - name: DATABASE_MAX_CLIENT_COUNT
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-database-client-config-map
+                  key: database-max-client-count
+            - name: HASH_COST
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-core-config-map
+                  key: hash-cost
+            - name: SESSION_EXPIRE_MILLIS
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-core-config-map
+                  key: session-expire-millis
+            - name: PORT
+              value: '9000'
+            - name: NODE_ENV
+              value: production
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 500m
