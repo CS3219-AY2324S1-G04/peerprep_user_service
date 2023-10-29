@@ -66,11 +66,26 @@ spec:
                 configMapKeyRef:
                   name: user-service-core-config-map
                   key: hash-cost
+            - name: ACCESS_TOKEN_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-core-secret
+                  key: access-token-private-key
+            - name: ACCESS_TOKEN_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: user-service-core-secret
+                  key: access-token-public-key
             - name: SESSION_EXPIRE_MILLIS
               valueFrom:
                 configMapKeyRef:
                   name: user-service-core-config-map
                   key: session-expire-millis
+            - name: ACCESS_TOKEN_EXPIRE_MILLIS
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-core-config-map
+                  key: access-token-expire-millis
             - name: PORT
               value: '9000'
             - name: NODE_ENV

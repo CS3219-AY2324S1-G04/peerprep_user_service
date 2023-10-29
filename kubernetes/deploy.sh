@@ -2,6 +2,7 @@
 
 kubectl apply -f ./config_maps/core.yaml
 kubectl apply -f ./config_maps/database_client.yaml
+kubectl apply -f ./secrets/core.yaml
 kubectl apply -f ./secrets/database_initialiser.yaml
 kubectl apply -f ./secrets/database.yaml
 
