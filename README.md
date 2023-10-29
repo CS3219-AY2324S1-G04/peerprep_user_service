@@ -333,7 +333,7 @@ Gets the public key for verifying access tokens.
 
 Gets the user ID and user role of the user who owns the specified session token.
 
-This is only intended to be used by other services when performing high threat model operations, where trusting the information stored in a valid access token is insufficient.
+This is only intended to be used by other services when performing high threat model operations, where trusting the information stored in a valid access token is risky.
 
 **Query Parameters**
 
