@@ -9,6 +9,7 @@ import CreateUserHandler from './handlers/create_user_handler';
 import DeleteSessionHandler from './handlers/delete_session_handler';
 import DeleteUserHandler from './handlers/delete_user_handler';
 import GetAccessTokenHandler from './handlers/get_access_token_handler';
+import GetAccessTokenPublicKeyHandler from './handlers/get_access_token_public_key_handler';
 import GetUserIdentityHandler from './handlers/get_user_identity_handler';
 import GetUserProfileHandler from './handlers/get_user_profile_handler';
 import UpdatePasswordHandler from './handlers/update_password_handler';
@@ -54,6 +55,7 @@ const app: App = new App(
     new UpdatePasswordHandler(databaseConfig.hashCost),
     new UpdateUserRoleHandler(),
     new DeleteUserHandler(),
+    new GetAccessTokenPublicKeyHandler(apiConfig.accessTokenPublicKey),
     new GetUserIdentityHandler(),
   ],
   apiConfig.isDevEnv,

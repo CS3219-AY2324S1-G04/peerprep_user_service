@@ -316,8 +316,9 @@ Since this is a high threat operation, the user must provide their session token
 - `401` - Session token was not provided, or session token is invalid, or password is incorrect.
 - `500` - Unexpected error occurred on the server.
 
-<!-- TODO: -->
 ### Get Access Token Public Key
+
+> [GET] `/user-service/access-token-public-key`
 
 Gets the public key for verifying access tokens.
 
