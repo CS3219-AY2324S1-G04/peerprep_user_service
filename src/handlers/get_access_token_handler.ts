@@ -1,5 +1,5 @@
 /**
- * @file Defines {@link KeepSessionAliveHandler}.
+ * @file Defines {@link GetAccessTokenHandler}.
  */
 import express from 'express';
 
@@ -8,29 +8,38 @@ import SessionToken from '../data_structs/session_token';
 import DatabaseClient from '../service/database_client';
 import { sessionTokenKey } from '../utils/parameter_keys';
 import Handler, {
+  HandlerUtils,
   HttpMethod,
   authenticationErrorMessages,
-  sessionCookieOptions,
 } from './handler';
 
 /**
- * Handles extending the expiry of the session whose token was included in the
- * request.
+ * Handles getting an access token for the user who sent the request.
+ *
+ * Also extends the expiry of the session which the request is associated with.
  */
-export default class KeepSessionAliveHandler extends Handler {
+export default class GetAccessTokenHandler extends Handler {
+  private readonly _accessTokenPrivateKey: string;
   private readonly _sessionExpireMillis: number;
+  private readonly _accessTokenExpireMillis: number;
 
-  public constructor(sessionExpireMillis: number) {
+  public constructor(
+    accessTokenPrivateKey: string,
+    sessionExpireMillis: number,
+    accessTokenExpireMillis: number,
+  ) {
     super();
+    this._accessTokenPrivateKey = accessTokenPrivateKey;
     this._sessionExpireMillis = sessionExpireMillis;
+    this._accessTokenExpireMillis = accessTokenExpireMillis;
   }
 
   public override get method(): HttpMethod {
-    return HttpMethod.post;
+    return HttpMethod.get;
   }
 
   public override get path(): string {
-    return '/user-service/session/keep-alive';
+    return '/user-service/session/access-token';
   }
 
   private static _parseCookie(cookies: {
@@ -47,7 +56,7 @@ export default class KeepSessionAliveHandler extends Handler {
     client: DatabaseClient,
     sessionToken: SessionToken,
     sessionExpireMillis: number,
-  ) {
+  ): Promise<void> {
     if (
       !(await client.updateUserSessionExpiry(
         sessionToken,
@@ -59,14 +68,16 @@ export default class KeepSessionAliveHandler extends Handler {
   }
 
   /**
-   * Extends the expiry of the session token stored in the request cookie. Sends
-   * a HTTP 200 response.
+   * Gets an access token for the user who owns the session token stored in the
+   * request cookie. Also extends the expiry of the session which the session
+   * token is associated with. Sends a HTTP 200 response containing the session
+   * token, access token, and access token expiry as cookies.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
-   * @throws {HttpErrorInfo} Error 401 if no session token is found or the
-   * session token is invalid (expired or not owned by any user).
+   * @throws {HttpErrorInfo} Error 401 if no session token is specified or the
+   * session token is invalid.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
   public override async handleLogic(
@@ -75,19 +86,25 @@ export default class KeepSessionAliveHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = KeepSessionAliveHandler._parseCookie(
+    const sessionToken: SessionToken = GetAccessTokenHandler._parseCookie(
       req.cookies,
     );
 
-    await KeepSessionAliveHandler._extendSessionExpiry(
+    await GetAccessTokenHandler._extendSessionExpiry(
       client,
       sessionToken,
       this._sessionExpireMillis,
     );
 
-    res
-      .status(200)
-      .cookie(sessionTokenKey, sessionToken.toString(), sessionCookieOptions)
-      .send();
+    await HandlerUtils.addSessionTokenCookie(res, sessionToken);
+    await HandlerUtils.addAccessTokenCookie(
+      res,
+      client,
+      sessionToken,
+      this._accessTokenPrivateKey,
+      this._accessTokenExpireMillis,
+    );
+
+    res.status(200).send();
   }
 }

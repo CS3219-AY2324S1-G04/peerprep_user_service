@@ -20,8 +20,9 @@ import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /**
  * Handles updating the user role of the user whose username is specified in the
- * request. The user who sent the request must have the {@link UserRole.admin}
- * user role.
+ * request.
+ *
+ * The user who sent the request must have the {@link UserRole.admin} user role.
  */
 export default class UpdateUserRoleHandler extends Handler {
   public get method(): HttpMethod {
@@ -78,7 +79,7 @@ export default class UpdateUserRoleHandler extends Handler {
       await client.fetchUserIdentityFromSessionToken(sessionToken);
 
     if (userIdentity?.userRole !== UserRole.admin) {
-      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
+      throw new HttpErrorInfo(401, authenticationErrorMessages.notAdmin);
     }
   }
 
@@ -104,10 +105,9 @@ export default class UpdateUserRoleHandler extends Handler {
    * @throws {HttpErrorInfo} Error 400 if the username and/or user role
    * specified in the request is invalid. Message contains a JSON string of the
    * reasons for the error.
-   * @throws {HttpErrorInfo} Error 401 if no session token is found, or the
+   * @throws {HttpErrorInfo} Error 401 if no session token is specified, or the
    * session token is invalid, or the user who owns the session token does not
-   * have the user role {@link UserRole.admin}. A session token can be
-   * invalid if it is expired or is not owned by any user.
+   * have the user role {@link UserRole.admin}.
    * @throws {HttpErrorInfo} Error 404 if the user ID in the request does not
    * belong to any user.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.

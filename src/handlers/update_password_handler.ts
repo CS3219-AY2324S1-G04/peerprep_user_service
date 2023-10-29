@@ -124,10 +124,10 @@ export default class UpdatePasswordHandler extends Handler {
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
-   * @throws {HttpErrorInfo} Error 401 if no session token is found, or the
-   * session token is invalid, or the provided current password is incorrect.
    * @throws {HttpErrorInfo} Error 400 if the new password is invalid. Message
    * contains a JSON string of the reason for the error.
+   * @throws {HttpErrorInfo} Error 401 if no session token is specified, or the
+   * session token is invalid, or the provided current password is incorrect.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
   public override async handleLogic(

@@ -3,11 +3,11 @@
  */
 import express from 'express';
 
+import ClientModifiableUserProfile from '../data_structs/client_modifiable_user_profile';
 import EmailAddress from '../data_structs/email_address';
 import HttpErrorInfo from '../data_structs/http_error_info';
 import Password from '../data_structs/password';
 import PasswordHash from '../data_structs/password_hash';
-import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
 import {
@@ -17,13 +17,13 @@ import {
 } from '../utils/parameter_keys';
 import Handler, { HttpMethod } from './handler';
 
-/** Handles creating user. */
+/** Handles creating users. */
 export default class CreateUserHandler extends Handler {
-  private readonly _hashSaltRounds: number;
+  private readonly _hashCost: number;
 
-  public constructor(hashSaltRounds: number) {
+  public constructor(hashCost: number) {
     super();
-    this._hashSaltRounds = hashSaltRounds;
+    this._hashCost = hashCost;
   }
 
   public override get method(): HttpMethod {
@@ -91,24 +91,12 @@ export default class CreateUserHandler extends Handler {
       hashCost,
     );
 
-    await CreateUserHandler._createUserProfileAndCredential(
-      client,
-      userProfile,
-      passwordHash,
-    );
-  }
-
-  private static async _createUserProfileAndCredential(
-    client: DatabaseClient,
-    userProfile: ClientModifiableUserProfile,
-    passwordHash: PasswordHash,
-  ): Promise<void> {
     await client.createUserProfileAndCredential(userProfile, passwordHash);
   }
 
   /**
    * Creates a new user using the details specified in the request. Sends a HTTP
-   * 200 response.
+   * 201 response.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
@@ -131,9 +119,9 @@ export default class CreateUserHandler extends Handler {
       client,
       userProfile,
       password,
-      this._hashSaltRounds,
+      this._hashCost,
     );
 
-    res.sendStatus(200);
+    res.sendStatus(201);
   }
 }

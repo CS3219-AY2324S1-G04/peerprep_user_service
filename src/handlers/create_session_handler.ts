@@ -10,20 +10,24 @@ import PasswordHash from '../data_structs/password_hash';
 import SessionToken from '../data_structs/session_token';
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
-import {
-  passwordKey,
-  sessionTokenKey,
-  usernameKey,
-} from '../utils/parameter_keys';
-import Handler, { HttpMethod, sessionCookieOptions } from './handler';
+import { passwordKey, usernameKey } from '../utils/parameter_keys';
+import Handler, { HandlerUtils, HttpMethod } from './handler';
 
-/** Handles creating session. */
+/** Handles creating sessions. */
 export default class CreateSessionHandler extends Handler {
+  private readonly _accessTokenPrivateKey: string;
   private readonly _sessionExpireMillis: number;
+  private readonly _accessTokenExpireMillis: number;
 
-  public constructor(sessionExpireMillis: number) {
+  public constructor(
+    accessTokenPrivateKey: string,
+    sessionExpireMillis: number,
+    accessTokenExpireMillis: number,
+  ) {
     super();
+    this._accessTokenPrivateKey = accessTokenPrivateKey;
     this._sessionExpireMillis = sessionExpireMillis;
+    this._accessTokenExpireMillis = accessTokenExpireMillis;
   }
 
   public override get method(): HttpMethod {
@@ -109,7 +113,7 @@ export default class CreateSessionHandler extends Handler {
 
     let isEntryCreated: boolean = false;
     while (!isEntryCreated) {
-      sessionToken = SessionToken.createNew();
+      sessionToken = SessionToken.create();
 
       try {
         await client.createUserSession(
@@ -131,7 +135,8 @@ export default class CreateSessionHandler extends Handler {
 
   /**
    * Creates a new user session if the username and password provided in the
-   * request are a match. Sends a HTTP 200 response.
+   * request are a match. Sends a HTTP 201 response containing the session
+   * token, access token, and access token expiry as cookies.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
@@ -159,9 +164,14 @@ export default class CreateSessionHandler extends Handler {
       this._sessionExpireMillis,
     );
 
-    res
-      .status(200)
-      .cookie(sessionTokenKey, sessionToken.toString(), sessionCookieOptions)
-      .send();
+    await HandlerUtils.addSessionTokenCookie(res, sessionToken);
+    await HandlerUtils.addAccessTokenCookie(
+      res,
+      client,
+      sessionToken,
+      this._accessTokenPrivateKey,
+      this._accessTokenExpireMillis,
+    );
+    res.status(201).send();
   }
 }

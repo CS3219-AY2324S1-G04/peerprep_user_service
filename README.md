@@ -18,14 +18,15 @@ The build script `build_images.sh` produces 2 docker images.
 - [REST API](#rest-api)
   - [Create a User](#create-a-user)
   - [Create a Session](#create-a-session)
-  - [Keep Session Alive](#keep-session-alive)
-  - [Delete a Session \[via Session Token\]](#delete-a-session-via-session-token)
-  - [Get a User Profile \[via Session Token\]](#get-a-user-profile-via-session-token)
-  - [Update a User Profile \[via Session Token\]](#update-a-user-profile-via-session-token)
-  - [Update a User's Password \[via Session Token\]](#update-a-users-password-via-session-token)
+  - [Get an Access Token](#get-an-access-token)
+  - [Delete a Session](#delete-a-session)
+  - [Get a User Profile](#get-a-user-profile)
+  - [Update a User Profile](#update-a-user-profile)
+  - [Update a User's Password](#update-a-users-password)
   - [Update a User's Role](#update-a-users-role)
-  - [Delete a User \[via Session Token\]](#delete-a-user-via-session-token)
-  - [Get a User Identity \[via Session Token\]](#get-a-user-identity-via-session-token)
+  - [Delete a User](#delete-a-user)
+  - [Get Access Token Public Key](#get-access-token-public-key)
+  - [Get a User Identity](#get-a-user-identity)
 - [To Do](#to-do)
 
 ## Quickstart Guide
@@ -43,6 +44,7 @@ The build script `build_images.sh` produces 2 docker images.
 ./build_images.sh -h
 ```
 
+<!-- TODO: Update -->
 ## Environment Variables
 
 ### Common
@@ -99,7 +101,7 @@ Creates a new user.
 
 **Response**
 
-- `200` - Success.
+- `201` - User created.
 - `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
   - Example response body:
     ```json
@@ -124,7 +126,7 @@ Creates a new user session.
 
 **Response**
 
-- `200` - Success. A unique session token is stored in the response as a cookie with name "session-token".
+- `201` - Session created. The response will contain 3 cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry". The access token expiry cookie is the only cookie that is not HTTP-only.
 - `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
   - Example response body:
     ```json
@@ -136,11 +138,13 @@ Creates a new user session.
 - `401` - Username is not in use or the username and password do not match.
 - `500` - Unexpected error occurred on the server.
 
-### Keep Session Alive
+### Get an Access Token
 
-> [POST] `/user-service/session/keep-alive`
+> [GET] `/user-service/session/access-token`
 
-Extends the expiry of the session whose session token is specified.
+Gets an access token for the user who owns the specified session token.
+
+A successful request to this endpoint will also extend the expiry of the session whose session token was specified.
 
 **Cookies**
 
@@ -148,11 +152,11 @@ Extends the expiry of the session whose session token is specified.
 
 **Response**
 
-- `200` - Success.
-- `401` - Session token was not provided or does not match any existing session tokens.
+- `200` - Success. The response will contain 3 cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry". The session token cookie is sent to extend the lifespan of the cookie on the browser. The access token expiry cookie is the only cookie that is not HTTP-only.
+- `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
-### Delete a Session [via Session Token]
+### Delete a Session
 
 > [DELETE] `/user-service/session`
 
@@ -165,18 +169,18 @@ Deletes the session whose session token is the one specified.
 **Response**
 
 - `200` - Success.
-- `401` - Session token was not provided or does not match any existing session tokens.
+- `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
-### Get a User Profile [via Session Token]
+### Get a User Profile
 
 > [GET] `/user-service/user/profile`
 
-Gets the profile of the user who owns the specified session token.
+Gets the profile of the user who owns the specified access token.
 
 **Cookies**
 
-- `session-token` - Session token.
+- `access-token` - Access token.
 
 **Response**
 
@@ -190,14 +194,16 @@ Gets the profile of the user who owns the specified session token.
       "user-role": "user"
     }
     ```
-- `401` - Session token was not provided or does not match any existing session tokens.
+- `401` - Access token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
-### Update a User Profile [via Session Token]
+### Update a User Profile
 
 > [PUT] `/user-service/user/profile`
 
 Updates the profile of the user who owns the specified session token.
+
+Since this is a high threat operation, the user must provide their session token.
 
 Note that all fields of the user profile must be provided including fields that have not been updated.
 
@@ -212,7 +218,7 @@ Note that all fields of the user profile must be provided including fields that 
 
 **Response**
 
-- `200` - Success.
+- `200` - Success. The response will contain 2 cookies, an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry". The access token expiry cookie is the only cookie that is not HTTP-only.
 - `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
   - Example response body:
     ```json
@@ -221,16 +227,16 @@ Note that all fields of the user profile must be provided including fields that 
       "email-address": "Email address cannot be empty."
     }
     ```
-- `401` - Session token was not provided or does not match any existing session tokens.
+- `401` - Access token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
-### Update a User's Password [via Session Token]
+### Update a User's Password
 
 > [PUT] `/user-service/user/password`
 
 Updates the password of the user who owns the specified session token.
 
-Since this is a high threat operation, the user must verify their identity by providing their current password.
+Since this is a high threat operation, the user must provide their session token and also their current password.
 
 **Query Parameters**
 
@@ -251,7 +257,7 @@ Since this is a high threat operation, the user must verify their identity by pr
       "new-password": "Password cannot be empty."
     }
     ```
-- `401` - Session token was not provided, or does not match any existing session tokens, or password is incorrect.
+- `401` - Session token was not provided, or session token is invalid, or password is incorrect.
 - `500` - Unexpected error occurred on the server.
 
 ### Update a User's Role
@@ -260,7 +266,7 @@ Since this is a high threat operation, the user must verify their identity by pr
 
 Updates the user role of a user.
 
-The user making the request must have the "admin" user role.
+The user making the request must have the "admin" user role. Since this is a high threat operation, the user must provide their session token.
 
 **Path Parameters**
 
@@ -284,17 +290,17 @@ The user making the request must have the "admin" user role.
       "user-role": "User role is invalid."
     }
     ```
-- `401` - Session token was not provided, or does not match any existing session tokens, or does not belong to a user with the "admin" user role.
+- `401` - Session token was not provided, or is invalid, or does not belong to a user with the "admin" user role.
 - `404` - User ID does not belong to any existing user.
 - `500` - Unexpected error occurred on the server.
 
-### Delete a User [via Session Token]
+### Delete a User
 
 > [DELETE] `/user-service/user`
 
 Deletes the user who owns the specified session token.
 
-Since this is a high threat operation, the user must verify their identity by providing their password.
+Since this is a high threat operation, the user must provide their session token and also their password.
 
 **Query Parameters**
 
@@ -307,24 +313,30 @@ Since this is a high threat operation, the user must verify their identity by pr
 **Response**
 
 - `200` - Success.
-- `401` - Session token was not provided, or does not match any existing session tokens, or password is incorrect.
+- `401` - Session token was not provided, or session token is invalid, or password is incorrect.
 - `500` - Unexpected error occurred on the server.
 
-### Get a User Identity [via Session Token]
+<!-- TODO: -->
+### Get Access Token Public Key
+
+Gets the public key for verifying access tokens.
+
+**Response**
+
+- `200` - Success. The response body will contain the public key.
+- `500` - Unexpected error occurred on the server.
+
+### Get a User Identity
 
 > [GET] `/user-service/user/identity`
 
 Gets the user ID and user role of the user who owns the specified session token.
 
-This is similar to [Get a User Profile \[via Session Token\]](#get-a-user-profile-via-session-token) but sends less information and allows the session token to be specified via a query parameter. It is mainly to be use by other services to determine the existence and user role of a user.
+This is only intended to be used by other services when performing high threat model operations, where trusting the information stored in a valid access token is insufficient.
 
 **Query Parameters**
 
-- `session-token` - Session token. This is preferred if the HTTP request is made from another service. If specified, there is no need to specify it again in the request cookie.
-
-**Cookies**
-
-- `session-token` - Session token. This is only to be use if the HTTP request is made from a browser. If specified, there is no need to specify it again in the request query parameter.
+- `session-token` - Session token.
 
 **Response**
 
@@ -337,13 +349,11 @@ This is similar to [Get a User Profile \[via Session Token\]](#get-a-user-profil
       "user-role": "user"
     }
     ```
-- `401` - Session token was not provided or does not match any existing session tokens.
+- `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
 ## To Do
-- Extend session token expiry whenever session token is used
 - Sync frontend and backend parameter value validation
 - Set session token to be secure
-- API for validating session token
 - API for listing users if user role is admin
 - API for password recovery

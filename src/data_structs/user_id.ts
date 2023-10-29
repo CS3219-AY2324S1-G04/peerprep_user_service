@@ -13,43 +13,49 @@ export default class UserId {
   }
 
   /**
-   * Parses {@link userId} as a user ID.
-   * @param userId - User ID.
+   * Parses {@link rawUserId} as a user ID.
+   * @param rawUserId - User ID.
    * @returns The parsed {@link UserId}.
    * @throws Error if parsing fails.
    */
-  public static parseString(userId: string): UserId {
-    if (!UserId._isUserIdSpecified(userId)) {
+  public static parseString(rawUserId: string | undefined): UserId {
+    if (!UserId._isUserIdStringSpecified(rawUserId)) {
       throw new Error('User ID cannot be empty.');
     }
 
-    if (!UserId._isUserIdPositiveInteger(userId)) {
+    if (!UserId._isUserIdStringPositiveInteger(rawUserId!)) {
       throw new Error('User ID must be a positive integer.');
     }
 
-    return new UserId(parseInt(userId, 10));
+    return new UserId(parseInt(rawUserId!, 10));
   }
 
   /**
-   * Parses {@link userId} as a user ID.
-   * @param userId - User ID.
+   * Parses {@link rawUserId} as a user ID.
+   * @param rawUserId - User ID.
    * @returns The parsed {@link UserId}.
    * @throws Error if parsing fails.
    */
-  public static parseNumber(userId: number): UserId {
-    if (userId <= 0) {
+  public static parseNumber(rawUserId: number | undefined): UserId {
+    if (rawUserId === undefined) {
+      throw new Error('User ID cannot be empty.');
+    }
+
+    if (rawUserId <= 0) {
       throw new Error('User ID must be a positive integer.');
     }
 
-    return new UserId(userId);
+    return new UserId(rawUserId);
   }
 
-  private static _isUserIdSpecified(userId: string): boolean {
-    return userId.length > 0;
+  private static _isUserIdStringSpecified(
+    rawUserId: string | undefined,
+  ): boolean {
+    return rawUserId !== undefined && rawUserId.length > 0;
   }
 
-  private static _isUserIdPositiveInteger(userId: string): boolean {
-    return UserId._regex.test(userId);
+  private static _isUserIdStringPositiveInteger(rawUserId: string): boolean {
+    return UserId._regex.test(rawUserId);
   }
 
   public toString(): string {

@@ -93,8 +93,9 @@ export default class DatabaseConfig {
    */
   public constructor(env: NodeJS.ProcessEnv = process.env) {
     assert(
-      env[DatabaseConfig.databasePasswordEnvVar] !== undefined,
-      `Postgres database password not specified via the environment variable "${DatabaseConfig.databasePasswordEnvVar}".`,
+      env[DatabaseConfig.databasePasswordEnvVar] !== undefined &&
+        env[DatabaseConfig.databasePasswordEnvVar] !== '',
+      `Database password not specified via the environment variable "${DatabaseConfig.databasePasswordEnvVar}".`,
     );
 
     this.databasePassword = DatabaseConfig._parseString(
@@ -148,13 +149,5 @@ export default class DatabaseConfig {
     }
 
     return val;
-  }
-
-  private static _parseBoolean(raw: string | undefined): boolean | undefined {
-    if (raw === undefined) {
-      return undefined;
-    }
-
-    return raw.toLowerCase().trim() === 'true';
   }
 }

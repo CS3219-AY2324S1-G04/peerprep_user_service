@@ -3,10 +3,10 @@
  */
 import express from 'express';
 
+import ClientModifiableUserProfile from '../data_structs/client_modifiable_user_profile';
 import EmailAddress from '../data_structs/email_address';
 import HttpErrorInfo from '../data_structs/http_error_info';
 import SessionToken from '../data_structs/session_token';
-import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import Username from '../data_structs/username';
 import DatabaseClient from '../service/database_client';
 import {
@@ -14,10 +14,26 @@ import {
   sessionTokenKey,
   usernameKey,
 } from '../utils/parameter_keys';
-import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
+import Handler, {
+  HandlerUtils,
+  HttpMethod,
+  authenticationErrorMessages,
+} from './handler';
 
 /** Handles updating the profile of the user who sent the request. */
 export default class UpdateUserProfileHandler extends Handler {
+  private readonly _accessTokenPrivateKey: string;
+  private readonly _accessTokenExpireMillis: number;
+
+  public constructor(
+    accessTokenPrivateKey: string,
+    accessTokenExpireMillis: number,
+  ) {
+    super();
+    this._accessTokenPrivateKey = accessTokenPrivateKey;
+    this._accessTokenExpireMillis = accessTokenExpireMillis;
+  }
+
   public override get method(): HttpMethod {
     return HttpMethod.put;
   }
@@ -91,16 +107,16 @@ export default class UpdateUserProfileHandler extends Handler {
 
   /**
    * Updates the user profile belonging to the user who owns the session token
-   * stored in the request cookie. Sends a HTTP 200 response.
+   * stored in the request cookie. Sends a HTTP 200 response containing the
+   * updated access token and updated access token expiry as cookies.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
-   * @throws {HttpErrorInfo} Error 401 if no session token is found or the
-   * session token is invalid. A session token can be invalid if it is expired
-   * or is not owned by any user.
    * @throws {HttpErrorInfo} Error 400 if the updated user profile values are
    * invalid. Message contains a JSON string of the reasons for the error.
+   * @throws {HttpErrorInfo} Error 401 if no session token is specified or the
+   * session token is invalid.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
   public override async handleLogic(
@@ -123,6 +139,14 @@ export default class UpdateUserProfileHandler extends Handler {
       client,
       userProfile,
       sessionToken,
+    );
+
+    await HandlerUtils.addAccessTokenCookie(
+      res,
+      client,
+      sessionToken,
+      this._accessTokenPrivateKey,
+      this._accessTokenExpireMillis,
     );
 
     res.sendStatus(200);

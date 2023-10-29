@@ -92,9 +92,8 @@ export default class DeleteUserHandler extends Handler {
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
-   * @throws {HttpErrorInfo} Error 401 if no session token is found, or the
-   * session token is invalid (expired or not owned by any user), or the
-   * password provided is incorrect.
+   * @throws {HttpErrorInfo} Error 401 if no session token is specified, or the
+   * session token is invalid, or the password provided is incorrect.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
   protected override async handleLogic(
