@@ -168,7 +168,7 @@ Deletes the session whose session token is the one specified.
 
 **Response**
 
-- `200` - Success.
+- `200` - Success. The response will contain 3 expired cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry".
 - `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
@@ -312,7 +312,7 @@ Since this is a high threat operation, the user must provide their session token
 
 **Response**
 
-- `200` - Success.
+- `200` - Success. The response will contain 3 expired cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry".
 - `401` - Session token was not provided, or session token is invalid, or password is incorrect.
 - `500` - Unexpected error occurred on the server.
 

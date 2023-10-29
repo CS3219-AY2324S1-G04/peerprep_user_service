@@ -83,20 +83,22 @@ export const authenticationErrorMessages = {
   notAdmin: 'User is not an admin.',
 };
 
-/** Options for cookies. */
-export const cookieOptions: CookieOptions = {
-  expires: new Date((Math.pow(2, 31) - 1) * 1000),
-  sameSite: true,
-};
-
-/** Options for cookies that contain sensitive information. */
-export const sensitiveCookieOptions: CookieOptions = {
-  ...cookieOptions,
-  httpOnly: true,
-};
-
 /** Utility functions for {@link Handler}. */
 export class HandlerUtils {
+  private static _validCookieOptions: CookieOptions = {
+    expires: new Date((Math.pow(2, 31) - 1) * 1000),
+    sameSite: true,
+  };
+
+  private static _sensitiveValidCookieOptions: CookieOptions = {
+    ...HandlerUtils._validCookieOptions,
+    httpOnly: true,
+  };
+
+  private static _expiredCookieOptions: CookieOptions = {
+    expires: new Date(0),
+  };
+
   /**
    * Adds the session token {@link sessionToken} to the response {@link res} as
    * a cookie.
@@ -110,7 +112,7 @@ export class HandlerUtils {
     res.cookie(
       sessionTokenKey,
       sessionToken.toString(),
-      sensitiveCookieOptions,
+      HandlerUtils._sensitiveValidCookieOptions,
     );
   }
 
@@ -146,11 +148,26 @@ export class HandlerUtils {
     );
 
     res
-      .cookie(accessTokenKey, accessToken.toString(), sensitiveCookieOptions)
+      .cookie(
+        accessTokenKey,
+        accessToken.toString(),
+        HandlerUtils._sensitiveValidCookieOptions,
+      )
       .cookie(
         accessTokenExpiryKey,
         accessToken.expiry.toISOString(),
-        cookieOptions,
+        HandlerUtils._validCookieOptions,
       );
+  }
+
+  /**
+   * Adds an expired session token cookie, access token cookie, and access token
+   * expiry cookie to the response {@link res}.
+   * @param res - Response to add the cookie to.
+   */
+  public static addExpiredCookies(res: express.Response): void {
+    res.cookie(sessionTokenKey, '', HandlerUtils._expiredCookieOptions);
+    res.cookie(accessTokenKey, '', HandlerUtils._expiredCookieOptions);
+    res.cookie(accessTokenExpiryKey, '', HandlerUtils._expiredCookieOptions);
   }
 }

@@ -17,8 +17,6 @@ export default class ApiConfig {
    */
   public static readonly accessTokenPublicKeyEnvVar: string =
     'ACCESS_TOKEN_PUBLIC_KEY';
-  /** Name of the environment variable corresponding to {@link port}. */
-  public static readonly portEnvVar: string = 'PORT';
   /**
    * Name of the environment variable corresponding to
    * {@link sessionExpireMillis}.
@@ -31,25 +29,25 @@ export default class ApiConfig {
    */
   public static readonly accessTokenExpireMillisEnvVar: string =
     'ACCESS_TOKEN_EXPIRE_MILLIS';
+  /** Name of the environment variable corresponding to {@link port}. */
+  public static readonly portEnvVar: string = 'PORT';
   /**
    * Name of the environment variable which contains the mode the app is running
    * in. This is use for determining {@link isDevEnv}.
    */
   public static readonly appModeEnvVar: string = 'NODE_ENV';
 
-  /** Default value for {@link port}. */
-  public static readonly defaultPort: number = 9000;
   /** Default value for {@link sessionExpireMillis}. */
   public static readonly defaultSessionExpireMillis: number = 604800000;
   /** Default value for {@link accessTokenExpireMillis}. */
   public static readonly defaultAccessTokenExpireMillis: number = 900000;
+  /** Default value for {@link port}. */
+  public static readonly defaultPort: number = 9000;
 
   /** Private key for creating access tokens. */
   public readonly accessTokenPrivateKey: string;
   /** Public key for verifying session tokens. */
   public readonly accessTokenPublicKey: string;
-  /** Port that the app will listen on. */
-  public readonly port: number;
   /**
    * Number of milliseconds a user session can last for.
    *
@@ -59,6 +57,8 @@ export default class ApiConfig {
   public readonly sessionExpireMillis: number;
   /** Number of milliseconds an access remains valid for. */
   public readonly accessTokenExpireMillis: number;
+  /** Port that the app will listen on. */
+  public readonly port: number;
   /** Boolean for whether developer features should be enabled. */
   public readonly isDevEnv: boolean;
 
@@ -88,14 +88,14 @@ export default class ApiConfig {
 
     this.accessTokenPrivateKey = env[ApiConfig.accessTokenPrivateKeyEnvVar]!;
     this.accessTokenPublicKey = env[ApiConfig.accessTokenPublicKeyEnvVar]!;
-    this.port =
-      ApiConfig._parseInt(env[ApiConfig.portEnvVar]) ?? ApiConfig.defaultPort;
     this.sessionExpireMillis =
       ApiConfig._parseInt(env[ApiConfig.sessionExpireMillisEnvVar]) ??
       ApiConfig.defaultSessionExpireMillis;
     this.accessTokenExpireMillis =
       ApiConfig._parseInt(env[ApiConfig.accessTokenExpireMillisEnvVar]) ??
       ApiConfig.defaultAccessTokenExpireMillis;
+    this.port =
+      ApiConfig._parseInt(env[ApiConfig.portEnvVar]) ?? ApiConfig.defaultPort;
     this.isDevEnv = env[ApiConfig.appModeEnvVar] === 'development';
   }
 
