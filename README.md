@@ -2,19 +2,13 @@
 
 Handles the storing and retrieving of user information.
 
-The build script `build_images.sh` produces 2 docker images.
-- `peerprep_user_service_database_initialiser` - Initialises a separate database container by creating the necessary entities and a default PeerPrep admin account.
-- `peerprep_user_service_api` - REST API for interacting with the database.
-
 ## Table of Contents
 
 - [Quickstart Guide](#quickstart-guide)
 - [Build Script](#build-script)
-- [Environment Variables](#environment-variables)
-  - [Common](#common)
+- [Docker Images](#docker-images)
   - [API](#api)
   - [Database Initialiser](#database-initialiser)
-  - [Database](#database)
 - [REST API](#rest-api)
   - [Create a User](#create-a-user)
   - [Create a Session](#create-a-session)
@@ -33,7 +27,7 @@ The build script `build_images.sh` produces 2 docker images.
 
 1. Clone this repository.
 2. Build the docker images by running: `./build_images.sh`
-3. Modify the ".env" file as per needed. It is recommended that you modify `DATABASE_PASSWORD`, `ADMIN_EMAIL_ADDRESS`, and `ADMIN_PASSWORD`. Refer to [Environment Variables](#environment-variables) for a list of configs.
+3. Modify the ".env" file as per needed. Refer to [Docker Images](#docker-images) for the list of environment variables.
 4. Create the docker containers by running: `docker compose up`
 
 ## Build Script
@@ -44,12 +38,15 @@ The build script `build_images.sh` produces 2 docker images.
 ./build_images.sh -h
 ```
 
-<!-- TODO: Update -->
-## Environment Variables
+## Docker Images
 
-### Common
+### API
 
-These are environment variables used by both the `peerprep_user_service_database_initialiser` image and the `peerprep_user_service_api` image:
+**Name:** ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_api
+
+**Description:** This docker image contains the REST API.
+
+**Environment Variables:**
 
 - `DATABASE_HOST` - Address of the database host. (no need to specify if using "compose.yaml")
 - `DATABASE_PASSWORD` - Password of the database.
@@ -60,30 +57,33 @@ These are environment variables used by both the `peerprep_user_service_database
 - `DATABASE_IDLE_TIMEOUT_MILLIS` - Number of milliseconds a database client can remain idle for before being disconnected.
 - `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
 - `HASH_COST` - Cost factor of the password hashing algorithm.
-
-### API
-
-These are environment variables used by the `peerprep_user_service_api` image:
-
+- `ACCESS_TOKEN_PRIVATE_KEY` - Private key for signing access tokens.
+- `ACCESS_TOKEN_PUBLIC_KEY` - Public key for verifying access tokens.
+- `SESSION_EXPIRE_MILLIS` - Number of milliseconds a user session can live for since the last expiry date and time extension.
+- `ACCESS_TOKEN_EXPIRE_MILLIS` - Number of milliseconds an access token can live for.
 - `PORT` - Port to listen on.
-- `SESSION_EXPIRE_MILLIS` - Number of milliseconds a login session can last for.
 - `NODE_ENV` - Sets the mode the app is running in ("development" or "production")
 
 ### Database Initialiser
 
-These are environment variables used by the `peerprep_user_service_database_initialiser` image:
+**Name:** ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_database_initialiser
 
-- `SHOULD_FORCE_INITIALISATION` - Set to "true" if initialisation should be done even if entities already exist. Do not set to "true" in production as it might cause loss of data.
+**Description:** This docker image initialises the database by creating the necessary entities and a default Peerprep adming account.
+
+**Environment Variables:**
+
+- `DATABASE_HOST` - Address of the database host. (no need to specify if using "compose.yaml")
+- `DATABASE_PASSWORD` - Password of the database.
+- `DATABASE_USER` - User on the database host.
+- `DATABASE_NAME` - Name of the database.
+- `DATABASE_PORT` - Port the database is listening on. (no need to specify if using "compose.yaml")
+- `DATABASE_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
+- `DATABASE_IDLE_TIMEOUT_MILLIS` - Number of milliseconds a database client can remain idle for before being disconnected.
+- `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
+- `HASH_COST` - Cost factor of the password hashing algorithm.
 - `ADMIN_EMAIL_ADDRESS` - Email address of the default PeerPrep admin user.
 - `ADMIN_PASSWORD` - Password of the default PeerPrep admin user.
-
-### Database
-
-These are some point to note for configuring the `postgres` image:
-
-- `POSTGRES_PASSWORD` - Must match `DATABASE_PASSWORD` of the API and Database Initialiser containers.
-- `POSTGRES_USER` - Must match `DATABASE_USER` of the API and Database Initialiser containers.
-- `POSTGRES_DB` - Must match `DATABASE_NAME` of the API and Database Initialiser containers.
+- `SHOULD_FORCE_INITIALISATION` - Set to "true" if initialisation should be done even if entities already exist. Do not set to "true" in production as it might cause loss of data.
 
 ## REST API
 
