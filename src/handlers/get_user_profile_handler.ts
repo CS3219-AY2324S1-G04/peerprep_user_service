@@ -3,17 +3,21 @@
  */
 import express from 'express';
 
+import AccessToken from '../data_structs/access_token';
 import HttpErrorInfo from '../data_structs/http_error_info';
-import SessionToken from '../data_structs/session_token';
-import UserProfile, {
-  jsonStringifyUserProfile,
-} from '../data_structs/user_profile';
-import DatabaseClient from '../service/database_client';
-import { sessionTokenKey } from '../utils/parameter_keys';
+import { createJsonCompatibleUserProfile } from '../data_structs/user_profile';
+import { accessTokenKey } from '../utils/parameter_keys';
 import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /** Handles getting the profile of the user who sent the request. */
 export default class GetUserProfileHandler extends Handler {
+  private readonly _accessTokenPublicKey: string;
+
+  public constructor(accessTokenPublicKey: string) {
+    super();
+    this._accessTokenPublicKey = accessTokenPublicKey;
+  }
+
   public override get method(): HttpMethod {
     return HttpMethod.get;
   }
@@ -22,53 +26,43 @@ export default class GetUserProfileHandler extends Handler {
     return '/user-service/user/profile';
   }
 
-  private static _parseCookie(cookies: {
-    [x: string]: string | undefined;
-  }): SessionToken {
+  private static _parseCookie(
+    cookies: {
+      [x: string]: string | undefined;
+    },
+    accessTokenPublicKey: string,
+  ): AccessToken {
     try {
-      return SessionToken.parse(cookies[sessionTokenKey]);
+      return AccessToken.verify(cookies[accessTokenKey], accessTokenPublicKey);
     } catch (e) {
-      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
+      throw new HttpErrorInfo(
+        401,
+        authenticationErrorMessages.invalidAccessToken,
+      );
     }
-  }
-
-  private static async _fetchUserProfile(
-    client: DatabaseClient,
-    sessionToken: SessionToken,
-  ): Promise<UserProfile> {
-    const userProfile: UserProfile | undefined =
-      await client.fetchUserProfileFromSessionToken(sessionToken);
-    if (userProfile === undefined) {
-      throw new HttpErrorInfo(401, authenticationErrorMessages.invalidSession);
-    }
-
-    return userProfile;
   }
 
   /**
-   * Gets the profile of the user who owns the session token stored in the
+   * Gets the profile of the user who owns the access token stored in the
    * request cookie. Sends a HTTP 200 response whose body is the JSON string
    * containing the user's profile.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
-   * @param next - Called to let the next handler (if any) handle the request.
-   * @param client - Client for communicating with the database.
-   * @throws {HttpErrorInfo} Error 401 if no session token is found or the
-   * session token is invalid (expired or not owned by any user).
+   * @throws {HttpErrorInfo} Error 401 if no access token is specified or the
+   * access token is invalid.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
   public override async handleLogic(
     req: express.Request,
     res: express.Response,
-    next: express.NextFunction,
-    client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = GetUserProfileHandler._parseCookie(
+    const accessToken: AccessToken = GetUserProfileHandler._parseCookie(
       req.cookies,
+      this._accessTokenPublicKey,
     );
-    const userProfile: UserProfile =
-      await GetUserProfileHandler._fetchUserProfile(client, sessionToken);
 
-    res.status(200).send(jsonStringifyUserProfile(userProfile));
+    res
+      .status(200)
+      .send(createJsonCompatibleUserProfile(accessToken.userProfile));
   }
 }

@@ -7,7 +7,7 @@ import {
   userRoleKey,
   usernameKey,
 } from '../utils/parameter_keys';
-import ClientModifiableUserProfile from './uncreated_user_profile';
+import ClientModifiableUserProfile from './client_modifiable_user_profile';
 import UserIdentity from './user_identity';
 
 /** User's profile. */
@@ -16,12 +16,13 @@ export default interface UserProfile
     ClientModifiableUserProfile {}
 
 /**
- * Create a JSON string using the contents of {@link userProfile}. The
- * key names in the JSON string uses the REST API parameter names.
- * @param userProfile - User profile to stringify.
- * @returns JSON string of the user profile {@link userProfile}.
+ * Create a JSON compatible object using the contents of {@link userProfile}.
+ * The key names of the object uses the REST API parameter names.
+ * @param userProfile - User profile.
+ * @returns JSON compatible object containing the contents of the user profile
+ * {@link userProfile}.
  */
-export function jsonStringifyUserProfile(userProfile: UserProfile) {
+export function createJsonCompatibleUserProfile(userProfile: UserProfile) {
   return {
     [usernameKey]: userProfile.username.toString(),
     [emailAddressKey]: userProfile.emailAddress.toString(),

@@ -9,7 +9,11 @@ import PasswordHash from '../data_structs/password_hash';
 import SessionToken from '../data_structs/session_token';
 import DatabaseClient from '../service/database_client';
 import { passwordKey, sessionTokenKey } from '../utils/parameter_keys';
-import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
+import Handler, {
+  HandlerUtils,
+  HttpMethod,
+  authenticationErrorMessages,
+} from './handler';
 
 /** Handles deleting the user who sent the request. */
 export default class DeleteUserHandler extends Handler {
@@ -87,14 +91,14 @@ export default class DeleteUserHandler extends Handler {
 
   /**
    * Deletes the user who owns the session token stored in the request cookie.
-   * Sends a HTTP 200 response.
+   * Sends a HTTP 200 response with expired session token, access token, and
+   * access token expiry cookies.
    * @param req - Information about the request. Sends a HTTP 200 response.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
-   * @throws {HttpErrorInfo} Error 401 if no session token is found, or the
-   * session token is invalid (expired or not owned by any user), or the
-   * password provided is incorrect.
+   * @throws {HttpErrorInfo} Error 401 if no session token is specified, or the
+   * session token is invalid, or the password provided is incorrect.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
   protected override async handleLogic(
@@ -110,6 +114,8 @@ export default class DeleteUserHandler extends Handler {
 
     await DeleteUserHandler._validatePassword(client, sessionToken, password);
     await DeleteUserHandler._deleteUserProfile(client, sessionToken);
+
+    HandlerUtils.addExpiredCookies(res);
 
     res.sendStatus(200);
   }

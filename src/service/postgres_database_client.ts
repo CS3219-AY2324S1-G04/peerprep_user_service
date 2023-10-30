@@ -3,10 +3,10 @@
  */
 import { DataSource, MoreThan } from 'typeorm';
 
+import ClientModifiableUserProfile from '../data_structs/client_modifiable_user_profile';
 import EmailAddress from '../data_structs/email_address';
 import PasswordHash from '../data_structs/password_hash';
 import SessionToken from '../data_structs/session_token';
-import ClientModifiableUserProfile from '../data_structs/uncreated_user_profile';
 import UserId from '../data_structs/user_id';
 import UserIdentity from '../data_structs/user_identity';
 import UserProfile from '../data_structs/user_profile';

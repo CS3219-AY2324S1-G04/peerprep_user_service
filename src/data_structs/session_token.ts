@@ -40,7 +40,7 @@ export default class SessionToken {
     return new SessionToken(rawSessionToken as string);
   }
 
-  public static createNew(): SessionToken {
+  public static create(): SessionToken {
     return new SessionToken(randomUUID());
   }
 

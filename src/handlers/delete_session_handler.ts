@@ -7,9 +7,13 @@ import HttpErrorInfo from '../data_structs/http_error_info';
 import SessionToken from '../data_structs/session_token';
 import DatabaseClient from '../service/database_client';
 import { sessionTokenKey } from '../utils/parameter_keys';
-import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
+import Handler, {
+  HandlerUtils,
+  HttpMethod,
+  authenticationErrorMessages,
+} from './handler';
 
-/** Handles deleting session. */
+/** Handles deleting sessions. */
 export default class DeleteSessionHandler extends Handler {
   public override get method(): HttpMethod {
     return HttpMethod.delete;
@@ -39,14 +43,15 @@ export default class DeleteSessionHandler extends Handler {
   }
 
   /**
-   * Deletes the user session which has the session token stored in the request
-   * cookie. Sends a HTTP 200 response.
+   * Deletes the user session associated with the session token specified in the
+   * request cookie. Sends a HTTP 200 response with expired session token,
+   * access token, and access token expiry cookies.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
-   * @throws {HttpErrorInfo} Error 401 if no session token is found or the
-   * session token is invalid (expired or not owned by any user).
+   * @throws {HttpErrorInfo} Error 401 if no session token is specified or the
+   * session token is invalid.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.
    */
   public override async handleLogic(
@@ -59,6 +64,8 @@ export default class DeleteSessionHandler extends Handler {
       req.cookies,
     );
     await DeleteSessionHandler._deleteUserSession(client, sessionToken);
+
+    HandlerUtils.addExpiredCookies(res);
 
     res.sendStatus(200);
   }

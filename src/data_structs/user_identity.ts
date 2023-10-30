@@ -14,12 +14,13 @@ export default interface UserIdentity {
 }
 
 /**
- * Create a JSON string using the contents of {@link userIdentity}. The
- * key names in the JSON string uses the REST API parameter names.
- * @param userIdentity - User identity to stringify.
- * @returns JSON string of the user identity {@link userIdentity}.
+ * Create a JSON compatible object using the contents of {@link userIdentity}.
+ * The key names of the object uses the REST API parameter names.
+ * @param userIdentity - User identity.
+ * @returns JSON compatible object containing the contents of the user identity
+ * {@link userIdentity}.
  */
-export function jsonStringifyUserIdentity(userIdentity: UserIdentity) {
+export function createJsonCompatibleUserIdentity(userIdentity: UserIdentity) {
   return {
     [userIdKey]: userIdentity.userId.toNumber(),
     [userRoleKey]: userIdentity.userRole.toString(),

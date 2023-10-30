@@ -39,12 +39,18 @@ build_image () {
   echo "Build successful."
 
   if [[ $should_export == 0 ]]; then
-    exit 0
+    return 0
   fi
+
   echo "Exporting image ..."
 
   mkdir -p $(dirname $export_file)
   docker image save --output=$export_file $image_name
+
+  if [[ $? -ne 0 ]]; then
+    echo "Export failed."
+    exit 1
+  fi
 
   echo "Exported image to $export_file"
 }
@@ -123,18 +129,10 @@ echo "Transpile successful."
 ### Build Images ###
 if [[ $should_build_api == 1 ]]; then
   build_image "api.dockerfile" $api_image_full_name
-
-  if [[ $? -ne 0 ]]; then
-    exit 1
-  fi
 fi
 
 if [[ $should_build_database_initaliser == 1 ]]; then
   build_image "database_initialiser.dockerfile" $database_initialiser_full_name
-
-  if [[ $? -ne 0 ]]; then
-    exit 1
-  fi
 fi
 
 ### Push Images to the Container Registry ###
@@ -144,16 +142,8 @@ fi
 
 if [[ $should_build_api == 1 ]]; then
   push $api_image_full_name
-
-  if [[ $? -ne 0 ]]; then
-    exit 1
-  fi
 fi
 
 if [[ $should_build_database_initaliser == 1 ]]; then
   push $database_initialiser_full_name
-
-  if [[ $? -ne 0 ]]; then
-    exit 1
-  fi
 fi

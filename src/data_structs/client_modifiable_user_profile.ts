@@ -11,12 +11,3 @@ export default interface ClientModifiableUserProfile {
   /** Email address. */
   readonly emailAddress: EmailAddress;
 }
-
-/** JSON string compatible {@link ClientModifiableUserProfile}. */
-export interface JsonClientModifiableUserProfile {
-  /** Username. */
-  readonly username: string;
-  /** Email address. */
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  readonly 'email-address': string;
-}
