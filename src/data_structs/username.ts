@@ -4,7 +4,9 @@
 
 /** Username. */
 export default class Username {
+  private static _minLength: number = 3;
   private static _maxLength: number = 255;
+  private static _charValidationRegex: RegExp = new RegExp('^[a-zA-Z0-9_]+$');
 
   private readonly _username: string;
 
@@ -63,9 +65,21 @@ export default class Username {
    * @throws Error if the username is invalid.
    */
   public validate(): void {
+    if (this._isUsernameTooShort()) {
+      throw new Error(
+        `Username must be at least ${Username._minLength} characters long.`,
+      );
+    }
+
     if (this._isUsernameTooLong()) {
       throw new Error(
         `Username cannot exceed ${Username._maxLength} characters.`,
+      );
+    }
+
+    if (!this._isUsernameCharsValid()) {
+      throw new Error(
+        "Username can only contain '_' or alphanumeric characters.",
       );
     }
   }
@@ -74,7 +88,15 @@ export default class Username {
     return this._username;
   }
 
+  private _isUsernameTooShort() {
+    return this._username.length < Username._minLength;
+  }
+
   private _isUsernameTooLong() {
     return this._username.length > Username._maxLength;
+  }
+
+  private _isUsernameCharsValid() {
+    return Username._charValidationRegex.test(this._username);
   }
 }
