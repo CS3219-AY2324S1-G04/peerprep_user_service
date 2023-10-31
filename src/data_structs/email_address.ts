@@ -1,21 +1,11 @@
 /**
  * @file Defines {@link EmailAddress}.
  */
-
 /** Email address. */
 export default class EmailAddress {
   private static _maxLength: number = 255;
-
-  private static _domainEdgeChars: string = '[a-zA-Z0-9]';
-  private static _domainChars: string = '[a-zA-Z0-9\\-]';
-  private static _domainLabelRegexStr: string = `${EmailAddress._domainEdgeChars}(${EmailAddress._domainChars}*${EmailAddress._domainEdgeChars}+)*`;
-  private static _domainRegexStr: string = `${EmailAddress._domainLabelRegexStr}(\\.${EmailAddress._domainLabelRegexStr})+`;
-
-  private static _emailAddressUsernameChars: string =
-    "[a-zA-Z0-9!#$%&'*+\\-/=?^_`{|}~]";
-  private static _emailAddressRegex: RegExp = RegExp(
-    `^${EmailAddress._emailAddressUsernameChars}+(\\.${EmailAddress._emailAddressUsernameChars}+)*@${EmailAddress._domainRegexStr}$`,
-  );
+  private static _emailAddressFormatRegex: RegExp =
+    getEmailAddressFormatRegex();
 
   private readonly _emailAddress: string;
 
@@ -114,6 +104,22 @@ export default class EmailAddress {
   }
 
   private _isEmailAddressFormatCorrect() {
-    return EmailAddress._emailAddressRegex.test(this._emailAddress);
+    return EmailAddress._emailAddressFormatRegex.test(this._emailAddress);
   }
+}
+
+/**
+ * @returns Regex for verifying an email address's format.
+ */
+function getEmailAddressFormatRegex(): RegExp {
+  const domainEdgeChars: string = '[a-zA-Z0-9]';
+  const domainChars: string = '[a-zA-Z0-9\\-]';
+  const domainLabelRegexStr: string = `${domainEdgeChars}(${domainChars}*${domainEdgeChars}+)*`;
+  const domainRegexStr: string = `${domainLabelRegexStr}(\\.${domainLabelRegexStr})+`;
+
+  const emailAddressUsernameChars: string = "[a-zA-Z0-9!#$%&'*+\\-/=?^_`{|}~]";
+
+  return RegExp(
+    `^${emailAddressUsernameChars}+(\\.${emailAddressUsernameChars}+)*@${domainRegexStr}$`,
+  );
 }
