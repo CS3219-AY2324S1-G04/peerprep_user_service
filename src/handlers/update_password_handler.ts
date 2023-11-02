@@ -28,8 +28,8 @@ export default class UpdatePasswordHandler extends Handler {
     return HttpMethod.put;
   }
 
-  public override get path(): string {
-    return '/user-service/user/password';
+  public override get subPath(): string {
+    return 'user/password';
   }
 
   private static _parseCookie(cookies: {

@@ -34,8 +34,8 @@ export default class CreateSessionHandler extends Handler {
     return HttpMethod.post;
   }
 
-  public override get path(): string {
-    return '/user-service/sessions';
+  public override get subPath(): string {
+    return 'sessions';
   }
 
   private static _parseQuery(query: qs.ParsedQs): [Username, Password] {

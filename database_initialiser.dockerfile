@@ -8,4 +8,4 @@ WORKDIR /peerprep_user_service_database_initialiser
 
 RUN npm install --omit=dev -y
 
-CMD node ./database/database_initialiser.js
+CMD node ./jobs/database_initialiser/database_initialiser.js

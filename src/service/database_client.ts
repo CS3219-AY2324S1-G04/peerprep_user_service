@@ -197,6 +197,7 @@ export default interface DatabaseClient {
   isUniqueConstraintViolated(err: unknown): boolean;
 }
 
+// TODO: REMOVE THIS
 /** Configs for {@link DatabaseClient}. */
 export interface DatabaseClientConfig {
   /** Password of the database. */

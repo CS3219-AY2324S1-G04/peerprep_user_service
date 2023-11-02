@@ -1,8 +1,8 @@
 /**
  * @file Defines {@link DatabaseInitialiserConfig}.
  */
-import EmailAddress from '../data_structs/email_address';
-import Password from '../data_structs/password';
+import EmailAddress from '../../data_structs/email_address';
+import Password from '../../data_structs/password';
 
 /** Configs for the database initialiser. */
 export default class DatabaseInitialiserConfig {

@@ -22,8 +22,8 @@ export default class GetUserIdentityHandler extends Handler {
     return HttpMethod.get;
   }
 
-  public override get path(): string {
-    return '/user-service/user/identity';
+  public override get subPath(): string {
+    return 'user/identity';
   }
 
   private static _getSessionToken(query: qs.ParsedQs) {

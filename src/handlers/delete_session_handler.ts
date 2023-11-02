@@ -19,8 +19,8 @@ export default class DeleteSessionHandler extends Handler {
     return HttpMethod.delete;
   }
 
-  public override get path(): string {
-    return '/user-service/session';
+  public override get subPath(): string {
+    return 'session';
   }
 
   private static _parseCookie(cookies: {

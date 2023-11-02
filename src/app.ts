@@ -12,7 +12,7 @@ import DatabaseClient from './service/database_client';
 export default class App {
   private readonly _app: express.Application;
   private readonly _port: number;
-  private readonly _database: DatabaseClient;
+  private readonly _client: DatabaseClient;
 
   /**
    * Setup the app.
@@ -28,15 +28,34 @@ export default class App {
     isDevEnv: boolean,
   ) {
     this._app = express();
+    this._port = port;
+    this._client = client;
+
+    this._setupMiddlewares(isDevEnv);
+    this._setupHandlers(handlers);
+  }
+
+  /** Starts the app. */
+  public start(): void {
+    this._app.listen(this._port, '0.0.0.0', () => {
+      console.log(`App is listening on ${this._port}`);
+    });
+  }
+
+  private _setupMiddlewares(isDevEnv: boolean): void {
     this._app.use(cookieParser());
 
     if (isDevEnv) {
-      this._enableDevFeatures();
+      this._app.use(
+        cors({
+          origin: new RegExp('http://localhost:[0-9]+'),
+          credentials: true,
+        }),
+      );
     }
+  }
 
-    this._port = port;
-    this._database = client;
-
+  private _setupHandlers(handlers: Handler[]) {
     for (const handler of handlers) {
       switch (handler.method) {
         case HttpMethod.get:
@@ -67,22 +86,6 @@ export default class App {
     }
   }
 
-  /** Starts the app. */
-  public start(): void {
-    this._app.listen(this._port, '0.0.0.0', () => {
-      console.log(`App is listening on ${this._port}`);
-    });
-  }
-
-  private _enableDevFeatures(): void {
-    this._app.use(
-      cors({
-        origin: new RegExp('http://localhost:[0-9]+'),
-        credentials: true,
-      }),
-    );
-  }
-
   private _wrapHandle(
     handle: (
       req: express.Request,
@@ -100,7 +103,7 @@ export default class App {
       res: express.Response,
       next: express.NextFunction,
     ) => {
-      await handle(req, res, next, this._database);
+      await handle(req, res, next, this._client);
     };
   }
 }

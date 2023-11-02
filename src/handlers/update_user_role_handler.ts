@@ -29,8 +29,8 @@ export default class UpdateUserRoleHandler extends Handler {
     return HttpMethod.put;
   }
 
-  public get path(): string {
-    return `/user-service/users/:${userIdPathKey}/user-role`;
+  public get subPath(): string {
+    return `users/:${userIdPathKey}/user-role`;
   }
 
   private static _parseCookie(cookies: {

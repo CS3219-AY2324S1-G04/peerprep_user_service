@@ -38,8 +38,8 @@ export default class GetAccessTokenHandler extends Handler {
     return HttpMethod.get;
   }
 
-  public override get path(): string {
-    return '/user-service/session/access-token';
+  public override get subPath(): string {
+    return 'session/access-token';
   }
 
   private static _parseCookie(cookies: {

@@ -3,7 +3,7 @@
  */
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-import UserRole from '../../enums/user_role';
+import UserRole from '../enums/user_role';
 
 /** Entity in the database for storing user profiles. */
 @Entity({ name: 'user_profile' })

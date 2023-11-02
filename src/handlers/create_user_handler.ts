@@ -30,8 +30,8 @@ export default class CreateUserHandler extends Handler {
     return HttpMethod.post;
   }
 
-  public override get path(): string {
-    return '/user-service/users';
+  public override get subPath(): string {
+    return 'users';
   }
 
   private static async _parseParams(

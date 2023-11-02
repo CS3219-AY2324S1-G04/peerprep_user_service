@@ -1,13 +1,13 @@
 /**
  * @file Initialises the database.
  */
-import DatabaseConfig from '../configs/database_config';
-import PasswordHash from '../data_structs/password_hash';
-import UserId from '../data_structs/user_id';
-import Username from '../data_structs/username';
-import UserRole from '../enums/user_role';
-import DatabaseClient from '../service/database_client';
-import { PostgresDatabaseClient } from '../service/postgres_database_client';
+import DatabaseConfig from '../../configs/database_config';
+import PasswordHash from '../../data_structs/password_hash';
+import UserId from '../../data_structs/user_id';
+import Username from '../../data_structs/username';
+import UserRole from '../../enums/user_role';
+import DatabaseClient from '../../service/database_client';
+import { PostgresDatabaseClient } from '../../service/postgres_database_client';
 import DatabaseInitialiserConfig from './database_initialiser_config';
 
 const databaseConfig: DatabaseConfig = new DatabaseConfig();

@@ -18,8 +18,8 @@ export default class GetAccessTokenPublicKeyHandler extends Handler {
     return HttpMethod.get;
   }
 
-  public override get path(): string {
-    return '/user-service/access-token-public-key';
+  public override get subPath(): string {
+    return 'access-token-public-key';
   }
 
   /**

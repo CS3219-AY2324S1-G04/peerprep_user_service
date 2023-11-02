@@ -16,10 +16,14 @@ import {
 
 /** Handler of a HTTP route. */
 export default abstract class Handler {
+  public get path(): string {
+    return `/user-service/${this.subPath}`;
+  }
+
   /** Gets the HTTP request method to handle. */
   public abstract get method(): HttpMethod;
   /** Gets the request path to handle. */
-  public abstract get path(): string;
+  public abstract get subPath(): string;
 
   /**
    * Handles a request that was sent to path {@link path()} with method

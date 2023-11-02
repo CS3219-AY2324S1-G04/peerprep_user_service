@@ -21,8 +21,8 @@ export default class DeleteUserHandler extends Handler {
     return HttpMethod.delete;
   }
 
-  public override get path(): string {
-    return '/user-service/user';
+  public override get subPath(): string {
+    return 'user';
   }
 
   private static _parseQuery(query: qs.ParsedQs): Password {

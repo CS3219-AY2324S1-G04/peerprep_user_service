@@ -22,8 +22,8 @@ export default class GetUserProfileHandler extends Handler {
     return HttpMethod.get;
   }
 
-  public override get path(): string {
-    return '/user-service/user/profile';
+  public override get subPath(): string {
+    return 'user/profile';
   }
 
   private static _parseCookie(
