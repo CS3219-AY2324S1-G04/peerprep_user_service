@@ -32,7 +32,7 @@ export default class UpdatePasswordHandler extends Handler {
     return 'user/password';
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -136,7 +136,7 @@ export default class UpdatePasswordHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = UpdatePasswordHandler._parseCookie(
+    const sessionToken: SessionToken = UpdatePasswordHandler._parseCookies(
       req.cookies,
     );
     const [password, newPassword]: [Password, Password] =

@@ -26,7 +26,7 @@ export default class GetUserProfileHandler extends Handler {
     return 'user/profile';
   }
 
-  private static _parseCookie(
+  private static _parseCookies(
     cookies: {
       [x: string]: string | undefined;
     },
@@ -56,7 +56,7 @@ export default class GetUserProfileHandler extends Handler {
     req: express.Request,
     res: express.Response,
   ): Promise<void> {
-    const accessToken: AccessToken = GetUserProfileHandler._parseCookie(
+    const accessToken: AccessToken = GetUserProfileHandler._parseCookies(
       req.cookies,
       this._accessTokenPublicKey,
     );

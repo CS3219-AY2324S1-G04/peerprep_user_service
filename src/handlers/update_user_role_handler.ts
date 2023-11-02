@@ -33,7 +33,7 @@ export default class UpdateUserRoleHandler extends Handler {
     return `users/:${userIdPathKey}/user-role`;
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -118,7 +118,7 @@ export default class UpdateUserRoleHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = UpdateUserRoleHandler._parseCookie(
+    const sessionToken: SessionToken = UpdateUserRoleHandler._parseCookies(
       req.cookies,
     );
     const [userId, userRole]: [UserId, UserRole] =

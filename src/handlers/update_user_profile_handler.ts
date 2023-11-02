@@ -42,7 +42,7 @@ export default class UpdateUserProfileHandler extends Handler {
     return 'user/profile';
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -125,7 +125,7 @@ export default class UpdateUserProfileHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = UpdateUserProfileHandler._parseCookie(
+    const sessionToken: SessionToken = UpdateUserProfileHandler._parseCookies(
       req.cookies,
     );
     const userProfile: ClientModifiableUserProfile =

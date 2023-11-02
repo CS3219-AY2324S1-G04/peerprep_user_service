@@ -40,7 +40,7 @@ export default class DeleteUserHandler extends Handler {
     return password!;
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -108,7 +108,7 @@ export default class DeleteUserHandler extends Handler {
     client: DatabaseClient,
   ): Promise<void> {
     const password: Password = DeleteUserHandler._parseQuery(req.query);
-    const sessionToken: SessionToken = DeleteUserHandler._parseCookie(
+    const sessionToken: SessionToken = DeleteUserHandler._parseCookies(
       req.cookies,
     );
 

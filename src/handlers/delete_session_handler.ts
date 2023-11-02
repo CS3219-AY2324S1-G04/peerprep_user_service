@@ -23,7 +23,7 @@ export default class DeleteSessionHandler extends Handler {
     return 'session';
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -60,7 +60,7 @@ export default class DeleteSessionHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = DeleteSessionHandler._parseCookie(
+    const sessionToken: SessionToken = DeleteSessionHandler._parseCookies(
       req.cookies,
     );
     await DeleteSessionHandler._deleteUserSession(client, sessionToken);

@@ -16,18 +16,16 @@ export default class Username {
 
   /**
    * Parses {@link rawUsername} as a username.
-   * @param rawUsername - Username.
+   * @param rawUsername - Value to parse.
    * @returns The parsed username.
    * @throws Error if parsing fails.
    */
-  public static parse(
-    rawUsername: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
-  ): Username {
-    if (!Username._isUsernameString(rawUsername)) {
+  public static parse(rawUsername: unknown): Username {
+    if (!Username._isString(rawUsername)) {
       throw new Error('Username must be a string.');
     }
 
-    if (!Username._isUsernameSpecified(rawUsername as string | undefined)) {
+    if (!Username._isStringSpecified(rawUsername as string | undefined)) {
       throw new Error('Username cannot be empty.');
     }
 
@@ -36,27 +34,21 @@ export default class Username {
 
   /**
    * Parses {@link username} as a username then validates it.
-   * @param rawUsername - Username.
+   * @param rawUsername - Value to parse.
    * @returns The parsed username.
    * @throws Error if parsing or validation fails.
    */
-  public static parseAndValidate(
-    rawUsername: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
-  ): Username {
+  public static parseAndValidate(rawUsername: unknown): Username {
     const username: Username = Username.parse(rawUsername);
     username.validate();
     return username;
   }
 
-  private static _isUsernameString(
-    rawUsername: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
-  ): boolean {
+  private static _isString(rawUsername: unknown): boolean {
     return typeof rawUsername === 'string' || rawUsername === undefined;
   }
 
-  private static _isUsernameSpecified(
-    rawUsername: string | undefined,
-  ): boolean {
+  private static _isStringSpecified(rawUsername: string | undefined): boolean {
     return rawUsername !== undefined && rawUsername.length > 0;
   }
 

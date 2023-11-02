@@ -42,7 +42,7 @@ export default class GetAccessTokenHandler extends Handler {
     return 'session/access-token';
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -86,7 +86,7 @@ export default class GetAccessTokenHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = GetAccessTokenHandler._parseCookie(
+    const sessionToken: SessionToken = GetAccessTokenHandler._parseCookies(
       req.cookies,
     );
 

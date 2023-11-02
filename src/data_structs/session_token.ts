@@ -13,26 +13,17 @@ export default class SessionToken {
 
   /**
    * Parses {@link rawSessionToken} as a session token.
-   * @param rawSessionToken - Session token.
+   * @param rawSessionToken - Value to parse.
    * @returns The parsed {@link SessionToken}.
    * @throws Error if parsing fails.
    */
-  public static parse(
-    rawSessionToken:
-      | string
-      | qs.ParsedQs
-      | string[]
-      | qs.ParsedQs[]
-      | undefined,
-  ): SessionToken {
-    if (!SessionToken._isSessionTokenString(rawSessionToken)) {
+  public static parse(rawSessionToken: unknown): SessionToken {
+    if (!SessionToken._isString(rawSessionToken)) {
       throw new Error('Session token must be a string.');
     }
 
     if (
-      !SessionToken._isSessionTokenSpecified(
-        rawSessionToken as string | undefined,
-      )
+      !SessionToken._isStringSpecified(rawSessionToken as string | undefined)
     ) {
       throw new Error('Session token cannot be empty.');
     }
@@ -44,18 +35,11 @@ export default class SessionToken {
     return new SessionToken(randomUUID());
   }
 
-  private static _isSessionTokenString(
-    rawSessionToken:
-      | string
-      | qs.ParsedQs
-      | string[]
-      | qs.ParsedQs[]
-      | undefined,
-  ): boolean {
+  private static _isString(rawSessionToken: unknown): boolean {
     return typeof rawSessionToken === 'string' || rawSessionToken === undefined;
   }
 
-  private static _isSessionTokenSpecified(
+  private static _isStringSpecified(
     rawSessionToken: string | undefined,
   ): boolean {
     return rawSessionToken !== undefined && rawSessionToken.length > 0;
