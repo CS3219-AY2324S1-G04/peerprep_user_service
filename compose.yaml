@@ -13,7 +13,7 @@ services:
     image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_database_initialiser
     build:
       context: .
-      dockerfile: database_initialiser.dockerfile
+      dockerfile: ./dockerfiles/database_initialiser.dockerfile
     networks:
       - peerprep_network
     environment:
@@ -37,7 +37,7 @@ services:
     image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_api
     build:
       context: .
-      dockerfile: api.dockerfile
+      dockerfile: ./dockerfiles/api.dockerfile
     networks:
       - peerprep_network
     ports:
@@ -65,3 +65,4 @@ services:
 networks:
   peerprep_network:
     name: peerprep
+    external: true
