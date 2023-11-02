@@ -27,12 +27,6 @@ export default class DatabaseConfig {
     'DATABASE_CONNECTION_TIMEOUT_MILLIS';
   /**
    * Name of the environment variable corresponding to
-   * {@link databaseIdleTimeoutMillis}.
-   */
-  public static readonly databaseIdleTimeoutMillisEnvVar: string =
-    'DATABASE_IDLE_TIMEOUT_MILLIS';
-  /**
-   * Name of the environment variable corresponding to
    * {@link databaseMaxClientCount}.
    */
   public static readonly databaseMaxClientCountEnvVar: string =
@@ -50,8 +44,6 @@ export default class DatabaseConfig {
   public static readonly defaultDatabaseName: string = 'user';
   /** Default value for {@link databaseConnectionTimeoutMillis}. */
   public static readonly defaultDatabaseConnectionTimeoutMillis: number = 0;
-  /** Default value for {@link databaseIdleTimeoutMillis}. */
-  public static readonly defaultDatabaseIdleTimeoutMillis: number = 10000;
   /** Default value for {@link databaseMaxClientCount}. */
   public static readonly defaultDatabaseMaxClientCount: number = 20;
   /** Default value for {@link hashCost}. */
@@ -72,11 +64,6 @@ export default class DatabaseConfig {
    * timing out.
    */
   public readonly databaseConnectionTimeoutMillis: number;
-  /**
-   * Number of milliseconds a client can remain idle for before being
-   * disconnected.
-   */
-  public readonly databaseIdleTimeoutMillis: number;
   /** Max number of clients. */
   public readonly databaseMaxClientCount: number;
   /** Cost factor of the password hashing algorithm. */
@@ -117,10 +104,6 @@ export default class DatabaseConfig {
       DatabaseConfig._parseInt(
         env[DatabaseConfig.databaseConnectionTimeoutMillisEnvVar],
       ) ?? DatabaseConfig.defaultDatabaseConnectionTimeoutMillis;
-    this.databaseIdleTimeoutMillis =
-      DatabaseConfig._parseInt(
-        env[DatabaseConfig.databaseIdleTimeoutMillisEnvVar],
-      ) ?? DatabaseConfig.defaultDatabaseIdleTimeoutMillis;
     this.databaseMaxClientCount =
       DatabaseConfig._parseInt(
         env[DatabaseConfig.databaseMaxClientCountEnvVar],

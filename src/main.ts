@@ -27,7 +27,6 @@ const client: DatabaseClient = new PostgresDatabaseClient({
   port: databaseConfig.databasePort,
   databaseName: databaseConfig.databaseName,
   connectionTimeoutMillis: databaseConfig.databaseConnectionTimeoutMillis,
-  idleTimeoutMillis: databaseConfig.databaseIdleTimeoutMillis,
   maxClientCount: databaseConfig.databaseMaxClientCount,
 });
 

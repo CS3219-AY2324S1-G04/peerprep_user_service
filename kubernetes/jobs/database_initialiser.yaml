@@ -44,11 +44,6 @@ spec:
                 configMapKeyRef:
                   name: user-service-database-client-config-map
                   key: database-connection-timeout-millis
-            - name: DATABASE_IDLE_TIMEOUT_MILLIS
-              valueFrom:
-                configMapKeyRef:
-                  name: user-service-database-client-config-map
-                  key: database-idle-timeout-millis
             - name: DATABASE_MAX_CLIENT_COUNT
               valueFrom:
                 configMapKeyRef:

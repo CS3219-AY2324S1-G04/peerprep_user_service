@@ -215,11 +215,6 @@ export interface DatabaseClientConfig {
    * timing out.
    */
   connectionTimeoutMillis: number;
-  /**
-   * Number of milliseconds a client can remain idle for before being
-   * disconnected.
-   */
-  idleTimeoutMillis: number;
   /** Max number of concurrent clients. */
   maxClientCount: number;
 }

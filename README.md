@@ -54,7 +54,6 @@ Handles the storing and retrieving of user information.
 - `DATABASE_NAME` - Name of the database.
 - `DATABASE_PORT` - Port the database is listening on. (no need to specify if using "compose.yaml")
 - `DATABASE_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
-- `DATABASE_IDLE_TIMEOUT_MILLIS` - Number of milliseconds a database client can remain idle for before being disconnected.
 - `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
 - `HASH_COST` - Cost factor of the password hashing algorithm.
 - `ACCESS_TOKEN_PRIVATE_KEY` - Private key for signing access tokens.
@@ -78,7 +77,6 @@ Handles the storing and retrieving of user information.
 - `DATABASE_NAME` - Name of the database.
 - `DATABASE_PORT` - Port the database is listening on. (no need to specify if using "compose.yaml")
 - `DATABASE_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
-- `DATABASE_IDLE_TIMEOUT_MILLIS` - Number of milliseconds a database client can remain idle for before being disconnected.
 - `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
 - `HASH_COST` - Cost factor of the password hashing algorithm.
 - `ADMIN_EMAIL_ADDRESS` - Email address of the default PeerPrep admin user.
