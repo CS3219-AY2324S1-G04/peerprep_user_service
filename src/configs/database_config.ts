@@ -35,7 +35,7 @@ export default class DatabaseConfig {
   public static readonly hashCostEnvVar: string = 'HASH_COST';
 
   /** Default value for {@link databaseUser}. */
-  public static readonly defaultDatabaseUser: string = 'postgres';
+  public static readonly defaultDatabaseUser: string = 'user';
   /** Default value for {@link databaseHost}. */
   public static readonly defaultDatabaseHost: string = 'localhost';
   /** Default value for {@link databasePort}. */
