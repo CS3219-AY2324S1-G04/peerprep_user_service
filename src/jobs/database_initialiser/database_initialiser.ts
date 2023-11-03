@@ -24,26 +24,40 @@ const client: DatabaseClient = new PostgresDatabaseClient({
   maxClientCount: databaseConfig.databaseMaxClientCount,
 });
 
-client.initialise().then(async () => {
+async function initialise(): Promise<void> {
+  await client.initialise();
+
   if (await client.doEntitiesExist()) {
     console.log('One or more entities to be created already exist.');
 
-    if (databaseInitialiserConfig.shouldForceInitialisation) {
-      console.log('Deleting existing entities ...');
-      await client.deleteEntities();
-      console.log('Deleted existing entities!');
-    } else {
+    if (!databaseInitialiserConfig.shouldForceInitialisation) {
       console.log('Initialisation aborted!');
       await client.disconnect();
       return;
     }
+
+    await deleteExistingEntities();
   }
 
+  await createEntities();
+  await createAdminUser();
+
+  await client.disconnect();
+}
+
+async function deleteExistingEntities(): Promise<void> {
+  console.log('Deleting existing entities ...');
+  await client.deleteEntities();
+  console.log('Deleted existing entities!');
+}
+
+async function createEntities(): Promise<void> {
   console.log('Creating entities ...');
-
   await client.synchronise();
-
   console.log('Created entities!');
+}
+
+async function createAdminUser(): Promise<void> {
   console.log('Creating admin user ...');
 
   await client.createUserProfileAndCredential(
@@ -59,6 +73,6 @@ client.initialise().then(async () => {
   await client.updateUserRole(UserId.parseNumber(1), UserRole.admin);
 
   console.log('Created admin user!');
+}
 
-  await client.disconnect();
-});
+initialise();
