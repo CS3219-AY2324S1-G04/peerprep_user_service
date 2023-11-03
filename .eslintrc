@@ -68,6 +68,22 @@
     ],
     "prettier/prettier": 2,
 
+    "jsdoc/require-jsdoc": [
+      1,
+      {
+        "publicOnly": true,
+        "contexts": [
+          "ArrowFunctionExpression",
+          "ClassDeclaration",
+          "ClassExpression",
+          "FunctionDeclaration",
+          "FunctionExpression",
+          "MethodDefinition",
+          "VariableDeclaration",
+          "PropertyDefinition"
+        ]
+      }
+    ],
     // "jsdoc/check-examples": 1, // TODO: Enable this when it is supported by ESLint 8
     "jsdoc/check-indentation": 1,
     "jsdoc/check-line-alignment": 1,
