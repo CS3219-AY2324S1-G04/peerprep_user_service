@@ -15,15 +15,17 @@ import Handler, {
 
 /** Handles deleting sessions. */
 export default class DeleteSessionHandler extends Handler {
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.delete;
   }
 
-  public override get path(): string {
-    return '/user-service/session';
+  /** @inheritdoc */
+  public override get subPath(): string {
+    return 'session';
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -60,7 +62,7 @@ export default class DeleteSessionHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = DeleteSessionHandler._parseCookie(
+    const sessionToken: SessionToken = DeleteSessionHandler._parseCookies(
       req.cookies,
     );
     await DeleteSessionHandler._deleteUserSession(client, sessionToken);

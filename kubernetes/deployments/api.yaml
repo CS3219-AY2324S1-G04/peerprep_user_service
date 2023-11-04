@@ -24,38 +24,33 @@ spec:
             - name: DATABASE_USER
               valueFrom:
                 secretKeyRef:
-                  name: user-service-database-secret
+                  name: user-service-database-client-secret
                   key: database-user
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: user-service-database-secret
+                  name: user-service-database-client-secret
                   key: database-password
             - name: DATABASE_HOST
               valueFrom:
                 secretKeyRef:
-                  name: user-service-database-secret
+                  name: user-service-database-client-secret
                   key: database-host
             - name: DATABASE_PORT
               valueFrom:
                 secretKeyRef:
-                  name: user-service-database-secret
+                  name: user-service-database-client-secret
                   key: database-port
             - name: DATABASE_NAME
               valueFrom:
                 secretKeyRef:
-                  name: user-service-database-secret
+                  name: user-service-database-client-secret
                   key: database-name
             - name: DATABASE_CONNECTION_TIMEOUT_MILLIS
               valueFrom:
                 configMapKeyRef:
                   name: user-service-database-client-config-map
                   key: database-connection-timeout-millis
-            - name: DATABASE_IDLE_TIMEOUT_MILLIS
-              valueFrom:
-                configMapKeyRef:
-                  name: user-service-database-client-config-map
-                  key: database-idle-timeout-millis
             - name: DATABASE_MAX_CLIENT_COUNT
               valueFrom:
                 configMapKeyRef:
@@ -69,22 +64,22 @@ spec:
             - name: ACCESS_TOKEN_PRIVATE_KEY
               valueFrom:
                 secretKeyRef:
-                  name: user-service-core-secret
+                  name: user-service-api-secret
                   key: access-token-private-key
             - name: ACCESS_TOKEN_PUBLIC_KEY
               valueFrom:
                 secretKeyRef:
-                  name: user-service-core-secret
+                  name: user-service-api-secret
                   key: access-token-public-key
             - name: SESSION_EXPIRE_MILLIS
               valueFrom:
                 configMapKeyRef:
-                  name: user-service-core-config-map
+                  name: user-service-api-config-map
                   key: session-expire-millis
             - name: ACCESS_TOKEN_EXPIRE_MILLIS
               valueFrom:
                 configMapKeyRef:
-                  name: user-service-core-config-map
+                  name: user-service-api-config-map
                   key: access-token-expire-millis
             - name: PORT
               value: '9000'

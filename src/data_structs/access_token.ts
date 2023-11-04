@@ -39,7 +39,7 @@ export default class AccessToken {
 
   /**
    * Creates an {@link AccessToken} by generating a new access token.
-   * @param userProfile - User profile to be used as the access token payload.
+   * @param userProfile - User profile to be stored in the access token payload.
    * @param privateKey - Private key for signing the access token.
    * @param expireMillis - Number of milliseconds till the access token expires.
    * @returns Created {@link AccessToken}.
@@ -62,7 +62,7 @@ export default class AccessToken {
   }
 
   /**
-   * Creates an {@link AccessToken} by verifiying and decoding a specified
+   * Creates an {@link AccessToken} by verifying and decoding a specified
    * access token.
    * @param rawAccessToken - Access token to be decoded.
    * @param publicKey - Public key for verifying the access token.
@@ -110,6 +110,7 @@ export default class AccessToken {
     return typeof accessTokenPayload.exp === 'number';
   }
 
+  /** @returns String representation. */
   public toString(): string {
     return this._accessToken;
   }

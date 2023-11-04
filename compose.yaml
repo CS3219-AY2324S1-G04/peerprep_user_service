@@ -13,7 +13,7 @@ services:
     image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_database_initialiser
     build:
       context: .
-      dockerfile: database_initialiser.dockerfile
+      dockerfile: ./dockerfiles/database_initialiser.dockerfile
     networks:
       - peerprep_network
     environment:
@@ -23,7 +23,6 @@ services:
       DATABASE_PORT: 5432
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_CONNECTION_TIMEOUT_MILLIS: ${DATABASE_CONNECTION_TIMEOUT_MILLIS}
-      DATABASE_IDLE_TIMEOUT_MILLIS: ${DATABASE_IDLE_TIMEOUT_MILLIS}
       DATABASE_MAX_CLIENT_COUNT: ${DATABASE_MAX_CLIENT_COUNT}
       HASH_COST: ${HASH_COST}
       ADMIN_EMAIL_ADDRESS: ${ADMIN_EMAIL_ADDRESS}
@@ -37,11 +36,11 @@ services:
     image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_api
     build:
       context: .
-      dockerfile: api.dockerfile
+      dockerfile: ./dockerfiles/api.dockerfile
     networks:
       - peerprep_network
     ports:
-      - '${PORT}:9000'
+      - '${API_EXPOSED_PORT}:9000'
     environment:
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
@@ -49,7 +48,6 @@ services:
       DATABASE_PORT: 5432
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_CONNECTION_TIMEOUT_MILLIS: ${DATABASE_CONNECTION_TIMEOUT_MILLIS}
-      DATABASE_IDLE_TIMEOUT_MILLIS: ${DATABASE_IDLE_TIMEOUT_MILLIS}
       DATABASE_MAX_CLIENT_COUNT: ${DATABASE_MAX_CLIENT_COUNT}
       HASH_COST: ${HASH_COST}
       ACCESS_TOKEN_PRIVATE_KEY: ${ACCESS_TOKEN_PRIVATE_KEY}
@@ -65,3 +63,4 @@ services:
 networks:
   peerprep_network:
     name: peerprep
+    external: true

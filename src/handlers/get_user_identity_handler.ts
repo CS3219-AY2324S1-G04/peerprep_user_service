@@ -14,16 +14,18 @@ import { sessionTokenKey } from '../utils/parameter_keys';
 import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /**
- * Handles getting the user identity of the user who owns a specified session
+ * Handles getting the user identity of the user who owns the specified session
  * token.
  */
 export default class GetUserIdentityHandler extends Handler {
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.get;
   }
 
-  public override get path(): string {
-    return '/user-service/user/identity';
+  /** @inheritdoc */
+  public override get subPath(): string {
+    return 'user/identity';
   }
 
   private static _getSessionToken(query: qs.ParsedQs) {

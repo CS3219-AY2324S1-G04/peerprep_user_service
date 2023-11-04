@@ -15,26 +15,17 @@ export default class EmailAddress {
 
   /**
    * Parses {@link rawEmailAddress} as an {@link EmailAddress}.
-   * @param rawEmailAddress - Email address.
+   * @param rawEmailAddress - Value to parse.
    * @returns The parsed {@link EmailAddress}.
    * @throws Error if parsing fails.
    */
-  public static parse(
-    rawEmailAddress:
-      | string
-      | qs.ParsedQs
-      | string[]
-      | qs.ParsedQs[]
-      | undefined,
-  ): EmailAddress {
-    if (!EmailAddress._isEmailAddressString(rawEmailAddress)) {
+  public static parse(rawEmailAddress: unknown): EmailAddress {
+    if (!EmailAddress._isString(rawEmailAddress)) {
       throw new Error('Email address must be a string.');
     }
 
     if (
-      !EmailAddress._isEmailAddressSpecified(
-        rawEmailAddress as string | undefined,
-      )
+      !EmailAddress._isStringSpecified(rawEmailAddress as string | undefined)
     ) {
       throw new Error('Email address cannot be empty.');
     }
@@ -45,35 +36,21 @@ export default class EmailAddress {
   /**
    * Parses {@link rawEmailAddress} as an {@link EmailAddress} then validates
    * it.
-   * @param rawEmailAddress - Email address.
-   * @returns The parsed {@link EmailAddress}.
+   * @param rawEmailAddress - Value to parse.
+   * @returns The parsed and validated {@link EmailAddress}.
    * @throws Error if parsing or validation fails.
    */
-  public static parseAndValidate(
-    rawEmailAddress:
-      | string
-      | qs.ParsedQs
-      | string[]
-      | qs.ParsedQs[]
-      | undefined,
-  ): EmailAddress {
+  public static parseAndValidate(rawEmailAddress: unknown): EmailAddress {
     const emailAddress: EmailAddress = EmailAddress.parse(rawEmailAddress);
     emailAddress.validate();
     return emailAddress;
   }
 
-  private static _isEmailAddressString(
-    rawEmailAddress:
-      | string
-      | qs.ParsedQs
-      | string[]
-      | qs.ParsedQs[]
-      | undefined,
-  ): boolean {
+  private static _isString(rawEmailAddress: unknown): boolean {
     return typeof rawEmailAddress === 'string' || rawEmailAddress === undefined;
   }
 
-  private static _isEmailAddressSpecified(
+  private static _isStringSpecified(
     rawEmailAddress: string | undefined,
   ): boolean {
     return rawEmailAddress !== undefined && rawEmailAddress.length > 0;
@@ -95,6 +72,7 @@ export default class EmailAddress {
     }
   }
 
+  /** @returns String representation. */
   public toString(): string {
     return this._emailAddress;
   }

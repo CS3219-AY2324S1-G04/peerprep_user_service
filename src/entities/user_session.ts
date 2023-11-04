@@ -31,15 +31,15 @@ export default class UserSession {
   @Column({ name: 'user_id', nullable: false })
   public userId: number;
 
-  /** Login time. */
+  /** Login date and time. */
   @CreateDateColumn({ name: 'login_time', nullable: false })
   public loginTime: Date;
 
-  /** Session expiry time. */
+  /** Session expiry date and time. */
   @Column({ name: 'session_expiry', nullable: false })
   public sessionExpiry: Date;
 
-  public constructor(
+  private constructor(
     sessionToken: string,
     userProfile: UserProfile,
     loginTime: Date,

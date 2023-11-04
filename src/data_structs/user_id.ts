@@ -4,26 +4,26 @@
 
 /** User ID. */
 export default class UserId {
-  private static _regex: RegExp = RegExp('^[1-9][0-9]*$');
+  private static _positiveIntegerStringRegex: RegExp = RegExp('^[1-9][0-9]*$');
 
   private readonly _userId: number;
 
-  public constructor(userId: number) {
+  private constructor(userId: number) {
     this._userId = userId;
   }
 
   /**
-   * Parses {@link rawUserId} as a user ID.
-   * @param rawUserId - User ID.
+   * Parses a string {@link rawUserId} as a user ID.
+   * @param rawUserId - Value to parse.
    * @returns The parsed {@link UserId}.
    * @throws Error if parsing fails.
    */
   public static parseString(rawUserId: string | undefined): UserId {
-    if (!UserId._isUserIdStringSpecified(rawUserId)) {
+    if (rawUserId === undefined || rawUserId.length === 0) {
       throw new Error('User ID cannot be empty.');
     }
 
-    if (!UserId._isUserIdStringPositiveInteger(rawUserId!)) {
+    if (!UserId._positiveIntegerStringRegex.test(rawUserId)) {
       throw new Error('User ID must be a positive integer.');
     }
 
@@ -31,8 +31,8 @@ export default class UserId {
   }
 
   /**
-   * Parses {@link rawUserId} as a user ID.
-   * @param rawUserId - User ID.
+   * Parses a number {@link rawUserId} as a user ID.
+   * @param rawUserId - Value to parse.
    * @returns The parsed {@link UserId}.
    * @throws Error if parsing fails.
    */
@@ -48,20 +48,12 @@ export default class UserId {
     return new UserId(rawUserId);
   }
 
-  private static _isUserIdStringSpecified(
-    rawUserId: string | undefined,
-  ): boolean {
-    return rawUserId !== undefined && rawUserId.length > 0;
-  }
-
-  private static _isUserIdStringPositiveInteger(rawUserId: string): boolean {
-    return UserId._regex.test(rawUserId);
-  }
-
+  /** @returns String representation. */
   public toString(): string {
     return this._userId.toString();
   }
 
+  /** @returns Number representation. */
   public toNumber(): number {
     return this._userId;
   }

@@ -5,5 +5,4 @@ metadata:
   namespace: peerprep # Defaults to "default"
 data:
   database-connection-timeout-millis: '0'
-  database-idle-timeout-millis: '10000'
   database-max-client-count: '20'

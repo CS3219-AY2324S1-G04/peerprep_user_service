@@ -21,17 +21,22 @@ import Handler, { HttpMethod } from './handler';
 export default class CreateUserHandler extends Handler {
   private readonly _hashCost: number;
 
+  /**
+   * @param hashCost - Cost factor of the password hashing algorithm.
+   */
   public constructor(hashCost: number) {
     super();
     this._hashCost = hashCost;
   }
 
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.post;
   }
 
-  public override get path(): string {
-    return '/user-service/users';
+  /** @inheritdoc */
+  public override get subPath(): string {
+    return 'users';
   }
 
   private static async _parseParams(

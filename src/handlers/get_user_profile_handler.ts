@@ -13,20 +13,25 @@ import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 export default class GetUserProfileHandler extends Handler {
   private readonly _accessTokenPublicKey: string;
 
+  /**
+   * @param accessTokenPublicKey - Public key for verifying access tokens.
+   */
   public constructor(accessTokenPublicKey: string) {
     super();
     this._accessTokenPublicKey = accessTokenPublicKey;
   }
 
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.get;
   }
 
-  public override get path(): string {
-    return '/user-service/user/profile';
+  /** @inheritdoc */
+  public override get subPath(): string {
+    return 'user/profile';
   }
 
-  private static _parseCookie(
+  private static _parseCookies(
     cookies: {
       [x: string]: string | undefined;
     },
@@ -56,7 +61,7 @@ export default class GetUserProfileHandler extends Handler {
     req: express.Request,
     res: express.Response,
   ): Promise<void> {
-    const accessToken: AccessToken = GetUserProfileHandler._parseCookie(
+    const accessToken: AccessToken = GetUserProfileHandler._parseCookies(
       req.cookies,
       this._accessTokenPublicKey,
     );

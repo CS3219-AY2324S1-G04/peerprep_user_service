@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service-api-config-map
+  namespace: peerprep # Defaults to "default"
+data:
+  session-expire-millis: '604800000'
+  access-token-expire-millis: '900000'

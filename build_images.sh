@@ -128,11 +128,11 @@ echo "Transpile successful."
 
 ### Build Images ###
 if [[ $should_build_api == 1 ]]; then
-  build_image "api.dockerfile" $api_image_full_name
+  build_image "dockerfiles/api.dockerfile" $api_image_full_name
 fi
 
 if [[ $should_build_database_initaliser == 1 ]]; then
-  build_image "database_initialiser.dockerfile" $database_initialiser_full_name
+  build_image "dockerfiles/database_initialiser.dockerfile" $database_initialiser_full_name
 fi
 
 ### Push Images to the Container Registry ###

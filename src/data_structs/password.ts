@@ -26,18 +26,16 @@ export default class Password {
 
   /**
    * Parses {@link rawPassword} as a password.
-   * @param rawPassword - Password.
+   * @param rawPassword - Value to parse.
    * @returns The parsed {@link Password}.
    * @throws Error if parsing fails.
    */
-  public static parse(
-    rawPassword: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
-  ): Password {
-    if (!Password._isPasswordString(rawPassword)) {
+  public static parse(rawPassword: unknown): Password {
+    if (!Password._isString(rawPassword)) {
       throw new Error('Password must be a string.');
     }
 
-    if (!Password._isPasswordSpecified(rawPassword as string | undefined)) {
+    if (!Password._isStringSpecified(rawPassword as string | undefined)) {
       throw new Error('Password cannot be empty.');
     }
 
@@ -46,27 +44,21 @@ export default class Password {
 
   /**
    * Parses {@link rawPassword} as a password then validates it.
-   * @param rawPassword - Password.
-   * @returns The parsed password.
+   * @param rawPassword - Value to parse.
+   * @returns The parsed and validated password.
    * @throws Error if parsing or validation fails.
    */
-  public static parseAndValidate(
-    rawPassword: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
-  ): Password {
+  public static parseAndValidate(rawPassword: unknown): Password {
     const password: Password = Password.parse(rawPassword);
     password.validate();
     return password;
   }
 
-  private static _isPasswordString(
-    rawPassword: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
-  ): boolean {
+  private static _isString(rawPassword: unknown): boolean {
     return typeof rawPassword === 'string' || rawPassword === undefined;
   }
 
-  private static _isPasswordSpecified(
-    rawPassword: string | undefined,
-  ): boolean {
+  private static _isStringSpecified(rawPassword: string | undefined): boolean {
     return rawPassword !== undefined && rawPassword.length > 0;
   }
 
@@ -100,6 +92,7 @@ export default class Password {
     }
   }
 
+  /** @returns String representation. */
   public toString(): string {
     return this._password;
   }

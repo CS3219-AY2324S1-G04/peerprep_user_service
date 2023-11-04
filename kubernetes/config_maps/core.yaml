@@ -4,6 +4,4 @@ metadata:
   name: user-service-core-config-map
   namespace: peerprep # Defaults to "default"
 data:
-  session-expire-millis: '604800000'
-  access-token-expire-millis: '900000'
   hash-cost: '10'

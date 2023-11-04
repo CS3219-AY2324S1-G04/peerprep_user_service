@@ -19,20 +19,25 @@ import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 export default class UpdatePasswordHandler extends Handler {
   private readonly _hashCost: number;
 
+  /**
+   * @param hashCost - Cost factor of the password hashing algorithm.
+   */
   public constructor(hashCost: number) {
     super();
     this._hashCost = hashCost;
   }
 
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.put;
   }
 
-  public override get path(): string {
-    return '/user-service/user/password';
+  /** @inheritdoc */
+  public override get subPath(): string {
+    return 'user/password';
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -136,7 +141,7 @@ export default class UpdatePasswordHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = UpdatePasswordHandler._parseCookie(
+    const sessionToken: SessionToken = UpdatePasswordHandler._parseCookies(
       req.cookies,
     );
     const [password, newPassword]: [Password, Password] =

@@ -3,6 +3,7 @@
  */
 import { DataSource, MoreThan } from 'typeorm';
 
+import DatabaseClientConfig from '../configs/database_client_config';
 import ClientModifiableUserProfile from '../data_structs/client_modifiable_user_profile';
 import EmailAddress from '../data_structs/email_address';
 import PasswordHash from '../data_structs/password_hash';
@@ -11,12 +12,13 @@ import UserId from '../data_structs/user_id';
 import UserIdentity from '../data_structs/user_identity';
 import UserProfile from '../data_structs/user_profile';
 import Username from '../data_structs/username';
-import UserCredentialEntity from '../database/entities/user_credential';
-import UserProfileEntity from '../database/entities/user_profile';
-import UserSessionEntity from '../database/entities/user_session';
+import UserCredentialEntity from '../entities/user_credential';
+import UserProfileEntity from '../entities/user_profile';
+import UserSessionEntity from '../entities/user_session';
 import UserRole, { parseUserRole } from '../enums/user_role';
-import DatabaseClient, { DatabaseClientConfig } from './database_client';
+import DatabaseClient from './database_client';
 
+/** Client for performing database operations on a Postgres database. */
 export class PostgresDatabaseClient implements DatabaseClient {
   private _dataSource: DataSource;
 
@@ -38,18 +40,22 @@ export class PostgresDatabaseClient implements DatabaseClient {
     });
   }
 
+  /** @inheritdoc */
   public async initialise(): Promise<void> {
     await this._dataSource.initialize();
   }
 
+  /** @inheritdoc */
   public async synchronise(): Promise<void> {
     await this._dataSource.synchronize();
   }
 
+  /** @inheritdoc */
   public async disconnect(): Promise<void> {
     await this._dataSource.destroy();
   }
 
+  /** @inheritdoc */
   public async doEntitiesExist(): Promise<boolean> {
     return (
       (
@@ -68,6 +74,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  /** @inheritdoc */
   public async deleteEntities(): Promise<void> {
     const userSessionEntityName: string =
       this._dataSource.getRepository(UserSessionEntity).metadata.tableName;
@@ -81,12 +88,13 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  /** @inheritdoc */
   public async isUsernameInUse(
     username: Username,
     sessionToken?: SessionToken,
   ): Promise<boolean> {
     const userIdFromUsername: UserId | undefined =
-      await this._getUserIdFromUsername(username);
+      await this._fetchUserIdFromUsername(username);
 
     if (userIdFromUsername === undefined) {
       return false;
@@ -95,19 +103,20 @@ export class PostgresDatabaseClient implements DatabaseClient {
     const userIdFromSessionToken: UserId | undefined =
       sessionToken === undefined
         ? undefined
-        : await this._getUserIdFromSessionToken(sessionToken);
+        : await this._fetchUserIdFromSessionToken(sessionToken);
 
     return (
       userIdFromUsername?.toNumber() !== userIdFromSessionToken?.toNumber()
     );
   }
 
+  /** @inheritdoc */
   public async isEmailAddressInUse(
     emailAddress: EmailAddress,
     sessionToken?: SessionToken,
   ): Promise<boolean> {
     const userIdFromEmailAddress: UserId | undefined =
-      await this._getUserIdFromEmailAddress(emailAddress);
+      await this._fetchUserIdFromEmailAddress(emailAddress);
 
     if (userIdFromEmailAddress === undefined) {
       return false;
@@ -116,44 +125,47 @@ export class PostgresDatabaseClient implements DatabaseClient {
     const userIdFromSessionToken: UserId | undefined =
       sessionToken === undefined
         ? undefined
-        : await this._getUserIdFromSessionToken(sessionToken);
+        : await this._fetchUserIdFromSessionToken(sessionToken);
 
     return (
       userIdFromEmailAddress?.toNumber() !== userIdFromSessionToken?.toNumber()
     );
   }
 
+  /** @inheritdoc */
   public async fetchPasswordHashFromUsername(
     username: Username,
   ): Promise<PasswordHash | undefined> {
     const userId: UserId | undefined =
-      await this._getUserIdFromUsername(username);
+      await this._fetchUserIdFromUsername(username);
 
     if (userId === undefined) {
       return undefined;
     }
 
-    return await this._getPasswordHashFromUserId(userId);
+    return await this._fetchPasswordHashFromUserId(userId);
   }
 
+  /** @inheritdoc */
   public async fetchPasswordHashFromSessionToken(
     sessionToken: SessionToken,
   ): Promise<PasswordHash | undefined> {
     const userId: UserId | undefined =
-      await this._getUserIdFromSessionToken(sessionToken);
+      await this._fetchUserIdFromSessionToken(sessionToken);
 
     if (userId === undefined) {
       return undefined;
     }
 
-    return this._getPasswordHashFromUserId(userId);
+    return this._fetchPasswordHashFromUserId(userId);
   }
 
+  /** @inheritdoc */
   public async fetchUserProfileFromSessionToken(
     sessionToken: SessionToken,
   ): Promise<UserProfile | undefined> {
     const userId: UserId | undefined =
-      await this._getUserIdFromSessionToken(sessionToken);
+      await this._fetchUserIdFromSessionToken(sessionToken);
 
     if (userId === undefined) {
       return undefined;
@@ -176,6 +188,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     };
   }
 
+  /** @inheritdoc */
   public async fetchUserIdentityFromSessionToken(
     sessionToken: SessionToken,
   ): Promise<UserIdentity | undefined> {
@@ -192,6 +205,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     };
   }
 
+  /** @inheritdoc */
   public async createUserProfileAndCredential(
     userProfile: ClientModifiableUserProfile,
     passwordHash: PasswordHash,
@@ -209,6 +223,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     });
   }
 
+  /** @inheritdoc */
   public async createUserSession(
     sessionToken: SessionToken,
     username: Username,
@@ -228,12 +243,13 @@ export class PostgresDatabaseClient implements DatabaseClient {
     });
   }
 
+  /** @inheritdoc */
   public async updateUserProfile(
     userProfile: ClientModifiableUserProfile,
     sessionToken: SessionToken,
   ): Promise<boolean> {
     const userId: UserId | undefined =
-      await this._getUserIdFromSessionToken(sessionToken);
+      await this._fetchUserIdFromSessionToken(sessionToken);
 
     if (userId === undefined) {
       return false;
@@ -251,12 +267,13 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  /** @inheritdoc */
   public async updatePasswordHash(
     passwordHash: PasswordHash,
     sessionToken: SessionToken,
   ): Promise<boolean> {
     const userId: UserId | undefined =
-      await this._getUserIdFromSessionToken(sessionToken);
+      await this._fetchUserIdFromSessionToken(sessionToken);
 
     if (userId === undefined) {
       return false;
@@ -273,6 +290,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  /** @inheritdoc */
   public async updateUserRole(
     userId: UserId,
     userRole: UserRole,
@@ -286,6 +304,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  /** @inheritdoc */
   public async updateUserSessionExpiry(
     sessionToken: SessionToken,
     sessionExpiry: Date,
@@ -299,9 +318,10 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  /** @inheritdoc */
   public async deleteUserProfile(sessionToken: SessionToken): Promise<boolean> {
     const userId: UserId | undefined =
-      await this._getUserIdFromSessionToken(sessionToken);
+      await this._fetchUserIdFromSessionToken(sessionToken);
 
     if (userId === undefined) {
       return false;
@@ -316,6 +336,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  /** @inheritdoc */
   public async deleteUserSession(sessionToken: SessionToken): Promise<boolean> {
     return (
       ((
@@ -326,6 +347,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
+  /** @inheritdoc */
   public isUniqueConstraintViolated(err: unknown): boolean {
     return (
       err instanceof Error &&
@@ -333,7 +355,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
     );
   }
 
-  private async _getUserIdFromUsername(
+  private async _fetchUserIdFromUsername(
     username: Username,
   ): Promise<UserId | undefined> {
     const userId: number | undefined = (
@@ -345,10 +367,10 @@ export class PostgresDatabaseClient implements DatabaseClient {
       })
     )?.userId;
 
-    return userId === undefined ? undefined : new UserId(userId);
+    return userId === undefined ? undefined : UserId.parseNumber(userId);
   }
 
-  private async _getUserIdFromSessionToken(
+  private async _fetchUserIdFromSessionToken(
     sessionToken: SessionToken,
   ): Promise<UserId | undefined> {
     const userId: number | undefined = (
@@ -361,10 +383,10 @@ export class PostgresDatabaseClient implements DatabaseClient {
       })
     )?.userId;
 
-    return userId === undefined ? undefined : new UserId(userId);
+    return userId === undefined ? undefined : UserId.parseNumber(userId);
   }
 
-  private async _getUserIdFromEmailAddress(
+  private async _fetchUserIdFromEmailAddress(
     emailAddress: EmailAddress,
   ): Promise<UserId | undefined> {
     const userId: number | undefined = (
@@ -376,10 +398,10 @@ export class PostgresDatabaseClient implements DatabaseClient {
       })
     )?.userId;
 
-    return userId === undefined ? undefined : new UserId(userId);
+    return userId === undefined ? undefined : UserId.parseNumber(userId);
   }
 
-  private async _getPasswordHashFromUserId(
+  private async _fetchPasswordHashFromUserId(
     userId: UserId,
   ): Promise<PasswordHash | undefined> {
     const passwordHash: string | undefined = (

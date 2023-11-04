@@ -25,6 +25,11 @@ export default class UpdateUserProfileHandler extends Handler {
   private readonly _accessTokenPrivateKey: string;
   private readonly _accessTokenExpireMillis: number;
 
+  /**
+   * @param accessTokenPrivateKey - Private key for creating access tokens.
+   * @param accessTokenExpireMillis - Number of milliseconds an access token
+   * remains valid for.
+   */
   public constructor(
     accessTokenPrivateKey: string,
     accessTokenExpireMillis: number,
@@ -34,15 +39,17 @@ export default class UpdateUserProfileHandler extends Handler {
     this._accessTokenExpireMillis = accessTokenExpireMillis;
   }
 
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.put;
   }
 
-  public override get path(): string {
-    return '/user-service/user/profile';
+  /** @inheritdoc */
+  public override get subPath(): string {
+    return 'user/profile';
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -125,7 +132,7 @@ export default class UpdateUserProfileHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = UpdateUserProfileHandler._parseCookie(
+    const sessionToken: SessionToken = UpdateUserProfileHandler._parseCookies(
       req.cookies,
     );
     const userProfile: ClientModifiableUserProfile =

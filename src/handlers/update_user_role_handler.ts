@@ -19,21 +19,22 @@ import {
 import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /**
- * Handles updating the user role of the user whose username is specified in the
- * request.
+ * Handles updating the user role of a specified user.
  *
  * The user who sent the request must have the {@link UserRole.admin} user role.
  */
 export default class UpdateUserRoleHandler extends Handler {
+  /** @inheritdoc */
   public get method(): HttpMethod {
     return HttpMethod.put;
   }
 
-  public get path(): string {
-    return `/user-service/users/:${userIdPathKey}/user-role`;
+  /** @inheritdoc */
+  public get subPath(): string {
+    return `users/:${userIdPathKey}/user-role`;
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -118,7 +119,7 @@ export default class UpdateUserRoleHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = UpdateUserRoleHandler._parseCookie(
+    const sessionToken: SessionToken = UpdateUserRoleHandler._parseCookies(
       req.cookies,
     );
     const [userId, userRole]: [UserId, UserRole] =

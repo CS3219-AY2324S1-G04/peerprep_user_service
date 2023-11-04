@@ -8,7 +8,7 @@ import UserProfile from './user_profile';
 /** Entity in the database for storing user credentials. */
 @Entity({ name: 'user_credential' })
 export default class UserCredential {
-  /** Profile of user who owns the credential. */
+  /** Profile of the user who owns the credential. */
   @OneToOne(() => UserProfile, (userProfile) => userProfile.userId, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -24,7 +24,7 @@ export default class UserCredential {
   @Column({ name: 'password_hash', type: 'char', length: 60, nullable: false })
   public passwordHash: string;
 
-  public constructor(userProfile: UserProfile, passwordHash: string) {
+  private constructor(userProfile: UserProfile, passwordHash: string) {
     this.userProfile = userProfile;
     this.userId = userProfile?.userId;
     this.passwordHash = passwordHash;

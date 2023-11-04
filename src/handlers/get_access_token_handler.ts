@@ -23,6 +23,12 @@ export default class GetAccessTokenHandler extends Handler {
   private readonly _sessionExpireMillis: number;
   private readonly _accessTokenExpireMillis: number;
 
+  /**
+   * @param accessTokenPrivateKey - Private key for creating access tokens.
+   * @param sessionExpireMillis - Number of milliseconds a session can last for.
+   * @param accessTokenExpireMillis - Number of milliseconds an access token
+   * remains valid for.
+   */
   public constructor(
     accessTokenPrivateKey: string,
     sessionExpireMillis: number,
@@ -34,15 +40,17 @@ export default class GetAccessTokenHandler extends Handler {
     this._accessTokenExpireMillis = accessTokenExpireMillis;
   }
 
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.get;
   }
 
-  public override get path(): string {
-    return '/user-service/session/access-token';
+  /** @inheritdoc */
+  public override get subPath(): string {
+    return 'session/access-token';
   }
 
-  private static _parseCookie(cookies: {
+  private static _parseCookies(cookies: {
     [x: string]: string | undefined;
   }): SessionToken {
     try {
@@ -86,7 +94,7 @@ export default class GetAccessTokenHandler extends Handler {
     next: express.NextFunction,
     client: DatabaseClient,
   ): Promise<void> {
-    const sessionToken: SessionToken = GetAccessTokenHandler._parseCookie(
+    const sessionToken: SessionToken = GetAccessTokenHandler._parseCookies(
       req.cookies,
     );
 

@@ -153,20 +153,20 @@ export default interface DatabaseClient {
   ): Promise<boolean>;
 
   /**
-   * Updates the user role of the user with username {@link userId}. The user
+   * Updates the user role of the user with user ID {@link userId}. The user
    * role will be updated to {@link userRole}.
    * @param userId - User ID of the user whose user role is to be updated.
    * @param userRole - User role to assign.
    * @returns True if a user role was updated. False if no user role was updated
-   * due to no user existing with the username {@link userId}.
+   * due to no user existing with the user ID {@link userId}.
    */
   updateUserRole(userId: UserId, userRole: UserRole): Promise<boolean>;
 
   /**
-   * Updates the expiry, to {@link sessionExpiry}, for the session whose token
-   * is {@link sessionToken}.
+   * Updates the expiry of the session token whose token is
+   * {@link sessionToken}. The expiry to update to is {@link sessionExpiry}.
    * @param sessionToken - Session token.
-   * @param sessionExpiry - Time of session expiry.
+   * @param sessionExpiry - Session expiry date and time.
    */
   updateUserSessionExpiry(
     sessionToken: SessionToken,
@@ -180,8 +180,9 @@ export default interface DatabaseClient {
    * the session token {@link sessionToken} being an invalid token.
    */
   deleteUserProfile(sessionToken: SessionToken): Promise<boolean>;
+
   /**
-   * Deletes the user session which has the session token {@link sessionToken}.
+   * Deletes the user session whose session token is {@link sessionToken}.
    * @param sessionToken - Session token of the user session to be deleted.
    * @returns True if a user session was deleted. False if no user session was
    * deleted due to the session token {@link sessionToken} being an invalid
@@ -195,30 +196,4 @@ export default interface DatabaseClient {
    * a unique constraint.
    */
   isUniqueConstraintViolated(err: unknown): boolean;
-}
-
-/** Configs for {@link DatabaseClient}. */
-export interface DatabaseClientConfig {
-  /** Password of the database. */
-  password: string;
-  /** User on the database host. */
-  user: string;
-  /** Address of the database host. */
-  host: string;
-  /** Port of the database host that the DBMS is listening on. */
-  port: number;
-  /** Name of the database. */
-  databaseName: string;
-  /**
-   * Number of milliseconds for a client to connect to the database before
-   * timing out.
-   */
-  connectionTimeoutMillis: number;
-  /**
-   * Number of milliseconds a client can remain idle for before being
-   * disconnected.
-   */
-  idleTimeoutMillis: number;
-  /** Max number of concurrent clients. */
-  maxClientCount: number;
 }

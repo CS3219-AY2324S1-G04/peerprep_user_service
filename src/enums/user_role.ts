@@ -10,19 +10,17 @@ enum UserRole {
 }
 
 /**
- * Parses {@link rawUserRole} as a user role and check it's validity.
- * @param rawUserRole - The user role to check.
+ * Parses {@link rawUserRole} as a user role.
+ * @param rawUserRole - Value to parse.
  * @returns The parsed user role.
  * @throws Error if parsing fails.
  */
-export function parseUserRole(
-  rawUserRole: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
-): UserRole {
-  if (!isUserRoleString(rawUserRole)) {
+export function parseUserRole(rawUserRole: unknown): UserRole {
+  if (!isString(rawUserRole)) {
     throw new Error('User role must be a string.');
   }
 
-  if (!isUserRoleSpecified(rawUserRole as string | undefined)) {
+  if (!isStringSpecified(rawUserRole as string | undefined)) {
     throw new Error('User role cannot be empty.');
   }
 
@@ -37,32 +35,14 @@ export function parseUserRole(
   return userRole;
 }
 
-/**
- * @param rawUserRole - User role.
- * @returns True if {@link rawUserRole} is a string or undefined. Else, returns
- * false.
- */
-function isUserRoleString(
-  rawUserRole: string | qs.ParsedQs | string[] | qs.ParsedQs[] | undefined,
-): boolean {
+function isString(rawUserRole: unknown): boolean {
   return typeof rawUserRole === 'string' || rawUserRole === undefined;
 }
 
-/**
- * @param rawUserRole - User role.
- * @returns True if {@link rawUserRole} is not undefined and is a non-empty
- * string). Else, returns false.
- */
-function isUserRoleSpecified(rawUserRole: string | undefined): boolean {
+function isStringSpecified(rawUserRole: string | undefined): boolean {
   return rawUserRole !== undefined && rawUserRole.length > 0;
 }
 
-/**
- * Parses {@link userRole} and returns a {@link UserRole}.
- * @param userRole - User role.
- * @returns The {@link UserRole} that corresponds to the value in
- * {@link userRole}.
- */
 function tryParseUserRole(userRole: string): UserRole | undefined {
   switch (userRole) {
     case 'user':
