@@ -16,13 +16,14 @@ import {
 
 /** Handler of a HTTP route. */
 export default abstract class Handler {
+  /** @returns Request path to handle. */
   public get path(): string {
     return `/user-service/${this.subPath}`;
   }
 
-  /** Gets the HTTP request method to handle. */
+  /** @returns HTTP request method to handle. */
   public abstract get method(): HttpMethod;
-  /** Gets the request path to handle. */
+  /** @returns Request subpath to handle. */
   public abstract get subPath(): string;
 
   /**
@@ -59,7 +60,6 @@ export default abstract class Handler {
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
-   * @returns Content to be use as the HTTP response body.
    * @throws {HttpErrorInfo} Error encountered that requires a HTTP error
    * response to be sent.
    */
@@ -106,7 +106,7 @@ export class HandlerUtils {
   /**
    * Adds the session token {@link sessionToken} to the response {@link res} as
    * a cookie.
-   * @param res - Response to add the cookie to.
+   * @param res - Response to add the cookies to.
    * @param sessionToken - Session token.
    */
   public static addSessionTokenCookie(
@@ -123,7 +123,7 @@ export class HandlerUtils {
   /**
    * Creates an access token for the user who owns the session token
    * {@link sessionToken} and adds it as a cookie to the response {@link res}.
-   * @param res - Response to add the cookie to.
+   * @param res - Response to add the cookies to.
    * @param client - Client for communicating with the database.
    * @param sessionToken - Session token.
    * @param accessTokenPrivateKey - Private key for signing access tokens.

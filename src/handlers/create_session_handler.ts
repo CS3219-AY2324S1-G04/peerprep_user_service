@@ -19,6 +19,12 @@ export default class CreateSessionHandler extends Handler {
   private readonly _sessionExpireMillis: number;
   private readonly _accessTokenExpireMillis: number;
 
+  /**
+   * @param accessTokenPrivateKey - Private key for creating access tokens.
+   * @param sessionExpireMillis - Number of milliseconds a session can last for.
+   * @param accessTokenExpireMillis - Number of milliseconds an access token
+   * remains valid for.
+   */
   public constructor(
     accessTokenPrivateKey: string,
     sessionExpireMillis: number,
@@ -30,10 +36,12 @@ export default class CreateSessionHandler extends Handler {
     this._accessTokenExpireMillis = accessTokenExpireMillis;
   }
 
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.post;
   }
 
+  /** @inheritdoc */
   public override get subPath(): string {
     return 'sessions';
   }

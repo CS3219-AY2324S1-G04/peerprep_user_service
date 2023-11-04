@@ -1,7 +1,8 @@
 /**
- * @file Initialises the database.
+ * @file Entrypoint to the database initialiser.
  */
-import DatabaseConfig from '../../configs/database_config';
+import CoreConfig from '../../configs/core_config';
+import DatabaseClientConfig from '../../configs/database_client_config';
 import PasswordHash from '../../data_structs/password_hash';
 import UserId from '../../data_structs/user_id';
 import Username from '../../data_structs/username';
@@ -10,19 +11,12 @@ import DatabaseClient from '../../service/database_client';
 import { PostgresDatabaseClient } from '../../service/postgres_database_client';
 import DatabaseInitialiserConfig from './database_initialiser_config';
 
-const databaseConfig: DatabaseConfig = new DatabaseConfig();
+const coreConfig: CoreConfig = new CoreConfig();
+const databaseClientConfig: DatabaseClientConfig = new DatabaseClientConfig();
 const databaseInitialiserConfig: DatabaseInitialiserConfig =
   new DatabaseInitialiserConfig();
 
-const client: DatabaseClient = new PostgresDatabaseClient({
-  password: databaseConfig.databasePassword,
-  user: databaseConfig.databaseUser,
-  host: databaseConfig.databaseHost,
-  port: databaseConfig.databasePort,
-  databaseName: databaseConfig.databaseName,
-  connectionTimeoutMillis: databaseConfig.databaseConnectionTimeoutMillis,
-  maxClientCount: databaseConfig.databaseMaxClientCount,
-});
+const client: DatabaseClient = new PostgresDatabaseClient(databaseClientConfig);
 
 async function initialise(): Promise<void> {
   await client.initialise();
@@ -67,7 +61,7 @@ async function createAdminUser(): Promise<void> {
     },
     await PasswordHash.hash(
       databaseInitialiserConfig.adminPassword,
-      databaseConfig.hashCost,
+      coreConfig.hashCost,
     ),
   );
   await client.updateUserRole(UserId.parseNumber(1), UserRole.admin);

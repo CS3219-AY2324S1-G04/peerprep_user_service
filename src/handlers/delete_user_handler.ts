@@ -17,10 +17,12 @@ import Handler, {
 
 /** Handles deleting the user who sent the request. */
 export default class DeleteUserHandler extends Handler {
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.delete;
   }
 
+  /** @inheritdoc */
   public override get subPath(): string {
     return 'user';
   }

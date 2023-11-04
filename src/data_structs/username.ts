@@ -35,7 +35,7 @@ export default class Username {
   /**
    * Parses {@link username} as a username then validates it.
    * @param rawUsername - Value to parse.
-   * @returns The parsed username.
+   * @returns The parsed and validated username.
    * @throws Error if parsing or validation fails.
    */
   public static parseAndValidate(rawUsername: unknown): Username {
@@ -76,6 +76,7 @@ export default class Username {
     }
   }
 
+  /** @returns String representation. */
   public toString(): string {
     return this._username;
   }

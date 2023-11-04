@@ -9,15 +9,20 @@ import Handler, { HttpMethod } from './handler';
 export default class GetAccessTokenPublicKeyHandler extends Handler {
   private readonly _accessTokenPublicKey: string;
 
+  /**
+   * @param accessTokenPublicKey - Public key for verifying access tokens.
+   */
   public constructor(accessTokenPublicKey: string) {
     super();
     this._accessTokenPublicKey = accessTokenPublicKey;
   }
 
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.get;
   }
 
+  /** @inheritdoc */
   public override get subPath(): string {
     return 'access-token-public-key';
   }

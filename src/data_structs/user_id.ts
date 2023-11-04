@@ -8,7 +8,7 @@ export default class UserId {
 
   private readonly _userId: number;
 
-  public constructor(userId: number) {
+  private constructor(userId: number) {
     this._userId = userId;
   }
 
@@ -48,10 +48,12 @@ export default class UserId {
     return new UserId(rawUserId);
   }
 
+  /** @returns String representation. */
   public toString(): string {
     return this._userId.toString();
   }
 
+  /** @returns Number representation. */
   public toNumber(): number {
     return this._userId;
   }

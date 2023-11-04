@@ -25,6 +25,11 @@ export default class UpdateUserProfileHandler extends Handler {
   private readonly _accessTokenPrivateKey: string;
   private readonly _accessTokenExpireMillis: number;
 
+  /**
+   * @param accessTokenPrivateKey - Private key for creating access tokens.
+   * @param accessTokenExpireMillis - Number of milliseconds an access token
+   * remains valid for.
+   */
   public constructor(
     accessTokenPrivateKey: string,
     accessTokenExpireMillis: number,
@@ -34,10 +39,12 @@ export default class UpdateUserProfileHandler extends Handler {
     this._accessTokenExpireMillis = accessTokenExpireMillis;
   }
 
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.put;
   }
 
+  /** @inheritdoc */
   public override get subPath(): string {
     return 'user/profile';
   }

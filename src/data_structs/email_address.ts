@@ -37,7 +37,7 @@ export default class EmailAddress {
    * Parses {@link rawEmailAddress} as an {@link EmailAddress} then validates
    * it.
    * @param rawEmailAddress - Value to parse.
-   * @returns The parsed {@link EmailAddress}.
+   * @returns The parsed and validated {@link EmailAddress}.
    * @throws Error if parsing or validation fails.
    */
   public static parseAndValidate(rawEmailAddress: unknown): EmailAddress {
@@ -72,6 +72,7 @@ export default class EmailAddress {
     }
   }
 
+  /** @returns String representation. */
   public toString(): string {
     return this._emailAddress;
   }

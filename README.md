@@ -48,11 +48,11 @@ Handles the storing and retrieving of user information.
 
 **Environment Variables:**
 
-- `DATABASE_HOST` - Address of the database host. (no need to specify if using "compose.yaml")
-- `DATABASE_PASSWORD` - Password of the database.
 - `DATABASE_USER` - User on the database host.
-- `DATABASE_NAME` - Name of the database.
+- `DATABASE_PASSWORD` - Password of the database.
+- `DATABASE_HOST` - Address of the database host. (no need to specify if using "compose.yaml")
 - `DATABASE_PORT` - Port the database is listening on. (no need to specify if using "compose.yaml")
+- `DATABASE_NAME` - Name of the database.
 - `DATABASE_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
 - `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
 - `HASH_COST` - Cost factor of the password hashing algorithm.
@@ -67,15 +67,15 @@ Handles the storing and retrieving of user information.
 
 **Name:** ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_database_initialiser
 
-**Description:** This docker image initialises the database by creating the necessary entities and a default Peerprep adming account.
+**Description:** This docker image initialises the database by creating the necessary entities and a default Peerprep admin account.
 
 **Environment Variables:**
 
-- `DATABASE_HOST` - Address of the database host. (no need to specify if using "compose.yaml")
-- `DATABASE_PASSWORD` - Password of the database.
 - `DATABASE_USER` - User on the database host.
-- `DATABASE_NAME` - Name of the database.
+- `DATABASE_PASSWORD` - Password of the database.
+- `DATABASE_HOST` - Address of the database host. (no need to specify if using "compose.yaml")
 - `DATABASE_PORT` - Port the database is listening on. (no need to specify if using "compose.yaml")
+- `DATABASE_NAME` - Name of the database.
 - `DATABASE_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
 - `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
 - `HASH_COST` - Cost factor of the password hashing algorithm.

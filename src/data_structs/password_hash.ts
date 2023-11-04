@@ -9,6 +9,9 @@ import Password from './password';
 export default class PasswordHash {
   private readonly _passwordHash: string;
 
+  /**
+   * @param passwordHash - Password hash.
+   */
   public constructor(passwordHash: string) {
     this._passwordHash = passwordHash;
   }
@@ -37,6 +40,7 @@ export default class PasswordHash {
     return await bcrypt.compare(password.toString(), this._passwordHash);
   }
 
+  /** @returns String representation. */
   public toString(): string {
     return this._passwordHash;
   }

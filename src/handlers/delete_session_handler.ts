@@ -15,10 +15,12 @@ import Handler, {
 
 /** Handles deleting sessions. */
 export default class DeleteSessionHandler extends Handler {
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.delete;
   }
 
+  /** @inheritdoc */
   public override get subPath(): string {
     return 'session';
   }

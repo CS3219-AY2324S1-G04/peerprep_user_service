@@ -19,16 +19,17 @@ import {
 import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /**
- * Handles updating the user role of the user whose username is specified in the
- * request.
+ * Handles updating the user role of a specified user.
  *
  * The user who sent the request must have the {@link UserRole.admin} user role.
  */
 export default class UpdateUserRoleHandler extends Handler {
+  /** @inheritdoc */
   public get method(): HttpMethod {
     return HttpMethod.put;
   }
 
+  /** @inheritdoc */
   public get subPath(): string {
     return `users/:${userIdPathKey}/user-role`;
   }

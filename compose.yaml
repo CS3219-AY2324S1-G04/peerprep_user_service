@@ -40,7 +40,7 @@ services:
     networks:
       - peerprep_network
     ports:
-      - '${PORT}:9000'
+      - '${API_EXPOSED_PORT}:9000'
     environment:
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}

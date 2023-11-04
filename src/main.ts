@@ -1,9 +1,10 @@
 /**
- * @file Entrypoint to the API app.
+ * @file Entrypoint to the REST API app.
  */
 import App from './app';
 import ApiConfig from './configs/api_config';
-import DatabaseConfig from './configs/database_config';
+import CoreConfig from './configs/core_config';
+import DatabaseClientConfig from './configs/database_client_config';
 import CreateSessionHandler from './handlers/create_session_handler';
 import CreateUserHandler from './handlers/create_user_handler';
 import DeleteSessionHandler from './handlers/delete_session_handler';
@@ -18,23 +19,17 @@ import UpdateUserRoleHandler from './handlers/update_user_role_handler';
 import DatabaseClient from './service/database_client';
 import { PostgresDatabaseClient } from './service/postgres_database_client';
 
-const databaseConfig: DatabaseConfig = new DatabaseConfig();
+const coreConfig: CoreConfig = new CoreConfig();
+const databaseClientConfig: DatabaseClientConfig = new DatabaseClientConfig();
 const apiConfig: ApiConfig = new ApiConfig();
-const client: DatabaseClient = new PostgresDatabaseClient({
-  password: databaseConfig.databasePassword,
-  user: databaseConfig.databaseUser,
-  host: databaseConfig.databaseHost,
-  port: databaseConfig.databasePort,
-  databaseName: databaseConfig.databaseName,
-  connectionTimeoutMillis: databaseConfig.databaseConnectionTimeoutMillis,
-  maxClientCount: databaseConfig.databaseMaxClientCount,
-});
+
+const client: DatabaseClient = new PostgresDatabaseClient(databaseClientConfig);
 
 const app: App = new App(
   apiConfig.port,
   client,
   [
-    new CreateUserHandler(databaseConfig.hashCost),
+    new CreateUserHandler(coreConfig.hashCost),
     new CreateSessionHandler(
       apiConfig.accessTokenPrivateKey,
       apiConfig.sessionExpireMillis,
@@ -51,7 +46,7 @@ const app: App = new App(
       apiConfig.accessTokenPrivateKey,
       apiConfig.accessTokenExpireMillis,
     ),
-    new UpdatePasswordHandler(databaseConfig.hashCost),
+    new UpdatePasswordHandler(coreConfig.hashCost),
     new UpdateUserRoleHandler(),
     new DeleteUserHandler(),
     new GetAccessTokenPublicKeyHandler(apiConfig.accessTokenPublicKey),

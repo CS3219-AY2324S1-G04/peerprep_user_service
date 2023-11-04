@@ -31,6 +31,7 @@ export default class SessionToken {
     return new SessionToken(rawSessionToken as string);
   }
 
+  /** @returns Session token created with a random value. */
   public static create(): SessionToken {
     return new SessionToken(randomUUID());
   }
@@ -45,6 +46,7 @@ export default class SessionToken {
     return rawSessionToken !== undefined && rawSessionToken.length > 0;
   }
 
+  /** @returns String representation. */
   public toString(): string {
     return this._sessionToken;
   }

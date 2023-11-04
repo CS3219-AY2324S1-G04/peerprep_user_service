@@ -45,7 +45,7 @@ export default class Password {
   /**
    * Parses {@link rawPassword} as a password then validates it.
    * @param rawPassword - Value to parse.
-   * @returns The parsed password.
+   * @returns The parsed and validated password.
    * @throws Error if parsing or validation fails.
    */
   public static parseAndValidate(rawPassword: unknown): Password {
@@ -92,6 +92,7 @@ export default class Password {
     }
   }
 
+  /** @returns String representation. */
   public toString(): string {
     return this._password;
   }

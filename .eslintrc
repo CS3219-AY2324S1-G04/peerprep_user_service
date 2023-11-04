@@ -79,8 +79,12 @@
           "FunctionDeclaration",
           "FunctionExpression",
           "MethodDefinition",
-          "VariableDeclaration",
-          "PropertyDefinition"
+          "PropertyDefinition",
+          "TSTypeAliasDeclaration",
+          "TSEnumDeclaration",
+          "TSInterfaceDeclaration",
+          "TSMethodSignature",
+          "TSPropertySignature"
         ]
       }
     ],

@@ -19,15 +19,20 @@ import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 export default class UpdatePasswordHandler extends Handler {
   private readonly _hashCost: number;
 
+  /**
+   * @param hashCost - Cost factor of the password hashing algorithm.
+   */
   public constructor(hashCost: number) {
     super();
     this._hashCost = hashCost;
   }
 
+  /** @inheritdoc */
   public override get method(): HttpMethod {
     return HttpMethod.put;
   }
 
+  /** @inheritdoc */
   public override get subPath(): string {
     return 'user/password';
   }

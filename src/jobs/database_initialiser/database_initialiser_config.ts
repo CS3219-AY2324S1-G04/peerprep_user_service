@@ -25,9 +25,9 @@ export default class DatabaseInitialiserConfig {
 
   /** Should initialisation be done even if entities exist. */
   public readonly shouldForceInitialisation: boolean;
-  /** Default admin user's email address. */
+  /** Email address of the default admin user. */
   public readonly adminEmailAddress: EmailAddress;
-  /** Default admin user's password. */
+  /** Password of the default admin user. */
   public readonly adminPassword: Password;
 
   /**

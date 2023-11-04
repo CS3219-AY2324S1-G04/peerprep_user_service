@@ -3,7 +3,9 @@
  */
 import assert from 'assert';
 
-/** Configs for the REST API server. */
+import { parseIntStrict } from '../utils/parser_utils';
+
+/** Configs for the REST API app. */
 export default class ApiConfig {
   /**
    * Name of the environment variable corresponding to
@@ -46,7 +48,7 @@ export default class ApiConfig {
 
   /** Private key for creating access tokens. */
   public readonly accessTokenPrivateKey: string;
-  /** Public key for verifying session tokens. */
+  /** Public key for verifying access tokens. */
   public readonly accessTokenPublicKey: string;
   /**
    * Number of milliseconds a user session can last for.
@@ -55,7 +57,7 @@ export default class ApiConfig {
    * {@link sessionExpireMillis} milliseconds from the current time.
    */
   public readonly sessionExpireMillis: number;
-  /** Number of milliseconds an access remains valid for. */
+  /** Number of milliseconds an access token remains valid for. */
   public readonly accessTokenExpireMillis: number;
   /** Port that the app will listen on. */
   public readonly port: number;
@@ -89,26 +91,13 @@ export default class ApiConfig {
     this.accessTokenPrivateKey = env[ApiConfig.accessTokenPrivateKeyEnvVar]!;
     this.accessTokenPublicKey = env[ApiConfig.accessTokenPublicKeyEnvVar]!;
     this.sessionExpireMillis =
-      ApiConfig._parseInt(env[ApiConfig.sessionExpireMillisEnvVar]) ??
+      parseIntStrict(env[ApiConfig.sessionExpireMillisEnvVar]) ??
       ApiConfig.defaultSessionExpireMillis;
     this.accessTokenExpireMillis =
-      ApiConfig._parseInt(env[ApiConfig.accessTokenExpireMillisEnvVar]) ??
+      parseIntStrict(env[ApiConfig.accessTokenExpireMillisEnvVar]) ??
       ApiConfig.defaultAccessTokenExpireMillis;
     this.port =
-      ApiConfig._parseInt(env[ApiConfig.portEnvVar]) ?? ApiConfig.defaultPort;
+      parseIntStrict(env[ApiConfig.portEnvVar]) ?? ApiConfig.defaultPort;
     this.isDevEnv = env[ApiConfig.appModeEnvVar] === 'development';
-  }
-
-  private static _parseInt(raw: string | undefined): number | undefined {
-    if (raw === undefined) {
-      return undefined;
-    }
-
-    const val: number = parseFloat(raw);
-    if (isNaN(val) || !Number.isInteger(val)) {
-      return undefined;
-    }
-
-    return val;
   }
 }

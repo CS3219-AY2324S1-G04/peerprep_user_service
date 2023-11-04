@@ -36,7 +36,7 @@ export default class UserProfile {
   })
   public userRole: UserRole;
 
-  public constructor(
+  private constructor(
     userId: number,
     username: string,
     emailAddress: string,
