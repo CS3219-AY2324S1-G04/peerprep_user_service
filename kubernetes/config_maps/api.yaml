@@ -2,7 +2,22 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: user-service-api-config-map
-  namespace: peerprep # Defaults to "default"
+  namespace: peerprep
 data:
+  access-token-public-key: |
+    -----BEGIN PUBLIC KEY-----
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAo63Te7Q0AZa6qF8DHa9r
+    ELSMM3IdMKRvGn69u4x0sirtoL5V0oIeAZvSJ/MyvU4UHT0si6DgxZBMnP1WHSFG
+    MlWy+UGPBjTgA4Ner4ppeuSIHrV5NaHUKfNLEN3hsODFKZj2/Ugl2oLcrZ1qGbh2
+    ehAiVX7J9e6v5Am+jEeKRVmhBh3H2El5Ng25vFj8YE40giZXHiiZ7mFLZt005hcB
+    xYos7tQlVRKULnac/zBH1MoiptArKuDrophnyz7hsE3QE1OkjVRDggsQAro6aWjZ
+    3vzeHiuQm8wYdiSIWz/+8QhoO6nmoJEaXqe4wdLn+yFLqns4e9AZmdlBCU7pVqY8
+    YjVle21zj7tPQS8F6DbAC+s+rhveQ85Q79NkzOThJoo7eNJrb5VY/NJs8x0FHSUx
+    lWJaAUQ/2QN9QgPCUbgDVRzMwm67TAwvrUF4uUb+eLe4AqjMNg0Vyi+za21c5A3n
+    v/Ingbj4chNNkNyoo4XZIBl8M6f09aR4QIbB3UWSi9cAu4YmV9Dcitghj+DSCZ5l
+    bZroEYKGwqmxrC/A7aB1q5IBbn+XFZRdvDn9000/0i4l2FClb8YwmxfGoTFkFsfT
+    YiKqrCN1AaihZgPe4kme10Galeo29qaAAQ+r+u69rHenxnEl+bMcgH5d5KDTkstW
+    gUZoB+hNBHtlOgx3NNdrTUMCAwEAAQ==
+    -----END PUBLIC KEY-----
   session-expire-millis: '604800000'
   access-token-expire-millis: '900000'
