@@ -2,7 +2,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: user-service-database-client-config-map
-  namespace: peerprep # Defaults to "default"
+  namespace: peerprep
 data:
+  database-user: fgnrvorv
+  database-host: satao.db.elephantsql.com
+  database-port: '5432'
+  database-name: fgnrvorv
   database-connection-timeout-millis: '0'
   database-max-client-count: '20'
