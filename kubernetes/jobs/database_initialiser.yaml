@@ -34,6 +34,11 @@ spec:
                 configMapKeyRef:
                   name: user-service-database-client-config-map
                   key: database-port
+            - name: DATABASE_SHOULD_USE_TLS
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-database-client-config-map
+                  key: database-should-use-tls
             - name: DATABASE_NAME
               valueFrom:
                 configMapKeyRef:

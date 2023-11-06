@@ -37,6 +37,7 @@ export class PostgresDatabaseClient implements DatabaseClient {
       connectTimeoutMS: config.connectionTimeoutMillis,
       poolSize: config.maxClientCount,
       synchronize: false,
+      ssl: config.shouldUseTls,
     });
   }
 

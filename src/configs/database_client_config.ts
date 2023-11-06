@@ -17,6 +17,8 @@ export default class DatabaseClientConfig {
   public static readonly hostEnvVar: string = 'DATABASE_HOST';
   /** Name of the environment variable corresponding to {@link port}. */
   public static readonly portEnvVar: string = 'DATABASE_PORT';
+  /** Name of the environment variable corresponding to {@link shouldUseTls}. */
+  public static readonly shouldUseTlsEnvVar: string = 'DATABASE_SHOULD_USE_TLS';
   /**
    * Name of the environment variable corresponding to {@link databaseName}.
    */
@@ -55,6 +57,8 @@ export default class DatabaseClientConfig {
   public readonly host: string;
   /** Port of the database host that the database is listening on. */
   public readonly port: number;
+  /** Should TLS be utilised to secure the connection. */
+  public readonly shouldUseTls: boolean;
   /** Name of the database. */
   public readonly databaseName: string;
   /**
@@ -93,6 +97,7 @@ export default class DatabaseClientConfig {
     this.port =
       parseIntStrict(env[DatabaseClientConfig.portEnvVar]) ??
       DatabaseClientConfig.defaultPort;
+    this.shouldUseTls = env[DatabaseClientConfig.shouldUseTlsEnvVar] === 'true';
     this.databaseName =
       DatabaseClientConfig._parseString(
         env[DatabaseClientConfig.databaseNameEnvVar],

@@ -7,6 +7,7 @@ data:
   database-user: fgnrvorv
   database-host: satao.db.elephantsql.com
   database-port: '5432'
+  database-should-use-tls: 'true'
   database-name: fgnrvorv
   database-connection-timeout-millis: '0'
   database-max-client-count: '20'
