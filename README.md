@@ -44,15 +44,15 @@ Handles the storing and retrieving of user information.
 
 **Name:** ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_api
 
-**Description:** This docker image contains the REST API.
+**Description:** Runs the REST API.
 
 **Environment Variables:**
 
 - `DATABASE_USER` - User on the database host.
 - `DATABASE_PASSWORD` - Password of the database.
-- `DATABASE_HOST` - Address of the database host. (no need to specify if using "compose.yaml")
-- `DATABASE_PORT` - Port the database is listening on. (no need to specify if using "compose.yaml")
-- `DATABASE_SHOULD_USE_TLS` - Set to "true" if database connection should be secured with TLS.
+- `DATABASE_HOST` - Address of the database host.
+- `DATABASE_PORT` - Port the database is listening on.
+- `DATABASE_SHOULD_USE_TLS` - Should database connection be secured with TLS. Set to "true" to enable.
 - `DATABASE_NAME` - Name of the database.
 - `DATABASE_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
 - `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
@@ -62,28 +62,28 @@ Handles the storing and retrieving of user information.
 - `SESSION_EXPIRE_MILLIS` - Number of milliseconds a user session can live for since the last expiry date and time extension.
 - `ACCESS_TOKEN_EXPIRE_MILLIS` - Number of milliseconds an access token can live for.
 - `PORT` - Port to listen on.
-- `NODE_ENV` - Sets the mode the app is running in ("development" or "production")
+- `NODE_ENV` - Mode the app is running on ("development" or "production").
 
 ### Database Initialiser
 
 **Name:** ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_database_initialiser
 
-**Description:** This docker image initialises the database by creating the necessary entities and a default Peerprep admin account.
+**Description:** Initialises the database by creating the necessary entities and a default Peerprep admin account.
 
 **Environment Variables:**
 
 - `DATABASE_USER` - User on the database host.
 - `DATABASE_PASSWORD` - Password of the database.
-- `DATABASE_HOST` - Address of the database host. (no need to specify if using "compose.yaml")
-- `DATABASE_PORT` - Port the database is listening on. (no need to specify if using "compose.yaml")
-- `DATABASE_SHOULD_USE_TLS` - Set to "true" if database connection should be secured with TLS.
+- `DATABASE_HOST` - Address of the database host.
+- `DATABASE_PORT` - Port the database is listening on.
+- `DATABASE_SHOULD_USE_TLS` - Should database connection be secured with TLS. Set to "true" to enable.
 - `DATABASE_NAME` - Name of the database.
 - `DATABASE_CONNECTION_TIMEOUT_MILLIS` - Number of milliseconds for a database client to connect to the database before timing out.
 - `DATABASE_MAX_CLIENT_COUNT` - Max number of database clients.
 - `HASH_COST` - Cost factor of the password hashing algorithm.
 - `ADMIN_EMAIL_ADDRESS` - Email address of the default PeerPrep admin user.
 - `ADMIN_PASSWORD` - Password of the default PeerPrep admin user.
-- `SHOULD_FORCE_INITIALISATION` - Set to "true" if initialisation should be done even if entities already exist. Do not set to "true" in production as it might cause loss of data.
+- `SHOULD_FORCE_INITIALISATION` - Should database initialisation be done regardless of whether one or more entities to be created already exist. Set to "true" to enable (may cause data loss).
 
 ## REST API
 
