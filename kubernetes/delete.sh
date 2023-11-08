@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 kubectl delete -f ./config_maps/core.yaml
 kubectl delete -f ./config_maps/database_client.yaml
