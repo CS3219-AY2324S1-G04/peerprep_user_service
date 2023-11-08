@@ -1,21 +1,29 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ### Constants ###
 cr="ghcr.io/cs3219-ay2324s1-g04/"
 export_dir="./docker_build"
 
+# This list should contain a unique key for each image.
 image_keys=(api database_initialiser)
 
-declare -A images=(
-  [api_name]=${cr}peerprep_user_service_api
-  [api_docker_file]="./dockerfiles/api.dockerfile"
-  [api_should_build]=0
+# For each image specify the following variables:
+# - images_KEY_name - Name of the image. (should be prepended with the container registry ${cr})
+# - images_KEY_docker_file - Path to the dockerfile.
+# - images_KEY_should_build - Should be 0. This value is set by CLI arguments.
+# Note: KEY refers to a key in image_keys
 
-  [database_initialiser_name]=${cr}peerprep_user_service_database_initialiser
-  [database_initialiser_docker_file]="./dockerfiles/database_initialiser.dockerfile"
-  [database_initialiser_should_build]=0
-)
+# API image
+images_api_name=${cr}peerprep_user_service_api
+images_api_docker_file="./dockerfiles/api.dockerfile"
+images_api_should_build=0
 
+# Database initialiser image
+images_database_initialiser_name=${cr}peerprep_user_service_database_initialiser
+images_database_initialiser_docker_file="./dockerfiles/database_initialiser.dockerfile"
+images_database_initialiser_should_build=0
+
+# Instructions
 image_keys_str=""
 for k in ${image_keys[@]}; do
   if [[ $image_keys_str == "" ]]; then
@@ -107,7 +115,7 @@ do
       should_push=1
       ;;
     i)
-      images[${OPTARG}_should_build]=1
+      eval images_${OPTARG}_should_build=1
       ;;
     t)
       image_tag=":$OPTARG"
@@ -115,19 +123,21 @@ do
 done
 
 for k in ${image_keys[@]}; do
-  images[${k}_name]=${images[${k}_name]}${image_tag}
+  image_name_var=images_${k}_name
+  eval images_${k}_name=${!image_name_var}${image_tag}
 done
 
 should_build_all=1
 for k in ${image_keys[@]}; do
-  if [[ ${images[${k}_should_build]} == 1 ]]; then
+  image_should_build_var=images_${k}_should_build
+  if [[ ${!image_should_build_var} == 1 ]]; then
     should_build_all=0
   fi
 done
 
 if [[ ${should_build_all} == 1 ]]; then
   for k in ${image_keys[@]}; do
-    images[${k}_should_build]=1
+    eval images_${k}_should_build=1
   done
 fi
 
@@ -145,8 +155,12 @@ echo "Transpile successful."
 
 ### Build Images ###
 for k in ${image_keys[@]}; do
-  if [[ ${images[${k}_should_build]} == 1 ]]; then
-    build_image ${images[${k}_docker_file]} ${images[${k}_name]}
+  image_name_var=images_${k}_name
+  image_docker_file_var=images_${k}_docker_file
+  image_should_build_var=images_${k}_should_build
+
+  if [[ ${!image_should_build_var} == 1 ]]; then
+    build_image ${!image_docker_file_var} ${!image_name_var}
   fi
 done
 
@@ -156,7 +170,11 @@ if [[ $should_push == 0 ]]; then
 fi
 
 for k in ${image_keys[@]}; do
-  if [[ ${images[${k}_should_build]} == 1 ]]; then
-    push_image ${images[${k}_name]}
+  image_name_var=images_${k}_name
+  image_docker_file_var=images_${k}_docker_file
+  image_should_build_var=images_${k}_should_build
+
+  if [[ ${!image_should_build_var} == 1 ]]; then
+    push_image ${!image_name_var}
   fi
 done
