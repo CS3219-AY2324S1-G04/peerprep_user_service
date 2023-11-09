@@ -33,18 +33,17 @@ for k in ${image_keys[@]}; do
   fi
 done
 
-instructions="\n
-Usage: build_images.sh [-h] [-e] [-p] [-i IMAGE] [-t TAG]\n
-\n
-This script builds Docker images, exports them to \"./docker_build\", then pushes them to the container registry. The default configuration builds all images and does not push them to the container registry. Arguments can be specified to change the script behaviour.\n
-\n
-Arguments:\n
--h\t\t     Prints the help message.\n
--e\t\t     Enables exporting the images to the directory \"${export_dir}\".\n
--p\t\t     Enables pushing to the container registry after building.\n
--i IMAGE\t Specifies the image to build and push. Value can be ${image_keys_str}. This argument can be specified multiple times to include multiple images.\n
--t TAG\t\t Tags the images built with \"TAG\".
-"
+instructions="\n"\
+"Usage: build_images.sh [-h] [-e] [-p] [-i IMAGE] [-t TAG]\n"\
+"\n"\
+"This script builds Docker images, exports them to \"./docker_build\", then pushes them to the container registry. The default configuration builds all images and does not push them to the container registry. Arguments can be specified to change the script behaviour.\n"\
+"\n"\
+"Arguments:\n"\
+"-h\t\t     Prints the help message.\n"\
+"-e\t\t     Enables exporting the images to the directory \"${export_dir}\".\n"\
+"-p\t\t     Enables pushing to the container registry after building.\n"\
+"-i IMAGE\t Specifies the image to build and push. Value can be ${image_keys_str}. This argument can be specified multiple times to include multiple images.\n"\
+"-t TAG\t\t Tags the images built with \"TAG\"."
 
 ### Functions ###
 build_image () {
