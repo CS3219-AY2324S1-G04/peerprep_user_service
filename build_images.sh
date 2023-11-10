@@ -51,7 +51,7 @@ done
 instructions="\n"\
 "Usage: build_images.sh [-h] [-e] [-p] [-i IMAGE] [-t TAG]\n"\
 "\n"\
-"This script builds Docker images, exports them to \"./docker_build\", then pushes them to the container registry. The default configuration builds all images and does not push them to the container registry. Arguments can be specified to change the script behaviour.\n"\
+"This script builds Docker images, exports them to \"./docker_build\", then pushes them to the container registry. The default configuration builds all images and does not export or push them to the container registry. Arguments can be specified to change the script behaviour.\n"\
 "\n"\
 "Arguments:\n"\
 "-h\t\t     Prints the help message.\n"\
