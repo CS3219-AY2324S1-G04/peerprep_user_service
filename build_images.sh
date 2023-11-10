@@ -9,8 +9,8 @@ export_dir="./docker_build"
 #                  This marks the start of image information.                  #
 #                                                                              #
 #                        If you are adding a new image:                        #
-#   1. Add a unique key in "image_keys" for your image.                        #
-#   2. For each image specify the following variables:                         #
+#  1. Add a unique key in "image_keys" for your image.                         #
+#  2. For each image specify the following variables:                          #
 #     - images_KEY_name - Name of the image. (should be prepended with the     #
 #       container registry ${cr})                                              #
 #     - images_KEY_docker_file - Path to the dockerfile.                       #
