@@ -67,7 +67,7 @@ export default class AccessToken {
    * @param rawAccessToken - Access token to be decoded.
    * @param publicKey - Public key for verifying the access token.
    * @returns Created {@link AccessToken}.
-   * @throws Error if {@link rawAccessToken} is not a valid access token.
+   * @throws {Error} if {@link rawAccessToken} is not a valid access token.
    */
   public static verify(
     rawAccessToken: string | undefined,

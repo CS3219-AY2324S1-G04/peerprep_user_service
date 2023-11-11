@@ -28,7 +28,7 @@ export default class Password {
    * Parses {@link rawPassword} as a password.
    * @param rawPassword - Value to parse.
    * @returns The parsed {@link Password}.
-   * @throws Error if parsing fails.
+   * @throws {Error} if parsing fails.
    */
   public static parse(rawPassword: unknown): Password {
     if (!Password._isString(rawPassword)) {
@@ -46,7 +46,7 @@ export default class Password {
    * Parses {@link rawPassword} as a password then validates it.
    * @param rawPassword - Value to parse.
    * @returns The parsed and validated password.
-   * @throws Error if parsing or validation fails.
+   * @throws {Error} if parsing or validation fails.
    */
   public static parseAndValidate(rawPassword: unknown): Password {
     const password: Password = Password.parse(rawPassword);
@@ -64,7 +64,7 @@ export default class Password {
 
   /**
    * Validates the password.
-   * @throws Error if the password is invalid.
+   * @throws {Error} if the password is invalid.
    */
   public validate(): void {
     if (this._isPasswordTooShort()) {

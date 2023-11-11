@@ -13,7 +13,7 @@ enum UserRole {
  * Parses {@link rawUserRole} as a user role.
  * @param rawUserRole - Value to parse.
  * @returns The parsed user role.
- * @throws Error if parsing fails.
+ * @throws {Error} if parsing fails.
  */
 export function parseUserRole(rawUserRole: unknown): UserRole {
   if (!isString(rawUserRole)) {
