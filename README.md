@@ -125,14 +125,13 @@ This is the main deployment method for production.
 - Docker images must be pushed to the container registry and made public.
   - To push to the container registry (assuming one has the necessary permissions), run: `./build_images.sh -p`
   - To make the images public, change the visibility of the image on [GitHub](https://github.com/orgs/CS3219-AY2324S1-G04/packages).
-- You must have the Kubernetes secrets for User Service (this is not stored in the Git repository).
+- Kubernetes cluster must be setup as specified in the [main repository](https://github.com/CS3219-AY2324S1/ay2324s1-course-assessment-g04#deployment).
 
 **Steps:**
 
 1. Ensure the "peerprep" namespace has been created: `kubectl create namespace peerprep`
 2. Navigate to the "kubernetes" directory: `cd kubernetes`
-3. Update the secrets in the "secrets" directory.
-4. Deploy the Kubernetes objects: `./deploy.sh`
+3. Deploy the Kubernetes objects: `./deploy.sh`
     - To delete the Kubernetes objects, run: `./delete.sh`
 
 ### Docker Compose Deployment
