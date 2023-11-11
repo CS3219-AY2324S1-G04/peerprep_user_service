@@ -4,11 +4,14 @@ Handles the storing and retrieving of user information.
 
 ## Table of Contents
 
-- [Quickstart Guide](#quickstart-guide)
 - [Build Script](#build-script)
+- [Architecture](#architecture)
 - [Docker Images](#docker-images)
   - [API](#api)
   - [Database Initialiser](#database-initialiser)
+- [Deployment](#deployment)
+  - [Kubernetes Deployment](#kubernetes-deployment)
+  - [Docker Compose Deployment](#docker-compose-deployment)
 - [REST API](#rest-api)
   - [Create a User](#create-a-user)
   - [Create a Session](#create-a-session)
@@ -22,13 +25,6 @@ Handles the storing and retrieving of user information.
   - [Get Access Token Public Key](#get-access-token-public-key)
   - [Get a User Identity](#get-a-user-identity)
 
-## Quickstart Guide
-
-1. Clone this repository.
-2. Build the docker images by running: `./build_images.sh`
-3. Modify the ".env" file as per needed. Refer to [Docker Images](#docker-images) for the list of environment variables.
-4. Create the docker containers by running: `docker compose up`
-
 ## Build Script
 
 `build_images.sh` is a build script for building the Docker images and optionally pushing them to the container registry. To get more information about the script, run:
@@ -36,6 +32,31 @@ Handles the storing and retrieving of user information.
 ```
 ./build_images.sh -h
 ```
+
+## Architecture
+
+![](./images/architecture.jpg)
+
+Note: Start of arrow indicates request origin and end of arrow indicates request destination.
+
+**REST API Server**
+
+- Handles REST API requests.
+- Can be scaled horizontally.
+- Corresponds to the [API](#api) docker image.
+
+**Database Initialiser**
+
+- Initialises the database.
+- Does nothing if the database already contains one or more entities it intends to create (behaviour can be changed via environment variables).
+- Shuts down once it is done initialising the database.
+- Creates entities in the database.
+- Creates the default Peerprep admin account.
+- Corresponds to the [Database Initialiser](#database-initialiser) docker image.
+
+**Database**
+
+- Database for storing user information.
 
 ## Docker Images
 
@@ -83,6 +104,51 @@ Handles the storing and retrieving of user information.
 - `ADMIN_EMAIL_ADDRESS` - Email address of the default PeerPrep admin user.
 - `ADMIN_PASSWORD` - Password of the default PeerPrep admin user.
 - `SHOULD_FORCE_INITIALISATION` - Should database initialisation be done regardless of whether one or more entities to be created already exist. Set to "true" to enable (may cause data loss).
+
+## Deployment
+
+### Kubernetes Deployment
+
+This is the main deployment method for production.
+
+**Note:**
+
+- The database is hosted externally, not within the Kubernetes cluster.
+
+**Prerequisite**
+
+- Docker images must be pushed to the container registry and made public.
+  - To push to the container registry (assuming one has the necessary permissions), run: `./build_images.sh -p`
+  - To make the images public, change the visibility of the image on [GitHub](https://github.com/orgs/CS3219-AY2324S1-G04/packages).
+- You must have the Kubernetes secrets for User Service (this is not stored in the Git repository).
+
+**Steps:**
+
+1. Ensure the "peerprep" namespace has been created: `kubectl create namespace peerprep`
+2. Navigate to the "kubernetes" directory: `cd kubernetes`
+3. Update the secrets in the "secrets" directory.
+4. Deploy the Kubernetes objects: `./deploy.sh`
+    - To delete the Kubernetes objects, run: `./delete.sh`
+
+### Docker Compose Deployment
+
+This is intended for development use only. It is meant to make developing other services easier.
+
+**Note:**
+
+- No horizontal auto scaling is provided.
+- The database is created by Docker compose and data is not backed up.
+
+**Prerequisite**
+
+- Docker images must be built.
+  - To build the images, run: `./build_images.sh`
+
+**Steps:**
+
+1. Ensure that the "peerprep" network exist: `docker network create -d bridge peerprep`
+2. Create the docker containers: `docker compose up`
+    - To delete the docker containers, run: `docker compose down`
 
 ## REST API
 
