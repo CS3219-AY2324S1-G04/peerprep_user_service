@@ -21,7 +21,6 @@ Handles the storing and retrieving of user information.
   - [Delete a User](#delete-a-user)
   - [Get Access Token Public Key](#get-access-token-public-key)
   - [Get a User Identity](#get-a-user-identity)
-- [To Do](#to-do)
 
 ## Quickstart Guide
 
@@ -126,7 +125,11 @@ Creates a new user session.
 
 **Response**
 
-- `201` - Session created. The response will contain 3 cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry". The access token expiry cookie is the only cookie that is not HTTP-only.
+- `201` - Session created.
+  - Cookies:
+    - `session-token` - Contains session token. This cookie is HTTP-only.
+    - `access-token` - Contains access token. This cookie is HTTP-only.
+    - `access-token-expiry` - Contains expiry of the access token.
 - `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
   - Example response body:
     ```json
@@ -152,7 +155,11 @@ A successful request to this endpoint will also extend the expiry of the session
 
 **Response**
 
-- `200` - Success. The response will contain 3 cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry". The session token cookie is sent to extend the lifespan of the cookie on the browser. The access token expiry cookie is the only cookie that is not HTTP-only.
+- `200` - Success.
+  - Cookies:
+    - `session-token` - Contains session token. This cookie is HTTP-only. This is sent to extend the lifespan of the cookie on the browser.
+    - `access-token` - Contains access token. This cookie is HTTP-only.
+    - `access-token-expiry` - Contains expiry of the access token.
 - `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
@@ -168,7 +175,11 @@ Deletes the session whose session token is the one specified.
 
 **Response**
 
-- `200` - Success. The response will contain 3 expired cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry".
+- `200` - Success.
+  - Cookies:
+    - `session-token` - Expired cookie.
+    - `access-token` - Expired cookie.
+    - `access-token-expiry` - Expired cookie.
 - `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
@@ -218,7 +229,10 @@ Note that all fields of the user profile must be provided including fields that 
 
 **Response**
 
-- `200` - Success. The response will contain 2 cookies, an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry". The access token expiry cookie is the only cookie that is not HTTP-only.
+- `200` - Success.
+  - Cookies:
+    - `access-token` - Contains access token. This cookie is HTTP-only.
+    - `access-token-expiry` - Contains expiry of the access token.
 - `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
   - Example response body:
     ```json
@@ -312,7 +326,11 @@ Since this is a high threat operation, the user must provide their session token
 
 **Response**
 
-- `200` - Success. The response will contain 3 expired cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry".
+- `200` - Success.
+  - Cookies:
+    - `session-token` - Expired cookie.
+    - `access-token` - Expired cookie.
+    - `access-token-expiry` - Expired cookie.
 - `401` - Session token was not provided, or session token is invalid, or password is incorrect.
 - `500` - Unexpected error occurred on the server.
 
@@ -352,9 +370,3 @@ This is only intended to be used by other services when performing high threat m
     ```
 - `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
-
-## To Do
-- Sync frontend and backend parameter value validation
-- Set session token to be secure
-- API for listing users if user role is admin
-- API for password recovery
