@@ -37,7 +37,13 @@ Handles the storing and retrieving of user information.
 
 ![](./images/architecture.jpg)
 
-Note: Start of arrow indicates request origin and end of arrow indicates request destination.
+Legend:
+
+- Start of arrow indicates request origin and end of arrow indicates request destination.
+- Dark grey items represents internal servers/containers.
+- Red items represents internal servers/containers that are temporary.
+- Green items represents internal servers/containers that are exposed to external services.
+- Blue items represents external servers/containers.
 
 **REST API Server**
 
