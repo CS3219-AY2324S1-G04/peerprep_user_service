@@ -4,14 +4,23 @@
 cr="ghcr.io/cs3219-ay2324s1-g04/"
 export_dir="./docker_build"
 
+################################################################################
+#                                                                              #
+#                  This marks the start of image information.                  #
+#                                                                              #
+#                        If you are adding a new image:                        #
+#  1. Add a unique key in "image_keys" for your image.                         #
+#  2. For each image specify the following variables:                          #
+#     - images_KEY_name - Name of the image. (should be prepended with the     #
+#       container registry ${cr})                                              #
+#     - images_KEY_docker_file - Path to the dockerfile.                       #
+#     - images_KEY_should_build - Should be 0. This value is set by CLI        #
+#       arguments.                                                             #
+#                                                                              #
+################################################################################
+
 # This list should contain a unique key for each image.
 image_keys=(api database_initialiser)
-
-# For each image specify the following variables:
-# - images_KEY_name - Name of the image. (should be prepended with the container registry ${cr})
-# - images_KEY_docker_file - Path to the dockerfile.
-# - images_KEY_should_build - Should be 0. This value is set by CLI arguments.
-# Note: KEY refers to a key in image_keys
 
 # API image
 images_api_name=${cr}peerprep_user_service_api
@@ -22,6 +31,12 @@ images_api_should_build=0
 images_database_initialiser_name=${cr}peerprep_user_service_database_initialiser
 images_database_initialiser_docker_file="./dockerfiles/database_initialiser.dockerfile"
 images_database_initialiser_should_build=0
+
+################################################################################
+#                                                                              #
+#                   This marks the end of image information.                   #
+#                                                                              #
+################################################################################
 
 # Instructions
 image_keys_str=""
@@ -36,7 +51,7 @@ done
 instructions="\n"\
 "Usage: build_images.sh [-h] [-e] [-p] [-i IMAGE] [-t TAG]\n"\
 "\n"\
-"This script builds Docker images, exports them to \"./docker_build\", then pushes them to the container registry. The default configuration builds all images and does not push them to the container registry. Arguments can be specified to change the script behaviour.\n"\
+"This script builds Docker images, exports them to \"./docker_build\", then pushes them to the container registry. The default configuration builds all images and does not export or push them to the container registry. Arguments can be specified to change the script behaviour.\n"\
 "\n"\
 "Arguments:\n"\
 "-h\t\t     Prints the help message.\n"\

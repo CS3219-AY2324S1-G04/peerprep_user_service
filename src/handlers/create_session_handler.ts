@@ -13,7 +13,7 @@ import DatabaseClient from '../service/database_client';
 import { passwordKey, usernameKey } from '../utils/parameter_keys';
 import Handler, { HandlerUtils, HttpMethod } from './handler';
 
-/** Handles creating sessions. */
+/** Handles REST API requests for creating sessions. */
 export default class CreateSessionHandler extends Handler {
   private readonly _accessTokenPrivateKey: string;
   private readonly _sessionExpireMillis: number;
@@ -21,7 +21,8 @@ export default class CreateSessionHandler extends Handler {
 
   /**
    * @param accessTokenPrivateKey - Private key for creating access tokens.
-   * @param sessionExpireMillis - Number of milliseconds a session can last for.
+   * @param sessionExpireMillis - Number of milliseconds a session can can
+   * remain valid for.
    * @param accessTokenExpireMillis - Number of milliseconds an access token
    * remains valid for.
    */
@@ -150,8 +151,7 @@ export default class CreateSessionHandler extends Handler {
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
    * @throws {HttpErrorInfo} Error 400 if the username and/or password are
-   * invalid (missing, empty etc.). Message contains a JSON string of the
-   * reasons for the error.
+   * invalid. Message contains a JSON string of the reasons for the error.
    * @throws {HttpErrorInfo} Error 401 if no user with the username exist, or
    * the username and password do not match.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.

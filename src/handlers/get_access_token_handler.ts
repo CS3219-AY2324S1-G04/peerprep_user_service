@@ -14,7 +14,8 @@ import Handler, {
 } from './handler';
 
 /**
- * Handles getting an access token for the user who sent the request.
+ * Handles REST API requests for getting an access token for the user who sent
+ * the request.
  *
  * Also extends the expiry of the session which the request is associated with.
  */
@@ -25,7 +26,8 @@ export default class GetAccessTokenHandler extends Handler {
 
   /**
    * @param accessTokenPrivateKey - Private key for creating access tokens.
-   * @param sessionExpireMillis - Number of milliseconds a session can last for.
+   * @param sessionExpireMillis - Number of milliseconds a session can can
+   * remain valid for.
    * @param accessTokenExpireMillis - Number of milliseconds an access token
    * remains valid for.
    */

@@ -15,7 +15,7 @@ import Handler, {
   authenticationErrorMessages,
 } from './handler';
 
-/** Handles deleting the user who sent the request. */
+/** Handles REST API requests for deleting the user who sent the request. */
 export default class DeleteUserHandler extends Handler {
   /** @inheritdoc */
   public override get method(): HttpMethod {
@@ -93,8 +93,8 @@ export default class DeleteUserHandler extends Handler {
 
   /**
    * Deletes the user who owns the session token stored in the request cookie.
-   * Sends a HTTP 200 response with expired session token, access token, and
-   * access token expiry cookies.
+   * Sends a HTTP 200 response with expired cookies for session token, access
+   * token, and access token expiry.
    * @param req - Information about the request. Sends a HTTP 200 response.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.

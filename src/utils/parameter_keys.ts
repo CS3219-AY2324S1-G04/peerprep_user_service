@@ -1,6 +1,7 @@
 /**
  * @file Keys for query parameters, path parameters, and cookies.
  */
+
 /** Username key. */
 export const usernameKey: string = 'username';
 /** Email address key. */

@@ -1,5 +1,7 @@
 /**
  * @file Entrypoint to the REST API app.
+ *
+ * The REST API app handles REST API requests sent to it's endpoints.
  */
 import App from './app';
 import ApiConfig from './configs/api_config';

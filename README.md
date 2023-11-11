@@ -4,11 +4,14 @@ Handles the storing and retrieving of user information.
 
 ## Table of Contents
 
-- [Quickstart Guide](#quickstart-guide)
 - [Build Script](#build-script)
+- [Architecture](#architecture)
 - [Docker Images](#docker-images)
   - [API](#api)
   - [Database Initialiser](#database-initialiser)
+- [Deployment](#deployment)
+  - [Kubernetes Deployment](#kubernetes-deployment)
+  - [Docker Compose Deployment](#docker-compose-deployment)
 - [REST API](#rest-api)
   - [Create a User](#create-a-user)
   - [Create a Session](#create-a-session)
@@ -21,14 +24,6 @@ Handles the storing and retrieving of user information.
   - [Delete a User](#delete-a-user)
   - [Get Access Token Public Key](#get-access-token-public-key)
   - [Get a User Identity](#get-a-user-identity)
-- [To Do](#to-do)
-
-## Quickstart Guide
-
-1. Clone this repository.
-2. Build the docker images by running: `./build_images.sh`
-3. Modify the ".env" file as per needed. Refer to [Docker Images](#docker-images) for the list of environment variables.
-4. Create the docker containers by running: `docker compose up`
 
 ## Build Script
 
@@ -37,6 +32,31 @@ Handles the storing and retrieving of user information.
 ```
 ./build_images.sh -h
 ```
+
+## Architecture
+
+![](./images/architecture.jpg)
+
+Note: Start of arrow indicates request origin and end of arrow indicates request destination.
+
+**REST API Server**
+
+- Handles REST API requests.
+- Can be scaled horizontally.
+- Corresponds to the [API](#api) docker image.
+
+**Database Initialiser**
+
+- Initialises the database.
+- Does nothing if the database already contains one or more entities it intends to create (behaviour can be changed via environment variables).
+- Shuts down once it is done initialising the database.
+- Creates entities in the database.
+- Creates the default Peerprep admin account.
+- Corresponds to the [Database Initialiser](#database-initialiser) docker image.
+
+**Database**
+
+- Database for storing user information.
 
 ## Docker Images
 
@@ -85,6 +105,51 @@ Handles the storing and retrieving of user information.
 - `ADMIN_PASSWORD` - Password of the default PeerPrep admin user.
 - `SHOULD_FORCE_INITIALISATION` - Should database initialisation be done regardless of whether one or more entities to be created already exist. Set to "true" to enable (may cause data loss).
 
+## Deployment
+
+### Kubernetes Deployment
+
+This is the main deployment method for production.
+
+**Note:**
+
+- The database is hosted externally, not within the Kubernetes cluster.
+
+**Prerequisite**
+
+- Docker images must be pushed to the container registry and made public.
+  - To push to the container registry (assuming one has the necessary permissions), run: `./build_images.sh -p`
+  - To make the images public, change the visibility of the image on [GitHub](https://github.com/orgs/CS3219-AY2324S1-G04/packages).
+- You must have the Kubernetes secrets for User Service (this is not stored in the Git repository).
+
+**Steps:**
+
+1. Ensure the "peerprep" namespace has been created: `kubectl create namespace peerprep`
+2. Navigate to the "kubernetes" directory: `cd kubernetes`
+3. Update the secrets in the "secrets" directory.
+4. Deploy the Kubernetes objects: `./deploy.sh`
+    - To delete the Kubernetes objects, run: `./delete.sh`
+
+### Docker Compose Deployment
+
+This is intended for development use only. It is meant to make developing other services easier.
+
+**Note:**
+
+- No horizontal auto scaling is provided.
+- The database is created by Docker compose and data is not backed up.
+
+**Prerequisite**
+
+- Docker images must be built.
+  - To build the images, run: `./build_images.sh`
+
+**Steps:**
+
+1. Ensure that the "peerprep" network exist: `docker network create -d bridge peerprep`
+2. Create the docker containers: `docker compose up`
+    - To delete the docker containers, run: `docker compose down`
+
 ## REST API
 
 ### Create a User
@@ -126,7 +191,11 @@ Creates a new user session.
 
 **Response**
 
-- `201` - Session created. The response will contain 3 cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry". The access token expiry cookie is the only cookie that is not HTTP-only.
+- `201` - Session created.
+  - Cookies:
+    - `session-token` - Contains session token. This cookie is HTTP-only.
+    - `access-token` - Contains access token. This cookie is HTTP-only.
+    - `access-token-expiry` - Contains expiry of the access token.
 - `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
   - Example response body:
     ```json
@@ -152,7 +221,11 @@ A successful request to this endpoint will also extend the expiry of the session
 
 **Response**
 
-- `200` - Success. The response will contain 3 cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry". The session token cookie is sent to extend the lifespan of the cookie on the browser. The access token expiry cookie is the only cookie that is not HTTP-only.
+- `200` - Success.
+  - Cookies:
+    - `session-token` - Contains session token. This cookie is HTTP-only. This is sent to extend the lifespan of the cookie on the browser.
+    - `access-token` - Contains access token. This cookie is HTTP-only.
+    - `access-token-expiry` - Contains expiry of the access token.
 - `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
@@ -168,7 +241,11 @@ Deletes the session whose session token is the one specified.
 
 **Response**
 
-- `200` - Success. The response will contain 3 expired cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry".
+- `200` - Success.
+  - Cookies:
+    - `session-token` - Expired cookie.
+    - `access-token` - Expired cookie.
+    - `access-token-expiry` - Expired cookie.
 - `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
 
@@ -218,7 +295,10 @@ Note that all fields of the user profile must be provided including fields that 
 
 **Response**
 
-- `200` - Success. The response will contain 2 cookies, an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry". The access token expiry cookie is the only cookie that is not HTTP-only.
+- `200` - Success.
+  - Cookies:
+    - `access-token` - Contains access token. This cookie is HTTP-only.
+    - `access-token-expiry` - Contains expiry of the access token.
 - `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
   - Example response body:
     ```json
@@ -312,7 +392,11 @@ Since this is a high threat operation, the user must provide their session token
 
 **Response**
 
-- `200` - Success. The response will contain 3 expired cookies, a session token cookie named "session-token", an access token cookie named "access-token", and a cookie for the expiry of the access token named "access-token-expiry".
+- `200` - Success.
+  - Cookies:
+    - `session-token` - Expired cookie.
+    - `access-token` - Expired cookie.
+    - `access-token-expiry` - Expired cookie.
 - `401` - Session token was not provided, or session token is invalid, or password is incorrect.
 - `500` - Unexpected error occurred on the server.
 
@@ -352,9 +436,3 @@ This is only intended to be used by other services when performing high threat m
     ```
 - `401` - Session token was not provided or is invalid.
 - `500` - Unexpected error occurred on the server.
-
-## To Do
-- Sync frontend and backend parameter value validation
-- Set session token to be secure
-- API for listing users if user role is admin
-- API for password recovery

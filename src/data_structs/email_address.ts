@@ -1,6 +1,7 @@
 /**
  * @file Defines {@link EmailAddress}.
  */
+
 /** Email address. */
 export default class EmailAddress {
   private static _maxLength: number = 255;
@@ -14,7 +15,7 @@ export default class EmailAddress {
   }
 
   /**
-   * Parses {@link rawEmailAddress} as an {@link EmailAddress}.
+   * Parses {@link rawEmailAddress} as an email address.
    * @param rawEmailAddress - Value to parse.
    * @returns The parsed {@link EmailAddress}.
    * @throws Error if parsing fails.
@@ -34,8 +35,7 @@ export default class EmailAddress {
   }
 
   /**
-   * Parses {@link rawEmailAddress} as an {@link EmailAddress} then validates
-   * it.
+   * Parses {@link rawEmailAddress} as an email address then validates it.
    * @param rawEmailAddress - Value to parse.
    * @returns The parsed and validated {@link EmailAddress}.
    * @throws Error if parsing or validation fails.

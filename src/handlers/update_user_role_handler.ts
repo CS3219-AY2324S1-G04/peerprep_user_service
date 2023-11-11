@@ -19,7 +19,7 @@ import {
 import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /**
- * Handles updating the user role of a specified user.
+ * Handles REST API requests for updating the user role of a specified user.
  *
  * The user who sent the request must have the {@link UserRole.admin} user role.
  */

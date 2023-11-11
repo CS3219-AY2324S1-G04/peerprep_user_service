@@ -15,7 +15,10 @@ import {
 } from '../utils/parameter_keys';
 import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
-/** Handles changing the password of the user who sent the request. */
+/**
+ * Handles REST API requests for changing the password of the user who sent the
+ * request.
+ */
 export default class UpdatePasswordHandler extends Handler {
   private readonly _hashCost: number;
 

@@ -23,11 +23,14 @@ export default class DatabaseInitialiserConfig {
    */
   public static readonly adminPasswordEnvVar: string = 'ADMIN_PASSWORD';
 
-  /** Should initialisation be done even if entities exist. */
+  /**
+   * Should initialisation be done even if one or more entities to be created
+   * already exist.
+   */
   public readonly shouldForceInitialisation: boolean;
-  /** Email address of the default admin user. */
+  /** Email address of the default Peerprep admin user. */
   public readonly adminEmailAddress: EmailAddress;
-  /** Password of the default admin user. */
+  /** Password of the default Peerprep admin user. */
   public readonly adminPassword: Password;
 
   /**

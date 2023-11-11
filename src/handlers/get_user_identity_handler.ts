@@ -2,7 +2,6 @@
  * @file Defines {@link ValidateUserHandler}.
  */
 import express from 'express';
-import qs from 'qs';
 
 import HttpErrorInfo from '../data_structs/http_error_info';
 import SessionToken from '../data_structs/session_token';
@@ -14,8 +13,8 @@ import { sessionTokenKey } from '../utils/parameter_keys';
 import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
 /**
- * Handles getting the user identity of the user who owns the specified session
- * token.
+ * Handles REST API requests for getting the user identity of the user who owns
+ * the specified session token.
  */
 export default class GetUserIdentityHandler extends Handler {
   /** @inheritdoc */
@@ -50,9 +49,9 @@ export default class GetUserIdentityHandler extends Handler {
   }
 
   /**
-   * Gets the user ID and user role of the user who owns the session token
-   * specified in the request. Sends a HTTP 200 response whose body is a JSON
-   * string containing the user's identity.
+   * Gets the identity of the user who owns the session token specified in the
+   * request. Sends a HTTP 200 response whose body is a JSON string containing
+   * the user's identity.
    * @param req - Information about the request.
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.

@@ -5,7 +5,10 @@ import express from 'express';
 
 import Handler, { HttpMethod } from './handler';
 
-/** Handles getting the public key for verifying access tokens. */
+/**
+ * Handles REST API requests for getting the public key for verifying access
+ * tokens.
+ */
 export default class GetAccessTokenPublicKeyHandler extends Handler {
   private readonly _accessTokenPublicKey: string;
 

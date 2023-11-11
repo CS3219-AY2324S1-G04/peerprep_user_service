@@ -20,7 +20,10 @@ import Handler, {
   authenticationErrorMessages,
 } from './handler';
 
-/** Handles updating the profile of the user who sent the request. */
+/**
+ * Handles REST API requests for updating the profile of the user who sent the
+ * request.
+ */
 export default class UpdateUserProfileHandler extends Handler {
   private readonly _accessTokenPrivateKey: string;
   private readonly _accessTokenExpireMillis: number;
