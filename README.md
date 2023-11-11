@@ -42,16 +42,15 @@ Note: Start of arrow indicates request origin and end of arrow indicates request
 **REST API Server**
 
 - Handles REST API requests.
+- Exposed to client/servers outside the service.
 - Can be scaled horizontally.
 - Corresponds to the [API](#api) docker image.
 
 **Database Initialiser**
 
-- Initialises the database.
+- Creates entities in the database and creates the default Peerprep admin account.
 - Does nothing if the database already contains one or more entities it intends to create (behaviour can be changed via environment variables).
 - Shuts down once it is done initialising the database.
-- Creates entities in the database.
-- Creates the default Peerprep admin account.
 - Corresponds to the [Database Initialiser](#database-initialiser) docker image.
 
 **Database**

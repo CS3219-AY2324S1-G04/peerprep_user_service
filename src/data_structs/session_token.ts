@@ -15,7 +15,7 @@ export default class SessionToken {
    * Parses {@link rawSessionToken} as a session token.
    * @param rawSessionToken - Value to parse.
    * @returns The parsed {@link SessionToken}.
-   * @throws Error if parsing fails.
+   * @throws {Error} if parsing fails.
    */
   public static parse(rawSessionToken: unknown): SessionToken {
     if (!SessionToken._isString(rawSessionToken)) {
