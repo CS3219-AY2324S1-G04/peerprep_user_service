@@ -14,7 +14,7 @@ import {
   sessionTokenKey,
 } from '../utils/parameter_keys';
 
-/** Handler of a HTTP route. */
+/** Handler of a REST API route. */
 export default abstract class Handler {
   /** @returns Request path to handle. */
   public get path(): string {

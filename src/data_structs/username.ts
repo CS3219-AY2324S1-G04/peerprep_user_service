@@ -33,7 +33,7 @@ export default class Username {
   }
 
   /**
-   * Parses {@link username} as a username then validates it.
+   * Parses {@link rawUsername} as a username then validates it.
    * @param rawUsername - Value to parse.
    * @returns The parsed and validated username.
    * @throws Error if parsing or validation fails.

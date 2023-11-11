@@ -17,7 +17,7 @@ import {
 } from '../utils/parameter_keys';
 import Handler, { HttpMethod } from './handler';
 
-/** Handles creating users. */
+/** Handles REST API requests for creating users. */
 export default class CreateUserHandler extends Handler {
   private readonly _hashCost: number;
 
@@ -106,7 +106,7 @@ export default class CreateUserHandler extends Handler {
    * @param res - For creating and sending the response.
    * @param next - Called to let the next handler (if any) handle the request.
    * @param client - Client for communicating with the database.
-   * @throws {HttpErrorInfo} Error 400 if the username, email address, or
+   * @throws {HttpErrorInfo} Error 400 if the username, email address, and/or
    * password are invalid. Message contains a JSON string of the reasons for the
    * error.
    * @throws {HttpErrorInfo} Error 500 if an unexpected error occurs.

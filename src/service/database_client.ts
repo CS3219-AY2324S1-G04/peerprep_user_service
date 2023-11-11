@@ -88,11 +88,11 @@ export default interface DatabaseClient {
   ): Promise<UserProfile | undefined>;
 
   /**
-   * Fetches the user ID and user role of the user who the session token
+   * Fetches the user identity of the user who the session token
    * {@link sessionToken} belongs to.
    * @param sessionToken - Session token belonging to the user.
-   * @returns User ID and user role of the user if a user who owns the session
-   * token {@link sessionToken} exist. Else, returns undefined.
+   * @returns Identity of the user if a user who owns the session token
+   * {@link sessionToken} exist. Else, returns undefined.
    */
   fetchUserIdentityFromSessionToken(
     sessionToken: SessionToken,
@@ -115,7 +115,7 @@ export default interface DatabaseClient {
    * {@link sessionExpiry}.
    * @param sessionToken - Session token.
    * @param username - Username of the user.
-   * @param sessionExpiry - Time of session expiry.
+   * @param sessionExpiry - Session expiry date and time.
    */
   createUserSession(
     sessionToken: SessionToken,
@@ -127,7 +127,7 @@ export default interface DatabaseClient {
    * Updates the user profile which belongs to the user who owns the session
    * token {@link sessionToken}. The user profile is updated with values in
    * {@link userProfile}.
-   * @param userProfile - Updated information on the user's profile.
+   * @param userProfile - Updated user profile information.
    * @param sessionToken - Session token belonging to the user.
    * @returns True if a user profile was updated. False if no user profile was
    * updated due to the session token {@link sessionToken} being an invalid
@@ -143,8 +143,8 @@ export default interface DatabaseClient {
    * {@link sessionToken}. The password hash is updated to {@link passwordHash}.
    * @param passwordHash - Updated password hash.
    * @param sessionToken - Session token belonging to the user.
-   * @returns True if a password hash was updated. False if not password hash
-   * was updated due to the session token {@link sessionToken}  being an
+   * @returns True if a password hash was updated. False if no password hash
+   * was updated due to the session token {@link sessionToken} being an
    * invalid token.
    */
   updatePasswordHash(
@@ -166,7 +166,10 @@ export default interface DatabaseClient {
    * Updates the expiry of the session token whose token is
    * {@link sessionToken}. The expiry to update to is {@link sessionExpiry}.
    * @param sessionToken - Session token.
-   * @param sessionExpiry - Session expiry date and time.
+   * @param sessionExpiry - Updated session expiry date and time.
+   * @returns True if a user session was updated. False if no user session was
+   * updated due to the session token {@link sessionToken} being an invalid
+   * token.
    */
   updateUserSessionExpiry(
     sessionToken: SessionToken,

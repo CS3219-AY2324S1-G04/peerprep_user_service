@@ -1,5 +1,8 @@
 /**
  * @file Entrypoint to the database initialiser.
+ *
+ * The database initialiser creates the necessary entities in the database and
+ * also creates default Peerprep admin account.
  */
 import CoreConfig from '../../configs/core_config';
 import DatabaseClientConfig from '../../configs/database_client_config';

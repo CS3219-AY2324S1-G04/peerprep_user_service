@@ -9,7 +9,10 @@ import { createJsonCompatibleUserProfile } from '../data_structs/user_profile';
 import { accessTokenKey } from '../utils/parameter_keys';
 import Handler, { HttpMethod, authenticationErrorMessages } from './handler';
 
-/** Handles getting the profile of the user who sent the request. */
+/**
+ * Handles REST API requests for getting the profile of the user who sent the
+ * request.
+ */
 export default class GetUserProfileHandler extends Handler {
   private readonly _accessTokenPublicKey: string;
 
