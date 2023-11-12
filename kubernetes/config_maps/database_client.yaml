@@ -10,4 +10,8 @@ data:
   database-should-use-tls: 'true'
   database-name: fgnrvorv
   database-connection-timeout-millis: '0'
-  database-max-client-count: '20'
+
+  # This value should be much higher for actual deployment (e.g. 10 or 20). The
+  # reason why it is set so low is due to free tier database concurrent
+  # connection restrictions.
+  database-max-client-count: '1'
