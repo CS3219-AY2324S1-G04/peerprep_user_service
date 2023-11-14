@@ -19,6 +19,7 @@ Provides endpoints for CRUD operations with regards to user information.
   - [Create a Session](#create-a-session)
   - [Get an Access Token](#get-an-access-token)
   - [Delete a Session](#delete-a-session)
+  - [Get Usernames](#get-usernames)
   - [Get a User Profile](#get-a-user-profile)
   - [Update a User Profile](#update-a-user-profile)
   - [Update a User's Password](#update-a-users-password)
@@ -252,6 +253,34 @@ Deletes the session whose session token is the one specified.
     - `access-token` - Expired cookie.
     - `access-token-expiry` - Expired cookie.
 - `401` - Session token was not provided or is invalid.
+- `500` - Unexpected error occurred on the server.
+
+### Get Usernames
+
+> [GET] `/user-service/users/all/username`
+
+Gets the usernames of all users whose user ID is specified.
+
+**Query Parameters**
+
+- `user-ids` - Array of user IDs in JSON format. (e.g. `[7,11,404]`)
+
+**Response**
+
+- `200` - Success. User IDs and their corresponding usernames are stored as a JSON string in the response body. User IDs which do not belong to any user would not be included in the response.
+  - Example response body:
+    ```json
+    {
+      "7": "foo",
+      "11": "bar"
+    }
+    ```
+- `400` - One or more query parameters are invalid. The reason for the error is provided in the response body.
+  - Example response body:
+    ```json
+    {
+      "user-ids": "User IDs must be a JSON array.",
+    }
 - `500` - Unexpected error occurred on the server.
 
 ### Get a User Profile

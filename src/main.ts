@@ -15,6 +15,7 @@ import GetAccessTokenHandler from './handlers/get_access_token_handler';
 import GetAccessTokenPublicKeyHandler from './handlers/get_access_token_public_key_handler';
 import GetUserIdentityHandler from './handlers/get_user_identity_handler';
 import GetUserProfileHandler from './handlers/get_user_profile_handler';
+import GetUsernameHandler from './handlers/get_usernames_handler';
 import UpdatePasswordHandler from './handlers/update_password_handler';
 import UpdateUserProfileHandler from './handlers/update_user_profile_handler';
 import UpdateUserRoleHandler from './handlers/update_user_role_handler';
@@ -43,6 +44,7 @@ const app: App = new App(
       apiConfig.accessTokenExpireMillis,
     ),
     new DeleteSessionHandler(),
+    new GetUsernameHandler(),
     new GetUserProfileHandler(apiConfig.accessTokenPublicKey),
     new UpdateUserProfileHandler(
       apiConfig.accessTokenPrivateKey,

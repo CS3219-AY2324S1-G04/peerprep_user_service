@@ -18,7 +18,7 @@ export default class Username {
    * Parses {@link rawUsername} as a username.
    * @param rawUsername - Value to parse.
    * @returns The parsed username.
-   * @throws {Error} if parsing fails.
+   * @throws Error if parsing fails.
    */
   public static parse(rawUsername: unknown): Username {
     if (!Username._isString(rawUsername)) {
@@ -36,7 +36,7 @@ export default class Username {
    * Parses {@link rawUsername} as a username then validates it.
    * @param rawUsername - Value to parse.
    * @returns The parsed and validated username.
-   * @throws {Error} if parsing or validation fails.
+   * @throws Error if parsing or validation fails.
    */
   public static parseAndValidate(rawUsername: unknown): Username {
     const username: Username = Username.parse(rawUsername);
@@ -54,7 +54,7 @@ export default class Username {
 
   /**
    * Validates the username.
-   * @throws {Error} if the username is invalid.
+   * @throws Error if the username is invalid.
    */
   public validate(): void {
     if (this._isUsernameTooShort()) {

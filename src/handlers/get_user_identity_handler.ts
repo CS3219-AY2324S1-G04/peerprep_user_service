@@ -1,5 +1,5 @@
 /**
- * @file Defines {@link ValidateUserHandler}.
+ * @file Defines {@link GetUserIdentityHandler}.
  */
 import express from 'express';
 

@@ -20,6 +20,8 @@ export const sessionTokenKey: string = 'session-token';
 export const accessTokenKey: string = 'access-token';
 /** Access token expiry key. */
 export const accessTokenExpiryKey: string = 'access-token-expiry';
+/** User IDs key. */
+export const userIdsKey: string = 'user-ids';
 
 // This is needed as express does not allow path parameters with hyphens
 /** User ID key for path parameters. */
