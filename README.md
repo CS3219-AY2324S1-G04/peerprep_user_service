@@ -86,7 +86,7 @@ Legend:
 - `SESSION_EXPIRE_MILLIS` - Number of milliseconds a user session can live for since the last expiry date and time extension.
 - `ACCESS_TOKEN_EXPIRE_MILLIS` - Number of milliseconds an access token can live for.
 - `PORT` - Port to listen on.
-- `NODE_ENV` - Mode the app is running on ("development" or "production").
+- `NODE_ENV` - Mode the app is running on ("development" or "production"). "development" mode enables features such as CORS for "localhost".
 
 ### Database Initialiser
 
