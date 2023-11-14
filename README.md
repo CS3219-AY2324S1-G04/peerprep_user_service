@@ -1,29 +1,31 @@
 # PeerPrep User Service
 
-Handles the storing and retrieving of user information.
+Manages user information.
 
 ## Table of Contents
 
-- [Build Script](#build-script)
-- [Architecture](#architecture)
-- [Docker Images](#docker-images)
-  - [API](#api)
-  - [Database Initialiser](#database-initialiser)
-- [Deployment](#deployment)
-  - [Kubernetes Deployment](#kubernetes-deployment)
-  - [Docker Compose Deployment](#docker-compose-deployment)
-- [REST API](#rest-api)
-  - [Create a User](#create-a-user)
-  - [Create a Session](#create-a-session)
-  - [Get an Access Token](#get-an-access-token)
-  - [Delete a Session](#delete-a-session)
-  - [Get a User Profile](#get-a-user-profile)
-  - [Update a User Profile](#update-a-user-profile)
-  - [Update a User's Password](#update-a-users-password)
-  - [Update a User's Role](#update-a-users-role)
-  - [Delete a User](#delete-a-user)
-  - [Get Access Token Public Key](#get-access-token-public-key)
-  - [Get a User Identity](#get-a-user-identity)
+- [PeerPrep User Service](#peerprep-user-service)
+  - [Table of Contents](#table-of-contents)
+  - [Build Script](#build-script)
+  - [Architecture](#architecture)
+  - [Docker Images](#docker-images)
+    - [API](#api)
+    - [Database Initialiser](#database-initialiser)
+  - [Deployment](#deployment)
+    - [Kubernetes Deployment](#kubernetes-deployment)
+    - [Docker Compose Deployment](#docker-compose-deployment)
+  - [REST API](#rest-api)
+    - [Create a User](#create-a-user)
+    - [Create a Session](#create-a-session)
+    - [Get an Access Token](#get-an-access-token)
+    - [Delete a Session](#delete-a-session)
+    - [Get a User Profile](#get-a-user-profile)
+    - [Update a User Profile](#update-a-user-profile)
+    - [Update a User's Password](#update-a-users-password)
+    - [Update a User's Role](#update-a-users-role)
+    - [Delete a User](#delete-a-user)
+    - [Get Access Token Public Key](#get-access-token-public-key)
+    - [Get a User Identity](#get-a-user-identity)
 
 ## Build Script
 
@@ -48,7 +50,6 @@ Legend:
 **REST API Server**
 
 - Handles REST API requests.
-- Exposed to client/servers outside the service.
 - Can be scaled horizontally.
 - Corresponds to the [API](#api) docker image.
 
