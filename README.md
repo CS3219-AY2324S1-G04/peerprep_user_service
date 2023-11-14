@@ -1,6 +1,6 @@
 # PeerPrep User Service
 
-Handles the storing and retrieving of user information.
+Manages user information.
 
 ## Table of Contents
 
@@ -48,7 +48,6 @@ Legend:
 **REST API Server**
 
 - Handles REST API requests.
-- Exposed to client/servers outside the service.
 - Can be scaled horizontally.
 - Corresponds to the [API](#api) docker image.
 
