@@ -2,6 +2,8 @@
 
 Manages user information.
 
+Provides endpoints for CRUD operations with regards to user information.
+
 ## Table of Contents
 
 - [Build Script](#build-script)
