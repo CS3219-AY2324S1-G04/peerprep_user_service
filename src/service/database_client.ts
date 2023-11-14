@@ -55,6 +55,18 @@ export default interface DatabaseClient {
   ): Promise<boolean>;
 
   /**
+   * Fetches the user ID and usernames of the users whose user ID is in
+   * {@link userIds}.
+   * @param userIds - User IDs.
+   * @returns User ID and username of the existing users whose user ID is in
+   * {@link userIds}. User IDs which do not belong to any user will not be
+   * included in the return result.
+   */
+  fetchUsernamesFromUserIds(
+    userIds: UserId[],
+  ): Promise<{ userId: UserId; username: Username }[]>;
+
+  /**
    * Fetches the password hash of the user whose username is {@link username}.
    * @param username - Username of the user whose password hash is to be
    * fetched.

@@ -1,7 +1,7 @@
 /**
  * @file Defines {@link PostgresDatabaseClient}.
  */
-import { DataSource, MoreThan } from 'typeorm';
+import { DataSource, In, MoreThan } from 'typeorm';
 
 import DatabaseClientConfig from '../configs/database_client_config';
 import ClientModifiableUserProfile from '../data_structs/client_modifiable_user_profile';
@@ -131,6 +131,27 @@ export class PostgresDatabaseClient implements DatabaseClient {
     return (
       userIdFromEmailAddress?.toNumber() !== userIdFromSessionToken?.toNumber()
     );
+  }
+
+  /** @inheritdoc */
+  public async fetchUsernamesFromUserIds(
+    userIds: UserId[],
+  ): Promise<{ userId: UserId; username: Username }[]> {
+    const userProfiles: UserProfileEntity[] = await this._dataSource
+      .getRepository(UserProfileEntity)
+      .find({
+        select: { userId: true, username: true },
+        where: {
+          userId: In(userIds.map((userId) => userId.toNumber())),
+        },
+      });
+
+    return userProfiles.map((userProfile) => {
+      return {
+        userId: UserId.parseNumber(userProfile.userId),
+        username: Username.parse(userProfile.username),
+      };
+    });
   }
 
   /** @inheritdoc */
