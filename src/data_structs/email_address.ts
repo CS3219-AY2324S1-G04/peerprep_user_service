@@ -18,7 +18,7 @@ export default class EmailAddress {
    * Parses {@link rawEmailAddress} as an email address.
    * @param rawEmailAddress - Value to parse.
    * @returns The parsed {@link EmailAddress}.
-   * @throws {Error} if parsing fails.
+   * @throws Error if parsing fails.
    */
   public static parse(rawEmailAddress: unknown): EmailAddress {
     if (!EmailAddress._isString(rawEmailAddress)) {
@@ -38,7 +38,7 @@ export default class EmailAddress {
    * Parses {@link rawEmailAddress} as an email address then validates it.
    * @param rawEmailAddress - Value to parse.
    * @returns The parsed and validated {@link EmailAddress}.
-   * @throws {Error} if parsing or validation fails.
+   * @throws Error if parsing or validation fails.
    */
   public static parseAndValidate(rawEmailAddress: unknown): EmailAddress {
     const emailAddress: EmailAddress = EmailAddress.parse(rawEmailAddress);
@@ -58,7 +58,7 @@ export default class EmailAddress {
 
   /**
    * Validates the email address.
-   * @throws {Error} if the email address is invalid.
+   * @throws Error if the email address is invalid.
    */
   public validate() {
     if (this._isEmailAddressTooLong()) {
