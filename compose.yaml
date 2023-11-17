@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
 
   user_service_database_initialiser:
-    image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_database_initialiser
+    image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_database_initialiser:demo
     build:
       context: .
       dockerfile: ./dockerfiles/database_initialiser.dockerfile
@@ -34,7 +34,7 @@ services:
     restart: on-failure
 
   user_service_api:
-    image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_api
+    image: ghcr.io/cs3219-ay2324s1-g04/peerprep_user_service_api:demo
     build:
       context: .
       dockerfile: ./dockerfiles/api.dockerfile
